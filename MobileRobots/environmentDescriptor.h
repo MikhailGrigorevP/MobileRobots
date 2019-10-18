@@ -3,26 +3,30 @@
 
 #include "Component.h"
 
+//! Environment desriptor namespace
+/*! ED namespace
+*/
 namespace ED_N {
 
-	struct Point {
-		int x = 0;
-		int y = 0;
-	};
-
+	//! Environment desriptor
+	/*! Environment desriptor class
+	*/
 	class environmentDescriptor
 	{
 	private:
-		int m, n;
-		int** field;
-		Components_N::Component* components;
-		Point* points;
-
+		int m, n;  //!< field size
+		int** field;;  //!< field 
+		Components_N::Component* components; ;  //!< used components
+		Point* pointsOfInterest;  //!< arary of points of interest
 	public:
+		//!< get size of field
 		int getSize() {};
-		void setSize() {};
-		int getCell() {};
-		void setCell() {};
+		//!< set size of field
+		void setSize(int m, int n) {};
+		//!< get type of cell
+		int getCell(Point point) {};
+		//!< set type of cell
+		void setCell(Point point) {};
 	};
 }
 

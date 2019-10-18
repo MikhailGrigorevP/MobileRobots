@@ -137,6 +137,7 @@
     <ClInclude Include="Component.h" />
     <ClInclude Include="environmentDescriptor.h" />
     <ClInclude Include="Module.h" />
+    <ClInclude Include="structures.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
