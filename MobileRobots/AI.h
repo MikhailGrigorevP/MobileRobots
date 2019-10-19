@@ -2,7 +2,7 @@
 #define _AI_H_
 
 #include "structures.h"
-
+using std::vector;
 //! Artificial intelligence namespace
 /*! AI namespace
 */
@@ -15,18 +15,20 @@ namespace AI_N {
 	 * - findInterestPoints
 	 * @{
 	 */
-	 //! Artificial intelligence
+	//! Artificial intelligence
 	/*! AI class
  	*/
 	class AI
 	{
+	private:
+		vector<Point> interestPonts; //!< Array with all points of interest
 	public:
-		//!Constructor
+		//! Constructor
 		AI() {};
-		//!Destructor
-		~AI() {};
-		//!Method that returns all points of intererst
-		Point* findInterestPoints() {};
+		//! Destructor
+		~AI() { interestPonts.~vector(); };
+		//! Method that returns all points of intererst
+		vector<Point> findInterestPoints() {};
 	};
 	/** @} */
 

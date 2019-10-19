@@ -3,10 +3,12 @@
 #include "Module.h"
 
 using std::string;
+using std::vector;
 
 #ifndef _COMPONENT_H_
 #define _COMPONENT_H_
 #include "Component.h"
+
 //!Components namespace
 /*! All components of robot complex:
  *
@@ -30,7 +32,7 @@ namespace Components_N {
 		string description;  //!< Description
 		int energy;  //!< Energy of component
 		const int slotsNum; //!< number of slots for modules
-		Modules_N::Module* modules; //!< array for modules 
+		vector<Modules_N::Module> modules; //!< array for modules 
 		int cost; //!< cost of component 
 	public:
 		/*! Simple Constructor gets
@@ -49,7 +51,7 @@ namespace Components_N {
 			cost(c) {};
 		/*! virtual destructor delete dynamic array of component's modules
 		*/
-		virtual ~Component() { delete[] modules; };
+		virtual ~Component() { modules.~vector(); };
 		/*! Method to set module: gets type of module, check free slots and install module. 
 		*
 		* Throw exception if out of free space
@@ -91,7 +93,7 @@ namespace Components_N {
 	{
 	private:
 		int numOfDevices = 0;  //!< num of managed devices
-		Component* managedComponents;  //!< array with managed devices
+		vector<Component> managedComponents;  //!< array with managed devices
 	public:
 		//! Simple Constructor gets all variables for "Component" constructor and numD for numOfDevices
 		managementComponent(int x0, int y0, int en, int num, int c, int numD, string desc = "Command center") :
@@ -100,7 +102,7 @@ namespace Components_N {
 		//! Constructor to set num of managed devices
 		managementComponent(int numD = 0) : numOfDevices(numD) {};
 		//! virtual destructor to delete mananaged Components
-		virtual ~managementComponent() { delete[] managedComponents; };
+		virtual ~managementComponent() { managedComponents.~vector(); };
 		/*! get environment information from robot
 		*
 		* throw exception, if there is no managed robot 

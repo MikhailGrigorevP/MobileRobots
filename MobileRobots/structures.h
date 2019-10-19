@@ -1,5 +1,7 @@
 #pragma once
 
+#include <vector>
+
 //! Point of the field
 /*! Using for environment
 */

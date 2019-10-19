@@ -25,7 +25,7 @@ namespace Modules_N {
 		int cost = 0;  //!< Cost of module
 	protected:
 		//! turn module on
-		virtual void on(int) {};
+		virtual void on() {};
 		//! turn module off
 		virtual void off() {};
 	public:
@@ -35,7 +35,11 @@ namespace Modules_N {
 		* en to set energy,
 		* c to set cost
 		*/
-		Module(int st = 0, int pr = 0, int en = 0, int c = 0) : state(st), priority(pr), energy(en), cost(c) {};
+		Module(int st = 0, int pr = 0, int en = 0, int c = 0) : 
+			state(st), 
+			priority(pr), 
+			energy(en), 
+			cost(c) {};
 		//! virtual destructor
 		virtual  ~Module() {};
 		//! get energy of module 
@@ -55,7 +59,9 @@ namespace Modules_N {
 	protected:
 	public:
 		//!	Simple constructor
-		generatorModule(int st = 0, int pr = 0, int en = 0, int c = 0, int enpr = 0) : Module(st, pr, en, c), energyProvision(enpr) {};
+		generatorModule(int st = 0, int pr = 0, int en = 0, int c = 0, int enpr = 0) : 
+			Module(st, pr, en, c), 
+			energyProvision(enpr) {};
 		//! Destructor
 		~generatorModule() {};
 	};
@@ -78,7 +84,10 @@ namespace Modules_N {
 		void freeResourse() {};
 	public:
 		//!	Simple constructor
-		managementModule(int st = 0, int pr = 0, int en = 0, int c = 0, int r = 0, int n = 0) :Module(st, pr, en, c), radius(r), num(n) {};
+		managementModule(int st = 0, int pr = 0, int en = 0, int c = 0, int r = 0, int n = 0) :
+			Module(st, pr, en, c), 
+			radius(r), 
+			num(n) {};
 		//! Destructor
 		~managementModule() {};
 	};
@@ -100,7 +109,11 @@ namespace Modules_N {
 		EnvironmentInfo getInfo() {};
 	public:
 		//!	Simple constructor
-		sensorModule(int st = 0, int pr = 0, int en = 0, int c = 0, int r = 0, int ang = 0, int direct = 0) :Module(st, pr, en, c), radius(r), angle(ang), direction(direct) {};
+		sensorModule(int st = 0, int pr = 0, int en = 0, int c = 0, int r = 0, int ang = 0, int direct = 0) :
+			Module(st, pr, en, c), 
+			radius(r), 
+			angle(ang), 
+			direction(direct) {};
 		//! Destructor
 		~sensorModule() {};
 
