@@ -19,15 +19,11 @@ namespace Modules_N {
 	class Module
 	{
 	private:
-		bool state = 0;  //!< State of module
 		int priority = 0;  //!< Priority of module
 		int energy = 0;  //!< Energy of module
 		int cost = 0;  //!< Cost of module
 	protected:
-		//! turn module on
-		virtual void on() {};
-		//! turn module off
-		virtual void off() {};
+		bool state = 0;  //!< State of module
 	public:
 		/*! Simple Module gets
 		* st to set state,
@@ -35,6 +31,10 @@ namespace Modules_N {
 		* en to set energy,
 		* c to set cost
 		*/
+		//! turn module on
+		virtual void on();
+		//! turn module off
+		virtual void off();
 		Module(int st = 0, int pr = 0, int en = 0, int c = 0) : 
 			state(st), 
 			priority(pr), 
@@ -42,8 +42,21 @@ namespace Modules_N {
 			cost(c) {};
 		//! virtual destructor
 		virtual  ~Module() {};
+		virtual int iAm() const = 0;
 		//! get energy of module 
-		virtual int getEnergy() {};
+
+		virtual int getEnergy() {
+			return energy;
+		};
+		virtual int getCost() {
+			return cost;
+		};
+		virtual int getPriority() {
+			return priority;
+		};
+		virtual bool getState() {
+			return state;
+		};
 	};
 
 	//! Generator
@@ -58,10 +71,17 @@ namespace Modules_N {
 		int energyProvision = 0;  //!< energy than generator produce
 	protected:
 	public:
+		virtual int iAm() const { return generator_Module; }
 		//!	Simple constructor
 		generatorModule(int st = 0, int pr = 0, int en = 0, int c = 0, int enpr = 0) : 
 			Module(st, pr, en, c), 
 			energyProvision(enpr) {};
+		virtual int getEnergy() {
+			return energyProvision - Module::getEnergy();
+		}
+		virtual int getEnergyProvision() {
+			return energyProvision;
+		};
 		//! Destructor
 		~generatorModule() {};
 	};
@@ -83,6 +103,13 @@ namespace Modules_N {
 		//!< free management resourse
 		void freeResourse() {};
 	public:
+		virtual int getR() {
+			return radius;
+		};
+		virtual int getN() {
+			return num;
+		};
+		virtual int iAm() const { return management_Module; }
 		//!	Simple constructor
 		managementModule(int st = 0, int pr = 0, int en = 0, int c = 0, int r = 0, int n = 0) :
 			Module(st, pr, en, c), 
@@ -108,6 +135,16 @@ namespace Modules_N {
 		//!get information from environment
 		EnvironmentInfo getInfo() {};
 	public:
+		virtual int getR() {
+			return radius;
+		};
+		virtual int getAng() {
+			return angle;
+		};
+		virtual int getDir() {
+			return direction;
+		};
+		virtual int iAm() const { return sensor_Module; }
 		//!	Simple constructor
 		sensorModule(int st = 0, int pr = 0, int en = 0, int c = 0, int r = 0, int ang = 0, int direct = 0) :
 			Module(st, pr, en, c), 

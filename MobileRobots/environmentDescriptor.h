@@ -3,6 +3,7 @@
 
 #include "Component.h"
 using std::vector;
+using namespace Components_N;
 //! Environment desriptor namespace
 /*! ED namespace
 */
@@ -14,27 +15,64 @@ namespace ED_N {
 	class environmentDescriptor
 	{
 	private:
-		int m, n;  //!< field size
-		vector<vector<Point>> field;;  //!< field 
-		vector<Components_N::Component> components; ;  //!< used components
-		vector<Point> pointsOfInterest;  //!< arary of points of interest
+		Field_size size;  //!< field size
+		vector<vector<unsigned>> field;  //!< field 
+		vector<Component*> components;  //!< used components
+	
 	public:
-		//! Constructor
-		environmentDescriptor(int m0 = 0, int n0 = 0) :m(m0), n(n0) {};
-		//! Destructor
-		~environmentDescriptor() { 
-			field.~vector(); 
-			components.~vector();
-			pointsOfInterest.~vector();
-		};
-		//!< get size of field
-		int getSize() {};
-		//!< set size of field
-		void setSize(int m, int n) {};
-		//!< get type of cell
-		int getCell(Point point) {};
-		//!< set type of cell
-		void setCell(Point point) {};
+
+
+		robotCommander* getRCComponent(int i) {
+			return dynamic_cast<robotCommander*>(components[i]);
+		}
+
+
+		managementComponent* getOCComponent(int i) {
+			return dynamic_cast<managementComponent*>(components[i]);
+		}
+
+		robotScout* getRSComponent(int i) {
+			return dynamic_cast<robotScout*>(components[i]);
+		}
+		
+		Component* getComponent(int i) {
+			return components[i];
+		}
+
+
+		environmentDescriptor(Field_size field_size);
+		
+		environmentDescriptor(int m0 = 0, int n0 = 0);
+		
+		~environmentDescriptor();
+		
+		int getCompCount() { return components.size(); };
+
+		Field_size getSize();
+		
+		void setSize(Field_size field_size);
+	
+		void drawMap();
+
+		void showComponents();
+
+		void AddObserveCenter(Point point,  int en, int num, int c);
+
+		void AddCommandCenter(Point point, int en, int num, int numD, int c);
+
+		void AddRobotCommander(Point point, int en, int num, int numD, int vel, int c);
+
+		void AddRobotScout(Point point, int en, int num, int vel, int c);
+		
+		unsigned getCell(Point point);
+		
+		void setCell(Point point, unsigned cell_type);
+
+		// Input
+		friend std::istream& operator >> (std::istream& s, environmentDescriptor& envD);
+
+		// Output
+		friend std::ostream& operator << (std::ostream& o, const environmentDescriptor& envD);
 	};
 }
 
