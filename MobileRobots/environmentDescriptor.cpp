@@ -3,6 +3,23 @@
 namespace ED_N {
 
 
+	void returnDir(int dir) {
+		switch (dir) {
+		case left:
+			std::cout << "left." << std::endl;
+			break;
+		case right:
+			std::cout << "right." << std::endl;
+			break;
+		case up:
+			std::cout << "up." << std::endl;
+			break;
+		case down:
+			std::cout << "down." << std::endl;
+			break;
+		}
+	}
+
 	//! Constructor
 	environmentDescriptor::environmentDescriptor(int m0, int n0) : size{ m0, n0} {};
 
@@ -22,6 +39,8 @@ namespace ED_N {
 
 	//! set size of field
 	void environmentDescriptor::setSize(Field_size field_size) {
+		if (field_size.m < 0 || field_size.n < 0)
+			throw std::exception(">>> incorrect size");
 		size.m = field_size.m;
 		size.n = field_size.n;
 
@@ -250,6 +269,7 @@ namespace ED_N {
 
 			std::cout << "Componets in field: \n";
 
+			std::vector<Components_N::Component*>::iterator c_it;
 			for (int i = 0; i < components.size(); ++i) {
 				switch (components[i]->iAm()) {
 				case observe_center:
@@ -261,11 +281,37 @@ namespace ED_N {
 					std::cout << i + 1 << ")  Command center with (" << components[i]->getCoord().x << ";" << components[i]->getCoord().y << ") coordinates, it needs: " << components[i]->getEnergy() <<
 						" energy to work, it's support " << components[i]->getNum() << " modules and can control " << components[i]->getNumD() << " components. Cost: " << components[i]->getCost() << std::endl;
 					std::cout << "\tDesription: " << components[i]->getDesc() << std::endl;
+
+					std::cout << "\tManaged components: ";
+					if (dynamic_cast<managementComponent*>(components[i])->getNComp()->size() != 0) {
+						c_it = dynamic_cast<managementComponent*>(components[i])->getNComp()->begin();
+						while (c_it != dynamic_cast<managementComponent*>(components[i])->getNComp()->end())
+						{
+							std::cout << "(" << (*c_it)->getCoord().x << ";" << (*c_it)->getCoord().y << ") ";
+							++c_it;
+						}
+					}
+					else
+						std::cout << "components weren't found";
+					std::cout << std::endl;
 					break;
 				case robot_commander:
 					std::cout << i + 1 << ")  Robot commander with (" << components[i]->getCoord().x << ";" << components[i]->getCoord().y << ") coordinates, it needs: " << components[i]->getEnergy() <<
 						" energy to work, it's support " << components[i]->getNum() << " modules and can control " << components[i]->getNumD() << " components. It's velocity: " << components[i]->getVel() << ". Cost: " << components[i]->getCost() << std::endl;
 					std::cout << "\tDesription: " << components[i]->getDesc() << std::endl;
+
+					std::cout << "\tManaged components: ";
+					if (dynamic_cast<robotCommander*>(components[i])->getNComp()->size() != 0) {
+						c_it = dynamic_cast<robotCommander*>(components[i])->getNComp()->begin();
+						while (c_it != dynamic_cast<robotCommander*>(components[i])->getNComp()->end())
+						{
+							std::cout << "(" << (*c_it)->getCoord().x << ";" << (*c_it)->getCoord().y << ") ";
+							++c_it;
+						}
+					}
+					else
+						std::cout << "components weren't found";
+					std::cout << std::endl;
 					break;
 				case robot_scout:
 					std::cout << i + 1 << ")  Robot scout with (" << components[i]->getCoord().x << ";" << components[i]->getCoord().y << ") coordinates, it needs: " << components[i]->getEnergy() <<
@@ -279,6 +325,12 @@ namespace ED_N {
 				else
 					for (int j = 0; j < components[i]->getModulesSize(); ++j) {
 						std::cout << "\t" << j << ". ";
+
+						EnvironmentInfo envinfo;
+						std::vector<Point>::iterator p_it, b_it;
+						std::vector<Components_N::Component*>::iterator c_it;
+
+
 						switch ((components[i]->getModule(j))->iAm()) {
 						case generator_Module:
 							std::cout << "Generator Module with prioritet - " << components[i]->getGModule(j)->getPriority() << 
@@ -294,7 +346,49 @@ namespace ED_N {
 								", state - " << components[i]->getSModule(j)->getState() <<
 								", radius - " << components[i]->getSModule(j)->getR() <<
 								", angle - " << components[i]->getSModule(j)->getAng() <<
-								", direction - " << components[i]->getSModule(j)->getDir();
+								", direction - ";
+							returnDir(components[i]->getSModule(j)->getDir());
+
+							envinfo = components[i]->getSModule(j)->getInfo(components[i]->getCoord(), this);
+
+							std::cout << "\t\tPoints of interest: ";
+
+							if (envinfo.pointsOfInterest.size() != 0) {
+								p_it = envinfo.pointsOfInterest.begin();
+								while (p_it != envinfo.pointsOfInterest.end())
+								{
+									std::cout << "(" << (*p_it).x << ";" << (*p_it).y << ") ";
+									++p_it;
+								}
+							}
+							else
+								std::cout << "points weren't found";
+
+							std::cout << "\n\t\tBarriers: ";
+							if (envinfo.barriers.size() != 0) {
+								b_it = envinfo.barriers.begin();
+								while (b_it != envinfo.barriers.end())
+								{
+									std::cout << "(" << (*b_it).x << ";" << (*b_it).y << ") ";
+									++b_it;
+								}
+							}
+							else
+								std::cout << "barriers weren't found";
+
+							std::cout << "\n\t\tComponents: ";
+							if (envinfo.components.size() != 0) {
+								c_it = envinfo.components.begin();
+								while (c_it != envinfo.components.end())
+								{
+									std::cout << "(" << (*c_it)->getCoord().x << ";" << (*c_it)->getCoord().y << ") ";
+									++c_it;
+								}
+							}
+							else
+								std::cout << "components weren't found";
+
+
 							break;
 						case management_Module:
 							std::cout << "Management Module with prioritet - " << components[i]->getMModule(j)->getPriority() <<
@@ -314,5 +408,52 @@ namespace ED_N {
 		}
 
 	}
+
+
+	void environmentDescriptor::showInfo(EnvironmentInfo envinfo) {
+
+		std::vector<Point>::iterator p_it, b_it;
+		std::vector<Components_N::Component*>::iterator c_it;
+
+		std::cout << "\t\tPoints of interest: ";
+
+		if (envinfo.pointsOfInterest.size() != 0) {
+			p_it = envinfo.pointsOfInterest.begin();
+			while (p_it != envinfo.pointsOfInterest.end())
+			{
+				std::cout << "(" << (*p_it).x << ";" << (*p_it).y << ") ";
+				++p_it;
+			}
+		}
+		else
+			std::cout << "points weren't found";
+
+		std::cout << "\n\t\tBarriers: ";
+		if (envinfo.barriers.size() != 0) {
+			b_it = envinfo.barriers.begin();
+			while (b_it != envinfo.barriers.end())
+			{
+				std::cout << "(" << (*b_it).x << ";" << (*b_it).y << ") ";
+				++b_it;
+			}
+		}
+		else
+			std::cout << "barriers weren't found";
+
+		std::cout << "\n\t\tComponents: ";
+		if (envinfo.components.size() != 0) {
+			c_it = envinfo.components.begin();
+			while (c_it != envinfo.components.end())
+			{
+				std::cout << "(" << (*c_it)->getCoord().x << ";" << (*c_it)->getCoord().y << ") ";
+				++c_it;
+			}
+		}
+		else
+			std::cout << "components weren't found";
+		
+		std::cout << std::endl;
+	}
+	
 
 }

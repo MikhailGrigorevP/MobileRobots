@@ -40,7 +40,6 @@
 #include <iostream>
 #include <cstdlib>
 
-
 //Main menu
 const char* MENU_0[]{ "1. Work with Environment", "2. Work with components", "3. Show all information", "0. Exit" };
 const unsigned menu_0_SZ = sizeof(MENU_0) / sizeof(MENU_0[0]);
@@ -81,7 +80,87 @@ int main() {
 
 	unsigned menu0 = 1;
 	bool work0 = true;
+
 	environmentDescriptor environment;
+
+
+	//////////////////////////////////////
+	//////////////////////////////////////
+	//FILL ENVIREONMENT
+	//////////////////////////////////////
+	//////////////////////////////////////
+
+	environment.setSize({16, 16});
+	environment.setCell({ 0, 0 }, 2);
+	environment.setCell({ 0, 5 }, 1);
+	environment.setCell({ 0, 6 }, 1);
+	environment.setCell({ 2, 1 }, 1);
+	environment.setCell({ 4, 1 }, 1);
+	environment.setCell({ 4, 2 }, 1);
+	environment.setCell({ 5, 1 }, 1);
+	environment.setCell({ 9, 1 }, 2);
+	environment.setCell({ 12, 1 }, 1);
+	environment.setCell({ 7, 3 }, 1);
+	environment.setCell({ 2, 4 }, 1);
+	environment.setCell({ 13, 5 }, 1);
+	environment.setCell({ 3, 7 }, 1);
+	environment.setCell({ 14, 8 }, 2);
+	environment.setCell({ 5, 9 }, 1);
+	environment.setCell({ 10, 9 }, 1);
+	environment.setCell({ 1, 11 }, 1);
+	environment.setCell({ 7, 11 }, 2);
+	environment.setCell({ 5, 13}, 2);
+	environment.setCell({ 9, 14 }, 1);
+	environment.setCell({ 14, 14 }, 1);
+
+	//0
+	environment.AddCommandCenter({ 8, 8 }, 150, 4, 7, 1000);
+	environment.getCCComponent(0)->setModule_g(1, 100, 250, 9000);
+	environment.getCCComponent(0)->setModule_m(2, 150, 250, 9, 10);
+	//1
+	environment.AddRobotScout({ 5, 2 }, 80, 4, 2, 600);
+	environment.getRSComponent(1)->setModule_s(1, 150, 500, 4, 60, 0);
+	environment.getRSComponent(1)->setModule_s(1, 150, 500, 4, 60, 1);
+	environment.getRSComponent(1)->setModule_s(1, 150, 500, 4, 60, 2);
+	//2
+	environment.AddRobotScout({ 1, 6 }, 80, 5, 2, 600);
+	environment.getRSComponent(2)->setModule_s(1, 150, 500, 4, 60, 0);
+	environment.getRSComponent(2)->setModule_s(1, 150, 500, 4, 60, 1);
+	environment.getRSComponent(2)->setModule_s(1, 150, 500, 4, 60, 2);
+	//3
+	environment.AddRobotScout({ 12, 7 }, 80, 5, 2, 600);
+	environment.getRSComponent(3)->setModule_s(1, 150, 500, 4, 60, 3);
+	environment.getRSComponent(3)->setModule_s(1, 150, 500, 4, 60, 1);
+	environment.getRSComponent(3)->setModule_s(1, 150, 500, 4, 60, 2);
+	//4
+	environment.AddRobotScout({ 2, 13 }, 80, 5, 2, 600);
+	environment.getRSComponent(4)->setModule_s(1, 150, 500, 4, 60, 3);
+	environment.getRSComponent(4)->setModule_s(1, 150, 500, 4, 60, 1);
+	//5
+	environment.AddRobotCommander({ 1, 2 }, 150, 4, 2, 1, 600);
+	environment.getComponent(5)->setModule_m(2, 150, 250, 9, 4);
+	dynamic_cast<managementComponent*>(environment.getComponent(5))->getMModule(0)->sendResourse(environment.getRCComponent(5), environment.getComponent(1));
+	dynamic_cast<managementComponent*>(environment.getComponent(5))->getMModule(0)->sendResourse(environment.getRCComponent(5), environment.getComponent(2));
+	//6
+	environment.AddObserveCenter({ 13, 2 }, 80, 5, 600);
+	environment.getComponent(6)->setModule_g(1, 100, 125, 4500);
+	environment.getComponent(6)->setModule_s(1, 150, 500, 4, 60, 0);
+	environment.getComponent(6)->setModule_s(1, 150, 500, 4, 60, 1);
+	environment.getComponent(6)->setModule_s(1, 150, 500, 4, 60, 2);
+	environment.getComponent(6)->setModule_s(1, 150, 500, 4, 60, 3);
+	//7
+	environment.AddObserveCenter({ 12, 14 }, 80, 5, 600);
+	environment.getComponent(7)->setModule_g(1, 100, 125, 4500);
+
+	environment.showInfo(dynamic_cast<managementComponent*>(environment.getComponent(5))->getInfo(0, &environment));
+
+
+
+
+	//////////////////////////////////////
+	//////////////////////////////////////
+
+
 	do {
 		if (menu0)
 			for (size_t i = 0; i != menu_0_SZ; ++i)
@@ -414,6 +493,7 @@ int main() {
 					}
 					break; }
 				case 3: {
+
 					break; }
 				case 4: {
 					std::cout << ">>> Input component's num to move (NOTICE: you can move just robots)" << std::endl;

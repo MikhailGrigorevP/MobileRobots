@@ -8,7 +8,6 @@ using namespace Modules_N;
 
 #ifndef _COMPONENT_H_
 #define _COMPONENT_H_
-#include "Component.h"
 
 //!Components namespace
 /*! All components of robot complex:
@@ -37,6 +36,11 @@ namespace Components_N {
 	protected:
 		int x, y;  //! Coordinates
 	public:
+
+		vector<Module*>* getModules() {
+			return &modules;
+		}
+
 
 		Component() :
 			x(0),
@@ -106,17 +110,27 @@ namespace Components_N {
 	{
 	private:
 		int numOfDevices = 0;  //!< num of managed devices
-		vector<Component> managedComponents;  //!< array with managed devices
+		vector<Component*> managedComponents;  //!< array with managed devices
 	public:
 		managementComponent(int x0, int y0, int en, int num, int c, int numD, string desc);
 		managementComponent(int numD = 0);
+
+
+		vector<Component*>* getNComp() {
+			return &managedComponents;
+		} 
+
+		Component* getComp(int i) {
+			return managedComponents[i];
+		}
 
 		virtual ~managementComponent();
 
 		virtual int getNumD() { return numOfDevices; }
 		virtual int iAm() const { return command_center; }
-		EnvironmentInfo getInfo();
-		virtual void moveRobot();
+		EnvironmentInfo getInfo(int i, ED_N::environmentDescriptor* env);
+
+		virtual void moveRobot(int i, int direction);
 	};
 
 	//! Mobile component

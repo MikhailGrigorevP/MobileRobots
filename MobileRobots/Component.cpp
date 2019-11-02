@@ -1,5 +1,5 @@
 #include "Component.h"
-
+#include <algorithm>>
 namespace Components_N {
 
 
@@ -45,6 +45,8 @@ namespace Components_N {
 	*/
 
 	void Component::setModule_g(int pr, int en, int c, int enpr) {
+		if(modules.size() == slotsNum)
+			throw std::exception(" >>> not enough space for modules");
 		if (pr < 0)
 			throw std::exception(" >>> incorrect prioritet");
 		if (en < 0)
@@ -59,6 +61,8 @@ namespace Components_N {
 	};
 
 	void Component::setModule_s(int pr, int en, int c, int r, int ang, int direct) {
+		if (modules.size() == slotsNum)
+			throw std::exception(" >>> not enough space for modules");
 		if (pr < 0)
 			throw std::exception(" >>> incorrect prioritet");
 		if (en < 0)
@@ -77,6 +81,8 @@ namespace Components_N {
 	};
 
 	void Component::setModule_m(int pr, int en, int c, int r, int n) {
+		if (modules.size() == slotsNum)
+			throw std::exception(" >>> not enough space for modules");
 		if (pr < 0)
 			throw std::exception(" >>> incorrect prioritet");
 		if (en < 0)
@@ -98,7 +104,7 @@ namespace Components_N {
 	*Throw exception if there is no module with this type
 	*/
 	void Component::deleteModule(int num) {
-		if ((num < 0) || (num >> modules.size()))
+		if ((num < 0) || (num >= modules.size()))
 			throw std::exception(" >>> incorrect num of module");
 		modules.erase(modules.begin() + num);
 	};
@@ -112,7 +118,7 @@ namespace Components_N {
 	* It calls moduleOff in module
 	*/
 	void Component::moduleOn(int num) {
-		if ((num < 0) || (num >> modules.size()))
+		if ((num < 0) || (num >= modules.size()))
 			throw std::exception(" >>> incorrect num of module");
 		modules[num]->on();
 	};
@@ -126,7 +132,7 @@ namespace Components_N {
 	* It calls moduleOff in module
 	*/
 	void Component::moduleOff(int num) {
-		if ((num < 0) || (num >> modules.size()))
+		if ((num < 0) || (num >= modules.size()))
 			throw std::exception(" >>> incorrect num of module");
 		modules[num]->off();
 	};
@@ -145,12 +151,55 @@ namespace Components_N {
 	};
 	/*! virtual destructor to delete mananaged Components */
 	managementComponent:: ~managementComponent() { managedComponents.~vector(); };
+
 	/*! get environment information from robot
 	*
 	* throw exception, if there is no managed robot
 	*/
-	EnvironmentInfo managementComponent::getInfo() {
+	EnvironmentInfo managementComponent::getInfo(int i, ED_N::environmentDescriptor* env) {
+		if (!env)
+			throw std::exception(" >>> incorrect environment");
+		if (i >= managedComponents.size())
+			throw std::exception(">>> incorrect num");
 		EnvironmentInfo EInf;
+		std::vector<Modules_N::Module*>::iterator it = managedComponents[i]->getModules()->begin();
+
+		while (it != managedComponents[i]->getModules()->end())
+		{
+			if ((*it)->iAm() == sensor_Module) {
+				EnvironmentInfo EInf_old = dynamic_cast<sensorModule*>(*it)->getInfo(managedComponents[i]->getCoord(), env);
+
+				std::vector<Point>::iterator iter;
+				iter = EInf_old.barriers.begin();
+				while (iter != EInf_old.barriers.end())
+				{
+					if (std::find(EInf.barriers.begin(), EInf.barriers.end(), *iter) == EInf.barriers.end()) {
+						EInf.barriers.push_back(*iter);
+					}
+					++iter;
+				}
+
+				iter = EInf_old.pointsOfInterest.begin();
+				while (iter != EInf_old.pointsOfInterest.end())
+				{
+					if (std::find(EInf.pointsOfInterest.begin(), EInf.pointsOfInterest.end(), *iter) == EInf.pointsOfInterest.end()) {
+						EInf.pointsOfInterest.push_back(*iter);
+					}
+					++iter;
+				}
+
+				std::vector<Component*>::iterator iterc;
+				iterc = EInf_old.components.begin();
+				while (iterc != EInf_old.components.end())
+				{
+					if (std::find(EInf.components.begin(), EInf.components.end(), *iterc) == EInf.components.end()) {
+						EInf.components.push_back(*iterc);
+					}
+					++iterc;
+				}
+			}
+			++it;
+		}
 		return EInf;
 	};
 	/*! move robot
@@ -159,7 +208,22 @@ namespace Components_N {
 	*
 	* it calls moveRobotInDirection function from mobileComponent
 	*/
-	void managementComponent::moveRobot() {
+	void managementComponent::moveRobot(int i, int direction) {
+		if (i >= managedComponents.size())
+			throw std::exception(">>> incorrect num");
+		if ((direction < 0 )|| (direction > 3))
+			throw std::exception(">>> incorrect direction");
+		switch (managedComponents[i]->iAm()) {
+		case robot_scout:
+			(dynamic_cast<robotScout*>(managedComponents[i]))->moveRobotInDirection(direction);
+			break;
+		case robot_commander:
+			(dynamic_cast<robotCommander*>(managedComponents[i]))->moveRobotInDirection(direction);
+			break;
+		default:
+			throw std::exception(">>> static components can't move");
+			break;
+		}
 	};
 
 	////////////////////////////////////////////////////////////
@@ -193,7 +257,7 @@ namespace Components_N {
 			y -= velocity;
 			break;
 		default:
-			throw std::exception(" >>> incorrect type");
+			throw std::exception(" >>> incorrect direction");
 			break;
 		}
 	};

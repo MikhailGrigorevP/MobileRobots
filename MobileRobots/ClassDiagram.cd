@@ -1,93 +1,95 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <ClassDiagram MajorVersion="1" MinorVersion="1">
   <Class Name="Components_N::managementComponent">
-    <Position X="7.75" Y="4.75" Width="1.5" />
+    <Position X="6.5" Y="4.5" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAAAABAAAAAAAAIAAAAAAAQAAAAAAAAAAIAAQCAAA=</HashCode>
+      <HashCode>AAAAAAABAAABAAAAIAAAAAAAQAAAAAAAAAAIAAQCAgA=</HashCode>
       <FileName>Component.h</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Components_N::Component">
     <Position X="9" Y="0.5" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAiAAgAAAAAAAQAIBAAAEAEAAAQAAAAAABgAAAAAAA=</HashCode>
+      <HashCode>AACiAAEAQAABAAQAMDAAUGAHAAAQACCAAABgAAQAAgA=</HashCode>
       <FileName>Component.h</FileName>
     </TypeIdentifier>
+    <ShowAsAssociation>
+      <Field Name="modules" />
+    </ShowAsAssociation>
   </Class>
   <Class Name="Components_N::mobileComponent">
-    <Position X="10.25" Y="4.75" Width="1.5" />
+    <Position X="12" Y="4" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAAAIAAAAEAAAAAAAAAAAAAAAAAQAAAAQAAAAAAAA=</HashCode>
+      <HashCode>AAAAAAIAAAAFAAAAACAAAAAAAAAAAQAAAAQAAAAAAAA=</HashCode>
       <FileName>Component.h</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Components_N::robotCommander">
-    <Position X="9" Y="7.75" Width="1.5" />
+    <Position X="9" Y="9" Width="1.5" />
     <InheritanceLine Type="Components_N::managementComponent">
       <InheritanceModifierLabel ManuallyPlaced="true" ManuallySized="true">
-        <Position X="0.06" Y="0.11" Height="0.182" Width="1.077" />
+        <Position X="0.11" Y="0.06" Height="0.182" Width="2.171" />
       </InheritanceModifierLabel>
     </InheritanceLine>
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAAAAEAAAAAAA=</HashCode>
+      <HashCode>AAAAAAAAAAABAAAAAAAAAAAAAAAAAABAAAAEAAAAAAA=</HashCode>
       <FileName>Component.h</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Components_N::robotScout">
     <Position X="11.75" Y="7.75" Width="1.5" />
-    <InheritanceLine Type="Components_N::mobileComponent" FixedFromPoint="true">
-      <Path>
-        <Point X="11.5" Y="6.819" />
-        <Point X="11.5" Y="7.375" />
-        <Point X="12.5" Y="7.375" />
-        <Point X="12.5" Y="7.75" />
-      </Path>
-    </InheritanceLine>
     <TypeIdentifier>
-      <HashCode>AABAAAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAA=</HashCode>
+      <HashCode>AABAAAAAAAABAAAAAAAAAAAAABAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>Component.h</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Modules_N::Module">
     <Position X="2.75" Y="0.75" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAgAAAAASACAQAAAAAAAAAAAAQAAAEAAAACAQAAAA=</HashCode>
+      <HashCode>QAAAgEEAAASBCAQAAAAAAAAAAAAQAAAEAAAACAQAAAA=</HashCode>
       <FileName>Module.h</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Modules_N::generatorModule">
-    <Position X="0.75" Y="4.5" Width="1.5" />
+    <Position X="0.75" Y="5.5" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAAABAAgAAAAAAAAAAAAAAAAgAAAAAA=</HashCode>
+      <HashCode>AAAAAAAAAAABAAAABAAgAAAAAAAAACAAAAAAgAQAAAA=</HashCode>
       <FileName>Module.h</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Modules_N::managementModule">
-    <Position X="4.75" Y="4.5" Width="1.5" />
+    <Position X="4.75" Y="5" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAEACAACAIAAAAAAAAAEAAAAAAAAAACAAAAAAAAAAA=</HashCode>
+      <HashCode>AAAEACAACAIBAAAAAAAAEAAAAAAAAAACAAAAAAAAEQA=</HashCode>
       <FileName>Module.h</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Modules_N::sensorModule">
-    <Position X="2.75" Y="4.5" Width="1.5" />
+    <Position X="2.75" Y="5" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>gAAAAAAACAAAIAAAAAIAAAAAQAAAAAAAAAAAAABAAAA=</HashCode>
+      <HashCode>gCCAAAAACAABIAAAAAIAAAAAQAAAAAAAAAAAAABAAQA=</HashCode>
       <FileName>Module.h</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="AI_N::AI">
-    <Position X="13.25" Y="4.25" Width="1.5" />
+    <Position X="11.75" Y="0.75" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AQAAAAAAAgAACAAAAAAAAAAAAQAAAAAAAAAAAAAAAAA=</HashCode>
       <FileName>AI.h</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="ED_N::environmentDescriptor">
-    <Position X="13" Y="0.5" Width="2" />
+    <Position X="13.75" Y="0.75" Width="2" />
     <TypeIdentifier>
-      <HashCode>AACAAEAABIAAAAgAACCAAAAAgAAAAAAAEgAQAAAAAAA=</HashCode>
+      <HashCode>AECAAEAAhIAAAggEAKCAAAAAAAAAQABCBAlQAAAAAAA=</HashCode>
       <FileName>environmentDescriptor.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="std::vector&lt;_Ty, _Alloc&gt;" Collapsed="true">
+    <Position X="6.5" Y="0.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AWAEk4EqCrBsCEBAAOMIIAAyAAUEQBIghQkwgkAFUko=</HashCode>
+      <FileName>C:\Program Files (x86)\Microsoft Visual Studio\2019\Community2\VC\Tools\MSVC\14.23.28105\include\vector</FileName>
     </TypeIdentifier>
   </Class>
   <Struct Name="EnvironmentInfo" Collapsed="true">
@@ -114,7 +116,7 @@
   <Enum Name="ModuleType" Collapsed="true">
     <Position X="0.5" Y="2.75" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AACAAAAAAAAAAAAAAAAAAAAAAAAAAAQEAAAAAAAAAAA=</HashCode>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQEAAgAAAAAAAA=</HashCode>
       <FileName>structures.h</FileName>
     </TypeIdentifier>
   </Enum>

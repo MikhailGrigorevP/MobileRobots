@@ -4,6 +4,13 @@
 #ifndef _MODULE_H_
 #define _MODULE_H_
 
+namespace ED_N {
+	class environmentDescriptor;
+}
+namespace Components_N {
+	class Component;
+	class managementComponent;
+}
 //!Modules namespace
 /*! All modules for components:
  * 1. generatorModule
@@ -76,9 +83,11 @@ namespace Modules_N {
 		generatorModule(int st = 0, int pr = 0, int en = 0, int c = 0, int enpr = 0) : 
 			Module(st, pr, en, c), 
 			energyProvision(enpr) {};
+
 		virtual int getEnergy() {
 			return energyProvision - Module::getEnergy();
 		}
+
 		virtual int getEnergyProvision() {
 			return energyProvision;
 		};
@@ -98,11 +107,14 @@ namespace Modules_N {
 		int radius = 0;  //!< range of the module
 		int num = 0;  //!< num of managed components
 	protected:
-		//!< send management resourse
-		void sendResourse() {};
-		//!< free management resourse
-		void freeResourse() {};
+
+
 	public:
+		//!< send management resourse
+		void sendResourse(Components_N::managementComponent*, Components_N::Component*);
+
+		//!< free management resourse
+		void freeResourse(Components_N::Component*, int i);
 		virtual int getR() {
 			return radius;
 		};
@@ -132,9 +144,10 @@ namespace Modules_N {
 		int angle = 0;
 		int direction = 0;
 	protected:
-		//!get information from environment
-		EnvironmentInfo getInfo() {};
 	public:
+
+		EnvironmentInfo getInfo(Point curr_location, ED_N::environmentDescriptor* env);
+
 		virtual int getR() {
 			return radius;
 		};

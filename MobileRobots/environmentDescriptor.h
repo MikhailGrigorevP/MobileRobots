@@ -2,6 +2,7 @@
 #define _ENVIRONMENTDESCRIPTOR_H_
 
 #include "Component.h"
+
 using std::vector;
 using namespace Components_N;
 //! Environment desriptor namespace
@@ -27,7 +28,7 @@ namespace ED_N {
 		}
 
 
-		managementComponent* getOCComponent(int i) {
+		managementComponent* getCCComponent(int i) {
 			return dynamic_cast<managementComponent*>(components[i]);
 		}
 
@@ -39,6 +40,9 @@ namespace ED_N {
 			return components[i];
 		}
 
+		vector<Component*> getComponents() {
+			return components;
+		}
 
 		environmentDescriptor(Field_size field_size);
 		
@@ -54,7 +58,8 @@ namespace ED_N {
 	
 		void drawMap();
 
-		void showComponents();
+		void showComponents();	
+		void showInfo(EnvironmentInfo envinfo);
 
 		void AddObserveCenter(Point point,  int en, int num, int c);
 
