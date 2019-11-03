@@ -190,6 +190,36 @@ namespace ED_N {
 
 	}
 
+	void environmentDescriptor::showComponentsNM() {
+		if (size.m == 0 || size.n == 0)
+			throw std::exception(">>> Environment is empty");
+
+
+		if (components.size() == 0)
+			std::cout << "No any components in field: \n";
+
+		else {
+			std::cout << "Componets in field: \n";
+			for (int i = 0; i < components.size(); ++i) {
+				switch (components[i]->iAm()) {
+				case observe_center:
+					std::cout << i << ")  Observe center (" << components[i]->getCoord().x << ";" << components[i]->getCoord().y << ")" << std::endl;
+					break;
+				case command_center:
+					std::cout << i << ")  Command center: (" << components[i]->getCoord().x << ";" << components[i]->getCoord().y << ")" << std::endl;
+					break;
+				case robot_commander:
+					std::cout << i << ")  Robot commander: (" << components[i]->getCoord().x << ";" << components[i]->getCoord().y << "), velocity = " << dynamic_cast<robotCommander*>(components[i])->getVel() << std::endl;
+					break;
+				case robot_scout:
+					std::cout << i << ")  Robot scout: (" << components[i]->getCoord().x << ";" << components[i]->getCoord().y << "), velocity = " << dynamic_cast<robotScout*>(components[i])->getVel() << std::endl;
+					break;
+				}
+			}
+		}
+		std::cout << std::endl;
+	}
+
 	void environmentDescriptor::showComponents() {
 		if (size.m == 0 || size.n == 0)
 			throw std::exception(">>> Environment is empty");

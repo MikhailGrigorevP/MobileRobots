@@ -1,5 +1,5 @@
 #include "Component.h"
-#include <algorithm>>
+#include <algorithm>
 namespace Components_N {
 
 
@@ -93,6 +93,8 @@ namespace Components_N {
 			throw std::exception(" >>> incorrect radius");
 		if (n < 0)
 			throw std::exception(" >>> incorrect num of managed devices");
+		if ((this->iAm() == robot_scout)||(this->iAm() == observe_center))
+			throw std::exception(" >>> You can't set management module on unmanageble component");
 
 		Module* mod = new managementModule(false, pr, en, c, r, n);
 		modules.push_back(mod);

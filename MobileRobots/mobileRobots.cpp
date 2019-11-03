@@ -40,18 +40,21 @@
 #include <iostream>
 #include <cstdlib>
 
-//Main menu
+//!Main menu
 const char* MENU_0[]{ "1. Work with Environment", "2. Work with components", "3. Show all information", "0. Exit" };
 const unsigned menu_0_SZ = sizeof(MENU_0) / sizeof(MENU_0[0]);
 
-//Environment menu
+//! Work with Environment
 const char* MENU_1[]{ "1. Set field", "2. Get field size", "3. Set cell info", "4. Get cell info", "5. Add component to field", "0. <- Back to Main menu" };
 const unsigned menu_1_SZ = sizeof(MENU_1) / sizeof(MENU_1[0]);
 
-//Component menu
+//! Work with components
 const char* MENU_2[]{ "1. Show all components", "2. Edit component's module", "3. Work with managed components", "4. Move robot", "0. <- Back to Main menu" };
 const unsigned menu_2_SZ = sizeof(MENU_2) / sizeof(MENU_2[0]);
-
+ 
+//! Work with managed components
+const char* MENU_3[]{ "1. Add resource", "2. Delete resource", "3. Move robot", "4. Get environment info", "0. <- Back to components menu" };
+const unsigned menu_3_SZ = sizeof(MENU_3) / sizeof(MENU_3[0]);
 
 using namespace Components_N;
 using namespace Modules_N;
@@ -71,6 +74,9 @@ void getClear()
 *
 */
 int main() {
+
+	unsigned menu3 = 1;
+	bool work3 = true;
 
 	unsigned menu2 = 1;
 	bool work2 = true;
@@ -152,14 +158,8 @@ int main() {
 	environment.AddObserveCenter({ 12, 14 }, 80, 5, 600);
 	environment.getComponent(7)->setModule_g(1, 100, 125, 4500);
 
-	environment.showInfo(dynamic_cast<managementComponent*>(environment.getComponent(5))->getInfo(0, &environment));
-
-
-
-
 	//////////////////////////////////////
 	//////////////////////////////////////
-
 
 	do {
 		if (menu0)
@@ -178,8 +178,10 @@ int main() {
 			break;
 		case 1:
 			//ENVIRONMENT
+			if (system("CLS"))
+				system("clear");
 			menu = 1;
-			std::cout << std::endl;
+			work = true;
 			do {
 				if (menu)
 					for (size_t i = 0; i != menu_1_SZ; ++i)
@@ -362,8 +364,10 @@ int main() {
 			break;
 		case 2:
 			//COMPONENTS
+					if (system("CLS"))
+						system("clear");
 			menu2 = 1;
-			std::cout << std::endl;
+			work2 = true;
 			do {
 				if (menu2)
 					for (size_t i = 0; i != menu_2_SZ; ++i)
@@ -400,6 +404,12 @@ int main() {
 					if (std::cin.fail() || ((ans != 1) && (ans != 0))) {
 						std::cout << " >>> wrong answer";
 						break;
+					}
+					try {
+						environment.showComponents();
+					}
+					catch (std::exception & ex) {
+						std::cout << ex.what() << std::endl;
 					}
 					std::cout << ">>> Input component's num" << std::endl;
 					std::cin >> cnum;
@@ -445,7 +455,7 @@ int main() {
 							break;
 						}
 
-						if ((mnum == management_Module) && ((environment.getComponent(cnum)->iAm() == robot_scout) && (environment.getComponent(cnum)->iAm() == observe_center))) {
+						if ((mnum == management_Module) && ((environment.getComponent(cnum)->iAm() == robot_scout) || (environment.getComponent(cnum)->iAm() == observe_center))) {
 							std::cout << " >>> You can't set management module on unmanageble component";
 							break;
 						}
@@ -493,9 +503,374 @@ int main() {
 					}
 					break; }
 				case 3: {
+					//Manage components
+					if (system("CLS"))
+						system("clear");
+					menu3 = 1;
+					work3 = true;
+					do {
+						if (menu3)
+							for (size_t i = 0; i != menu_3_SZ; ++i)
+								std::cout << MENU_3[i] << std::endl;
 
+						std::cout << ">> ";
+						std::cin >> menu3;
+						if (std::cin.eof())
+							work3 = false;
+
+						bool input;
+						switch (menu3)
+						{
+						case 0:
+							work3 = false;
+							if (system("CLS"))
+								system("clear");
+							break;
+						case 1: {
+
+							try {
+								environment.showComponentsNM();
+							}
+							catch (std::exception & ex) {
+								std::cout << ex.what() << std::endl;
+							}
+
+							std::cout << ">>> Input component's num to manage (NOTICE: you can move just robot - commander or comand center)" << std::endl;
+							std::cin >> cnum;
+
+							if (std::cin.fail()) {
+								std::cout << " >>> input failed";
+								break;
+							}
+
+
+							if ((environment.getComponent(cnum)->iAm() != robot_commander) && (environment.getComponent(cnum)->iAm() != command_center)) {
+								std::cout << " >>> you can't manage unmanageble things";
+								break;
+							}
+
+
+							if (environment.getComponent(cnum)->getModulesSize() == 0) {
+								std::cout << "\tNo modules in this components";
+								break;
+							}
+							else {
+								for (int j = 0; j < environment.getComponent(cnum)->getModulesSize(); ++j) {
+									std::cout << "\t" << j << ". ";
+
+									switch ((environment.getComponent(cnum)->getModule(j))->iAm()) {
+									case generator_Module:
+										std::cout << "Generator Module";
+										break;
+									case sensor_Module:
+										std::cout << "Sensor Module";
+										break;
+									case management_Module:
+										std::cout << "Management Module";
+										break;
+
+									}
+								}
+								std::cout << std::endl;
+							}
+
+							std::cout << ">>> Input num of Management module if exist" << std::endl;
+							std::cin >> ans;
+
+							if (std::cin.fail()) {
+								std::cout << " >>> input failed";
+								break;
+							}
+
+							if ((environment.getComponent(cnum)->getMModule(ans)->iAm() != management_Module)) {
+								std::cout << " >>> you can't manage unmanageble things";
+								break;
+							}
+
+							std::cout << ">>> Input component's num to add" << std::endl;
+							std::cin >> mnum;
+
+							if (std::cin.fail()) {
+								std::cout << " >>> input failed";
+								break;
+							}
+
+							try {
+								dynamic_cast<managementComponent*>(environment.getComponent(cnum))->getMModule(ans)->sendResourse(dynamic_cast<managementComponent*>(environment.getComponent(cnum)), environment.getComponent(mnum));
+							}
+							catch (std::exception & ex) {
+								std::cout << ex.what() << std::endl;
+							}
+
+							break;
+						}
+						case 2:{
+
+							try {
+								environment.showComponentsNM();
+							}
+							catch (std::exception & ex) {
+								std::cout << ex.what() << std::endl;
+							}
+
+							std::cout << ">>> Input component's num to manage (NOTICE: you can move just robot - commander or comand center)" << std::endl;
+							std::cin >> cnum;
+
+							if (std::cin.fail()) {
+								std::cout << " >>> input failed";
+								break;
+							}
+
+
+							if ((environment.getComponent(cnum)->iAm() != robot_commander) && (environment.getComponent(cnum)->iAm() != command_center)) {
+								std::cout << " >>> you can't manage unmanageble things";
+								break;
+							}
+
+
+							if (environment.getComponent(cnum)->getModulesSize() == 0) {
+								std::cout << "\tNo modules in this components";
+								break;
+							}
+							else {
+								for (int j = 0; j < environment.getComponent(cnum)->getModulesSize(); ++j) {
+									std::cout << "\t" << j << ". ";
+
+									switch ((environment.getComponent(cnum)->getModule(j))->iAm()) {
+									case generator_Module:
+										std::cout << "Generator Module";
+										break;
+									case sensor_Module:
+										std::cout << "Sensor Module";
+										break;
+									case management_Module:
+										std::cout << "Management Module";
+										break;
+
+									}
+								}
+								std::cout << std::endl;
+							}
+
+							std::cout << ">>> Input num of Management module if exist" << std::endl;
+							std::cin >> ans;
+
+							if (std::cin.fail()) {
+								std::cout << " >>> input failed";
+								break;
+							}
+
+							if ((environment.getComponent(cnum)->getMModule(ans)->iAm() != management_Module)) {
+								std::cout << " >>> you can't manage unmanageble things";
+								break;
+							}
+
+
+							std::vector<Components_N::Component*>::iterator c_it;
+							std::cout << "\tManaged components: ";
+							if (dynamic_cast<robotCommander*>(environment.getComponent(cnum))->getNComp()->size() != 0) {
+								c_it = dynamic_cast<robotCommander*>(environment.getComponent(cnum))->getNComp()->begin();
+								while (c_it != dynamic_cast<robotCommander*>(environment.getComponent(cnum))->getNComp()->end())
+								{
+									std::cout << "(" << (*c_it)->getCoord().x << ";" << (*c_it)->getCoord().y << ") ";
+									++c_it;
+								}
+								std::cout << std::endl;
+							}
+							else {
+								std::cout << "components weren't found";
+								break;
+							}
+
+							std::cout << ">>> Input component's num to delete" << std::endl;
+							std::cin >> mnum;
+
+							if (std::cin.fail()) {
+								std::cout << " >>> input failed";
+								break;
+							}
+
+							try {
+								dynamic_cast<managementComponent*>(environment.getComponent(cnum))->getMModule(ans)->freeResourse(dynamic_cast<managementComponent*>(environment.getComponent(cnum)), mnum);
+							}
+							catch (std::exception & ex) {
+								std::cout << ex.what() << std::endl;
+							}
+
+							break;
+						}
+						case 3: {
+							try {
+								environment.showComponentsNM();
+							}
+							catch (std::exception & ex) {
+								std::cout << ex.what() << std::endl;
+							}
+
+							std::cout << ">>> Input component's num to manage (NOTICE: you can move just robot - commander or comand center)" << std::endl;
+							std::cin >> cnum;
+							if (std::cin.fail()) {
+								std::cout << " >>> input failed";
+								break;
+							}
+
+
+							if ((environment.getComponent(cnum)->iAm() != robot_commander) && (environment.getComponent(cnum)->iAm() != command_center)) {
+								std::cout << " >>> you can't manage unmanageble things";
+								break;
+							}
+
+							std::vector<Components_N::Component*>::iterator c_it;
+							std::cout << "\tManaged components: ";
+							if (dynamic_cast<managementComponent*>(environment.getComponent(cnum))->getNComp()->size() != 0) {
+								c_it = dynamic_cast<managementComponent*>(environment.getComponent(cnum))->getNComp()->begin();
+								while (c_it != dynamic_cast<managementComponent*>(environment.getComponent(cnum))->getNComp()->end())
+								{
+									std::cout << "(" << (*c_it)->getCoord().x << ";" << (*c_it)->getCoord().y << ") ";
+									++c_it;
+								}
+								std::cout << std::endl;
+							}
+							else {
+								std::cout << "components weren't found";
+								break;
+							}
+
+
+
+							std::cout << ">>> Input component's num to move (NOTICE: you can move just robots)" << std::endl;
+							std::cin >> mnum;
+
+							if (std::cin.fail()) {
+								std::cout << " >>> input failed";
+								break;
+							}
+
+
+							if ((environment.getComponent(mnum)->iAm() != robot_scout) && (environment.getComponent(mnum)->iAm() != robot_commander)) {
+								std::cout << " >>> you can't move static things";
+								break;
+							}
+
+
+							std::cout << ">>> Input direction, where to move ( 0 - left, 1 - right, 2 - up, 3 - down)" << std::endl;
+							std::cin >> type;
+
+
+							pr = true;
+							switch (type) {
+							case right:
+								if ((dynamic_cast<managementComponent*>(environment.getComponent(cnum))->getComp(mnum)->getVel() + dynamic_cast<managementComponent*>(environment.getComponent(cnum))->getComp(mnum)->getCoord().x) >= environment.getSize().n)
+									pr = false;
+								break;
+							case left:
+								if ((-dynamic_cast<managementComponent*>(environment.getComponent(cnum))->getComp(mnum)->getVel() + dynamic_cast<managementComponent*>(environment.getComponent(cnum))->getComp(mnum)->getCoord().x) < 0)
+									pr = false;
+								break;
+							case down:
+								if ((dynamic_cast<managementComponent*>(environment.getComponent(cnum))->getComp(mnum)->getVel() + dynamic_cast<managementComponent*>(environment.getComponent(cnum))->getComp(mnum)->getCoord().y) >= environment.getSize().m)
+									pr = false;
+								break;
+							case up:
+								if ((-dynamic_cast<managementComponent*>(environment.getComponent(cnum))->getComp(mnum)->getVel() + dynamic_cast<managementComponent*>(environment.getComponent(cnum))->getComp(mnum)->getCoord().y) < 0)
+									pr = false;
+								break;
+							}
+							if (!pr) {
+								std::cout << " >>> you can't move over map";
+								break;
+							}
+
+							try {
+								dynamic_cast<managementComponent*>(environment.getComponent(cnum))->moveRobot(mnum, type);
+							}
+							catch (std::exception & ex) {
+								std::cout << ex.what() << std::endl;
+							}
+							break;
+						}
+						case 4: {
+							try {
+								environment.showComponentsNM();
+							}
+							catch (std::exception & ex) {
+								std::cout << ex.what() << std::endl;
+							}
+
+							std::cout << ">>> Input component's num to manage (NOTICE: you can move just robot - commander or comand center)" << std::endl;
+							std::cin >> cnum;
+							if (std::cin.fail()) {
+								std::cout << " >>> input failed";
+								break;
+							}
+
+							if ((environment.getComponent(cnum)->iAm() != robot_commander) && (environment.getComponent(cnum)->iAm() != command_center)) {
+								std::cout << " >>> you can't manage unmanageble things";
+								break;
+							}
+
+							std::vector<Components_N::Component*>::iterator c_it;
+							std::cout << "\tManaged components: ";
+							if (dynamic_cast<managementComponent*>(environment.getComponent(cnum))->getNComp()->size() != 0) {
+								c_it = dynamic_cast<managementComponent*>(environment.getComponent(cnum))->getNComp()->begin();
+								while (c_it != dynamic_cast<managementComponent*>(environment.getComponent(cnum))->getNComp()->end())
+								{
+									std::cout << "(" << (*c_it)->getCoord().x << ";" << (*c_it)->getCoord().y << ") ";
+									++c_it;
+								}
+								std::cout << std::endl;
+							}
+							else {
+								std::cout << "components weren't found";
+								break;
+							}
+
+							std::cout << ">>> Input component's num to get info from" << std::endl;
+							std::cin >> mnum;
+
+							if (std::cin.fail()) {
+								std::cout << " >>> input failed";
+								break;
+							}
+
+							try {
+								environment.showInfo(dynamic_cast<managementComponent*>(environment.getComponent(cnum))->getInfo(mnum, &environment));
+							}
+							catch (std::exception & ex) {
+								std::cout << ex.what() << std::endl;
+							}
+
+							break; }
+						default:
+							std::cout << " >>> Enter error, try again" << std::endl;
+							break;
+						}
+
+						if (menu3) {
+							std::cout << "\nEnter 0 to continue, 1 to show the menu once again (ctrl^Z to exit)" << std::endl;
+							do {
+								std::cout << ">> ";
+								getClear();
+								std::cin >> menu3;
+								if (std::cin.eof())
+									work3 = false;
+								else {
+									if (!(std::cin.good()))
+										std::cout << " >>> Enter error, try again" << std::endl;
+								}
+							} while ((work3) && !(std::cin.good()));
+						}
+
+					} while (work3);
 					break; }
 				case 4: {
+					try {
+						environment.showComponentsNM();
+					}
+					catch (std::exception & ex) {
+						std::cout << ex.what() << std::endl;
+					}
+
 					std::cout << ">>> Input component's num to move (NOTICE: you can move just robots)" << std::endl;
 					std::cin >> cnum;
 

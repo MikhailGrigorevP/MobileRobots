@@ -58,7 +58,8 @@ namespace ED_N {
 	
 		void drawMap();
 
-		void showComponents();	
+		void showComponents();
+		void showComponentsNM();
 		void showInfo(EnvironmentInfo envinfo);
 
 		void AddObserveCenter(Point point,  int en, int num, int c);
