@@ -18,7 +18,7 @@ struct Point {
 	int x = 0;   //!< x coordinate
 	int y = 0;   //!< y coordinate
 
-	bool operator==(const Point& a) const
+	bool operator == (const Point& a) const
 	{
 		return (x == a.x && y == a.y);
 	}
@@ -38,6 +38,11 @@ struct Point {
 struct Field_size {
 	int m = 0;   //!< max x size
 	int n = 0;   //!< max y size
+
+	bool operator == (const Field_size& a) const
+	{
+		return (m == a.m && n == a.n);
+	}
 };
 
 //! enum of cell's type of field

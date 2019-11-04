@@ -49,7 +49,7 @@ const char* MENU_1[]{ "1. Set field", "2. Get field size", "3. Set cell info", "
 const unsigned menu_1_SZ = sizeof(MENU_1) / sizeof(MENU_1[0]);
 
 //! Work with components
-const char* MENU_2[]{ "1. Show all components", "2. Edit component's module", "3. Work with managed components", "4. Move robot", "0. <- Back to Main menu" };
+const char* MENU_2[]{ "1. Show all components", "2. Add/delete component's module", "3. Work with managed components", "4. Move robot", "5. On/off component's module", "0. <- Back to Main menu" };
 const unsigned menu_2_SZ = sizeof(MENU_2) / sizeof(MENU_2[0]);
  
 //! Work with managed components
@@ -96,7 +96,7 @@ int main() {
 	//////////////////////////////////////
 	//////////////////////////////////////
 
-	environment.setSize({16, 16});
+	environment.setSize({ 16, 16 });
 	environment.setCell({ 0, 0 }, 2);
 	environment.setCell({ 0, 5 }, 1);
 	environment.setCell({ 0, 6 }, 1);
@@ -115,7 +115,7 @@ int main() {
 	environment.setCell({ 10, 9 }, 1);
 	environment.setCell({ 1, 11 }, 1);
 	environment.setCell({ 7, 11 }, 2);
-	environment.setCell({ 5, 13}, 2);
+	environment.setCell({ 5, 13 }, 2);
 	environment.setCell({ 9, 14 }, 1);
 	environment.setCell({ 14, 14 }, 1);
 
@@ -125,12 +125,19 @@ int main() {
 	environment.getCCComponent(0)->setModule_m(2, 150, 250, 9, 10);
 	//1
 	environment.AddRobotScout({ 5, 2 }, 80, 4, 2, 600);
+	environment.getComponent(1)->setModule_g(1, 100, 125, 4500);
+	environment.getComponent(1)->moduleOn(0);
 	environment.getRSComponent(1)->setModule_s(1, 150, 500, 4, 60, 0);
+	environment.getComponent(1)->moduleOn(1);
 	environment.getRSComponent(1)->setModule_s(1, 150, 500, 4, 60, 1);
+	environment.getComponent(1)->moduleOn(2);
 	environment.getRSComponent(1)->setModule_s(1, 150, 500, 4, 60, 2);
 	//2
 	environment.AddRobotScout({ 1, 6 }, 80, 5, 2, 600);
+	environment.getComponent(2)->setModule_g(1, 100, 125, 4500);
+	environment.getComponent(2)->moduleOn(0);
 	environment.getRSComponent(2)->setModule_s(1, 150, 500, 4, 60, 0);
+	environment.getComponent(2)->moduleOn(1);
 	environment.getRSComponent(2)->setModule_s(1, 150, 500, 4, 60, 1);
 	environment.getRSComponent(2)->setModule_s(1, 150, 500, 4, 60, 2);
 	//3
@@ -142,14 +149,18 @@ int main() {
 	environment.AddRobotScout({ 2, 13 }, 80, 5, 2, 600);
 	environment.getRSComponent(4)->setModule_s(1, 150, 500, 4, 60, 3);
 	environment.getRSComponent(4)->setModule_s(1, 150, 500, 4, 60, 1);
+	environment.getComponent(4)->setModule_g(1, 100, 125, 6000);
 	//5
 	environment.AddRobotCommander({ 1, 2 }, 150, 4, 2, 1, 600);
+	environment.getComponent(5)->setModule_g(1, 100, 125, 4500);
+	environment.getComponent(5)->moduleOn(0);
 	environment.getComponent(5)->setModule_m(2, 150, 250, 9, 4);
-	dynamic_cast<managementComponent*>(environment.getComponent(5))->getMModule(0)->sendResourse(environment.getRCComponent(5), environment.getComponent(1));
-	dynamic_cast<managementComponent*>(environment.getComponent(5))->getMModule(0)->sendResourse(environment.getRCComponent(5), environment.getComponent(2));
+	dynamic_cast<managementComponent*>(environment.getComponent(5))->getMModule(1)->sendResourse(environment.getRCComponent(5), environment.getComponent(1));
+	dynamic_cast<managementComponent*>(environment.getComponent(5))->getMModule(1)->sendResourse(environment.getRCComponent(5), environment.getComponent(2));
 	//6
 	environment.AddObserveCenter({ 13, 2 }, 80, 5, 600);
 	environment.getComponent(6)->setModule_g(1, 100, 125, 4500);
+	environment.getComponent(6)->moduleOn(0);
 	environment.getComponent(6)->setModule_s(1, 150, 500, 4, 60, 0);
 	environment.getComponent(6)->setModule_s(1, 150, 500, 4, 60, 1);
 	environment.getComponent(6)->setModule_s(1, 150, 500, 4, 60, 2);
@@ -176,7 +187,7 @@ int main() {
 		case 0:
 			work0 = false;
 			break;
-		case 1:
+		case 1: {
 			//ENVIRONMENT
 			if (system("CLS"))
 				system("clear");
@@ -203,7 +214,7 @@ int main() {
 					if (system("CLS"))
 						system("clear");
 					break;
-				case 1:
+				case 1: {
 					std::cout << ">>> Input m and n for field" << std::endl;
 					try {
 						std::cin >> environment;
@@ -211,16 +222,16 @@ int main() {
 					catch (std::exception & ex) {
 						std::cout << ex.what() << std::endl;
 					}
-					break;
-				case 2:
+					break; }
+				case 2: {
 					try {
 						std::cout << environment;
 					}
 					catch (std::exception & ex) {
 						std::cout << ex.what() << std::endl;
 					}
-					break;
-				case 3:
+					break; }
+				case 3: {
 					std::cout << ">>> Input x and y of cell and cell's type (1 for barrier, 2 for interest_point) (-1 to stop or ctrl^z to exit)" << std::endl;
 
 					input = true;
@@ -249,8 +260,8 @@ int main() {
 							}
 						}
 					} while (input);
-					break;
-				case 4:
+					break; }
+				case 4: {
 					std::cout << ">>> Input x and y of cell" << std::endl;
 					std::cin >> point.x >> point.y;
 					if (std::cin.fail()) {
@@ -274,8 +285,8 @@ int main() {
 					catch (std::exception & ex) {
 						std::cout << ex.what() << std::endl;
 					}
-					break;
-				case 5:
+					break; }
+				case 5: {
 					std::cout << ">>> Input x, y, energy level, num of mudules, cost of component and component's type \n"
 						<< "(0 for observecenter, 1 for command center, 2 for robot commander, 3 for robot scout) (-1 to stop or ctrl^z to exit)" << std::endl;
 
@@ -307,10 +318,15 @@ int main() {
 							std::cin >> vel;
 							std::cin >> numD;
 							break; }
-						case robot_scout:
+						case robot_scout: {
 							std::cout << " >>> Input velocity modules: ";
 							std::cin >> vel;
-							break;
+							break;		}
+						case observe_center: {
+							break; }
+						default: {
+							std::cout << " >>> Wrong type\n";
+							break; }
 						}
 
 						if (std::cin.fail()) {
@@ -318,28 +334,43 @@ int main() {
 							break;
 						}
 						else {
-							try {
-								switch (type) {
-								case observe_center:
+							switch (type) {
+							case observe_center:
+								try {
 									environment.AddObserveCenter(point, en, num, c);
-									break;
-								case command_center:
-									environment.AddCommandCenter(point, en, num, numD, c);
-									break;
-								case robot_commander:
-									environment.AddRobotCommander(point, en, num, numD, vel, c);
-									break;
-								case robot_scout:
-									environment.AddRobotScout(point, en, num, vel, c);
-									break;
 								}
-							}
-							catch (std::exception & ex) {
-								std::cout << ex.what() << std::endl;
+								catch (std::exception & ex) {
+									std::cout << ex.what() << std::endl;
+								}
+								break;
+							case command_center:
+								try {
+									environment.AddCommandCenter(point, en, num, numD, c);
+								}
+								catch (std::exception & ex) {
+									std::cout << ex.what() << std::endl;
+								}
+								break;
+							case robot_commander:
+								try {
+									environment.AddRobotCommander(point, en, num, numD, vel, c);
+								}
+								catch (std::exception & ex) {
+									std::cout << ex.what() << std::endl;
+								}
+								break;
+							case robot_scout:
+								try {
+									environment.AddRobotScout(point, en, num, vel, c);
+								}
+								catch (std::exception & ex) {
+									std::cout << ex.what() << std::endl;
+								}
+								break;
 							}
 						}
 					} while (input);
-					break;
+					break; }
 				default:
 					std::cout << " >>> Enter error, try again" << std::endl;
 					break;
@@ -361,11 +392,11 @@ int main() {
 				}
 
 			} while (work);
-			break;
+			break; }
 		case 2:
 			//COMPONENTS
-					if (system("CLS"))
-						system("clear");
+			if (system("CLS"))
+				system("clear");
 			menu2 = 1;
 			work2 = true;
 			do {
@@ -444,7 +475,12 @@ int main() {
 
 							std::cout << ">>> Input module's num" << std::endl;
 							std::cin >> mnum;
-							environment.getComponent(cnum)->deleteModule(mnum);
+							try {
+								environment.getComponent(cnum)->deleteModule(mnum);
+							}
+							catch (std::exception & ex) {
+								std::cout << ex.what() << std::endl;
+							}
 						}
 					}
 					else {
@@ -491,14 +527,30 @@ int main() {
 
 						switch (mnum) {
 						case generator_Module: {
-							environment.getComponent(cnum)->setModule_g(pr, en, c, enpr);
+							try {
+								environment.getComponent(cnum)->setModule_g(pr, en, c, enpr);
+							}
+							catch (std::exception & ex) {
+								std::cout << ex.what() << std::endl;
+							}
 							break; }
 						case sensor_Module: {
-							environment.getComponent(cnum)->setModule_s(pr, en, c, r, ang, direct);
+							try {
+								environment.getComponent(cnum)->setModule_s(pr, en, c, r, ang, direct);
+							}
+							catch (std::exception & ex) {
+								std::cout << ex.what() << std::endl;
+							}
 							break; }
-						case management_Module:
-							environment.getComponent(cnum)->setModule_m(pr, en, c, r, n);
-							break;
+						case management_Module: {
+							try {
+								environment.getComponent(cnum)->setModule_m(pr, en, c, r, n);
+							}
+							catch (std::exception & ex) {
+								std::cout << ex.what() << std::endl;
+							}
+							break; }
+
 						}
 					}
 					break; }
@@ -535,10 +587,10 @@ int main() {
 								std::cout << ex.what() << std::endl;
 							}
 
-							std::cout << ">>> Input component's num to manage (NOTICE: you can move just robot - commander or comand center)" << std::endl;
+							std::cout << ">>> Input component's num to manage (NOTICE: you can manage just robot - commander or comand center)" << std::endl;
 							std::cin >> cnum;
 
-							if (std::cin.fail()) {
+							if (std::cin.fail() || (cnum >= environment.getCompCount()) || (cnum < 0)) {
 								std::cout << " >>> input failed";
 								break;
 							}
@@ -577,8 +629,17 @@ int main() {
 							std::cout << ">>> Input num of Management module if exist" << std::endl;
 							std::cin >> ans;
 
-							if (std::cin.fail()) {
+							if (std::cin.fail() || (ans >= environment.getComponent(cnum)->getModulesSize()) || (ans < 0)) {
 								std::cout << " >>> input failed";
+								break;
+							}
+
+							if (environment.getComponent(cnum)->getModule(ans)->iAm() != management_Module) {
+								std::cout << " >>> module is not management";
+								break;
+							}
+							if (environment.getComponent(cnum)->getMModule(ans)->getState() == 0) {
+								std::cout << " >>> module is switched off";
 								break;
 							}
 
@@ -590,7 +651,7 @@ int main() {
 							std::cout << ">>> Input component's num to add" << std::endl;
 							std::cin >> mnum;
 
-							if (std::cin.fail()) {
+							if (std::cin.fail() || (mnum >= environment.getCompCount()) || (mnum < 0)) {
 								std::cout << " >>> input failed";
 								break;
 							}
@@ -604,7 +665,7 @@ int main() {
 
 							break;
 						}
-						case 2:{
+						case 2: {
 
 							try {
 								environment.showComponentsNM();
@@ -613,10 +674,10 @@ int main() {
 								std::cout << ex.what() << std::endl;
 							}
 
-							std::cout << ">>> Input component's num to manage (NOTICE: you can move just robot - commander or comand center)" << std::endl;
+							std::cout << ">>> Input component's num to manage (NOTICE: you can manage just robot - commander or comand center)" << std::endl;
 							std::cin >> cnum;
 
-							if (std::cin.fail()) {
+							if (std::cin.fail() || (cnum >= environment.getCompCount()) || (cnum < 0)) {
 								std::cout << " >>> input failed";
 								break;
 							}
@@ -655,10 +716,22 @@ int main() {
 							std::cout << ">>> Input num of Management module if exist" << std::endl;
 							std::cin >> ans;
 
-							if (std::cin.fail()) {
+							if (std::cin.fail() || (ans >= environment.getComponent(cnum)->getModulesSize()) || (ans < 0)) {
 								std::cout << " >>> input failed";
 								break;
 							}
+
+							if (environment.getComponent(cnum)->getModule(ans)->iAm() != management_Module) {
+								std::cout << " >>> module is not management";
+								break;
+							}
+
+
+							if (environment.getComponent(cnum)->getMModule(ans)->getState() == 0) {
+								std::cout << " >>> module is switched off";
+								break;
+							}
+
 
 							if ((environment.getComponent(cnum)->getMModule(ans)->iAm() != management_Module)) {
 								std::cout << " >>> you can't manage unmanageble things";
@@ -685,7 +758,7 @@ int main() {
 							std::cout << ">>> Input component's num to delete" << std::endl;
 							std::cin >> mnum;
 
-							if (std::cin.fail()) {
+							if (std::cin.fail() || (mnum >= environment.getCompCount()) || (mnum < 0)) {
 								std::cout << " >>> input failed";
 								break;
 							}
@@ -707,9 +780,9 @@ int main() {
 								std::cout << ex.what() << std::endl;
 							}
 
-							std::cout << ">>> Input component's num to manage (NOTICE: you can move just robot - commander or comand center)" << std::endl;
+							std::cout << ">>> Input component's num to manage (NOTICE: you can manage just robot - commander or comand center)" << std::endl;
 							std::cin >> cnum;
-							if (std::cin.fail()) {
+							if (std::cin.fail() || (cnum >= environment.getCompCount()) || (cnum < 0)) {
 								std::cout << " >>> input failed";
 								break;
 							}
@@ -736,18 +809,15 @@ int main() {
 								break;
 							}
 
-
-
 							std::cout << ">>> Input component's num to move (NOTICE: you can move just robots)" << std::endl;
 							std::cin >> mnum;
 
-							if (std::cin.fail()) {
+							if (std::cin.fail() || (mnum >= environment.getCompCount()) || (mnum < 0)) {
 								std::cout << " >>> input failed";
 								break;
 							}
 
-
-							if ((environment.getComponent(mnum)->iAm() != robot_scout) && (environment.getComponent(mnum)->iAm() != robot_commander)) {
+							if ((dynamic_cast<managementComponent*>(environment.getComponent(cnum))->getComp(mnum)->iAm() != robot_scout) && (dynamic_cast<managementComponent*>(environment.getComponent(cnum))->getComp(mnum)->iAm() != robot_commander)) {
 								std::cout << " >>> you can't move static things";
 								break;
 							}
@@ -797,9 +867,9 @@ int main() {
 								std::cout << ex.what() << std::endl;
 							}
 
-							std::cout << ">>> Input component's num to manage (NOTICE: you can move just robot - commander or comand center)" << std::endl;
+							std::cout << ">>> Input component's num to manage (NOTICE: you can manage just robot - commander or comand center)" << std::endl;
 							std::cin >> cnum;
-							if (std::cin.fail()) {
+							if (std::cin.fail() || (cnum >= environment.getCompCount()) || (cnum < 0)) {
 								std::cout << " >>> input failed";
 								break;
 							}
@@ -828,7 +898,7 @@ int main() {
 							std::cout << ">>> Input component's num to get info from" << std::endl;
 							std::cin >> mnum;
 
-							if (std::cin.fail()) {
+							if (std::cin.fail() || (mnum >= environment.getCompCount()) || (mnum < 0)) {
 								std::cout << " >>> input failed";
 								break;
 							}
@@ -864,6 +934,12 @@ int main() {
 					} while (work3);
 					break; }
 				case 4: {
+
+					std::cout << std::endl;
+					std::cout << " >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>" << std::endl;
+					std::cout << " >>> WARNING. You can’t make the object move itself. JUST FOR TEST >>>" << std::endl;
+					std::cout << " >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>" << std::endl;
+					std::cout << std::endl;
 					try {
 						environment.showComponentsNM();
 					}
@@ -874,7 +950,7 @@ int main() {
 					std::cout << ">>> Input component's num to move (NOTICE: you can move just robots)" << std::endl;
 					std::cin >> cnum;
 
-					if (std::cin.fail()) {
+					if (std::cin.fail() || (cnum >= environment.getCompCount()) || (cnum < 0)) {
 						std::cout << " >>> input failed";
 						break;
 					}
@@ -917,17 +993,108 @@ int main() {
 					else {
 						switch (environment.getComponent(cnum)->iAm()) {
 						case robot_scout:
-							environment.getRSComponent(cnum)->moveRobotInDirection(type);
+							try {
+								environment.getRSComponent(cnum)->moveRobotInDirection(type);
+							}
+							catch (std::exception & ex) {
+								std::cout << ex.what() << std::endl;
+							}
 							break;
 						case robot_commander:
-							environment.getRCComponent(cnum)->moveRobotInDirection(type);
+							try {
+								environment.getRCComponent(cnum)->moveRobotInDirection(type);
+							}
+							catch (std::exception & ex) {
+								std::cout << ex.what() << std::endl;
+							}
 							break;
 						}
 					}
 					break; }
-				default:
+				case 5: {
+
+					try {
+						environment.showComponentsNM();
+					}
+					catch (std::exception & ex) {
+						std::cout << ex.what() << std::endl;
+					}
+
+					std::cout << ">>> Input component's num to manage" << std::endl;
+					std::cin >> cnum;
+
+					if (std::cin.fail() || (cnum >= environment.getCompCount()) || (cnum < 0)) {
+						std::cout << " >>> input failed";
+						break;
+					}
+
+					if (environment.getComponent(cnum)->getModulesSize() == 0) {
+						std::cout << "\tNo modules in this components";
+						break;
+					}
+					else {
+						for (int j = 0; j < environment.getComponent(cnum)->getModulesSize(); ++j) {
+							std::cout << "\t" << j << ". ";
+
+							switch ((environment.getComponent(cnum)->getModule(j))->iAm()) {
+							case generator_Module:
+								std::cout << "Generator Module, state: " << environment.getComponent(cnum)->getModule(j)->getState();
+								break;
+							case sensor_Module:
+								std::cout << "Sensor Module, state: " << environment.getComponent(cnum)->getModule(j)->getState();
+								break;
+							case management_Module:
+								std::cout << "Management Module, state: " << environment.getComponent(cnum)->getModule(j)->getState();
+								break;
+
+							}
+							std::cout << std::endl;
+						}
+						std::cout << std::endl;
+					}
+
+					std::cout << ">>> Input num of module to change it state" << std::endl;
+					std::cin >> ans;
+
+					if (std::cin.fail() || (ans >= environment.getComponent(cnum)->getModulesSize()) || (ans < 0)) {
+						std::cout << " >>> input failed";
+						break;
+					}
+
+					try {
+						if (environment.getComponent(cnum)->getModule(ans)->getState() == 0) {
+							EnvironmentInfo EInf;
+							std::vector<Modules_N::Module*>::iterator it = environment.getComponent(cnum)->getModules()->begin();
+
+							int enProv = 0;
+
+							while (it != environment.getComponent(cnum)->getModules()->end())
+							{
+								if (((*it)->iAm() == generator_Module) && ((*it)->getState() == 1)) {
+									enProv += dynamic_cast<generatorModule*>((*it))->getEnergyProvision();
+								}
+								++it;
+							}
+							if (enProv > environment.getComponent(cnum)->getModule(ans)->getEnergy() + environment.getComponent(cnum)->getEnergy())
+								environment.getComponent(cnum)->moduleOn(ans);
+							else
+								std::cout << " >>> component doesn't have enough energy";
+						}
+						else {
+							environment.getComponent(cnum)->moduleOff(ans);
+						}
+
+					}
+					catch (std::exception & ex) {
+						std::cout << ex.what() << std::endl;
+					}
+
+					break;
+				}
+				default:{
 					std::cout << " >>> Enter error, try again" << std::endl;
 					break;
+				}
 				}
 
 
@@ -948,17 +1115,18 @@ int main() {
 
 			} while (work2);
 			break;
-		case 3:
+		case 3: {
 			try {
 				environment.drawMap();
 			}
 			catch (std::exception & ex) {
 				std::cout << ex.what() << std::endl;
 			}
-			break;
-		default:
+			break; }
+		default: {
 			std::cout << " >>> Enter error, try again" << std::endl;
 			break;
+		}
 		}
 
 	} while (work0);

@@ -84,12 +84,8 @@ namespace Modules_N {
 			Module(st, pr, en, c), 
 			energyProvision(enpr) {};
 
-		virtual int getEnergy() {
-			return energyProvision - Module::getEnergy();
-		}
-
 		virtual int getEnergyProvision() {
-			return energyProvision;
+			return energyProvision - Module::getEnergy();
 		};
 		//! Destructor
 		~generatorModule() {};

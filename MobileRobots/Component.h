@@ -37,6 +37,11 @@ namespace Components_N {
 		int x, y;  //! Coordinates
 	public:
 
+		bool operator == (const Component& a) const
+		{
+			return (a == *this);
+		}
+
 		vector<Module*>* getModules() {
 			return &modules;
 		}
@@ -54,6 +59,10 @@ namespace Components_N {
 
 
 		Module* getModule(int i) {
+			if (i < 0)
+				throw std::exception(" >>> incorrect num");
+			if (i >= modules.size())
+				throw std::exception(" >>> incorrect num");
 			return modules[i];
 		}
 
@@ -72,9 +81,12 @@ namespace Components_N {
 			return modules.size();
 		}
 
-		Point getCoord() { return { x,y }; }
+		Point getCoord() { return { x, y }; }
 		string getDesc() { return description; }
 		int getEnergy() { return energy; }
+		int getSlotsNum() { return slotsNum; }
+
+		void setEnergy(int en) {  energy = en; }
 		int getNum() { return slotsNum; }
 		int getCost() { return cost; }
 		virtual int getNumD() { return 0; }
@@ -116,11 +128,20 @@ namespace Components_N {
 		managementComponent(int numD = 0);
 
 
+		bool operator == (const managementComponent& a) const
+		{
+			return (a == *this);
+		}
+
 		vector<Component*>* getNComp() {
 			return &managedComponents;
 		} 
 
 		Component* getComp(int i) {
+			if (i < 0)
+				throw std::exception(" >>> incorrect num");
+			if (i >= managedComponents.size())
+				throw std::exception(" >>> incorrect num");
 			return managedComponents[i];
 		}
 
@@ -144,6 +165,11 @@ namespace Components_N {
 		int velocity = 0;  //!< velocity of mobile component
 	public:
 
+
+		bool operator == (const mobileComponent& a) const
+		{
+			return (a == *this);
+		}
 		mobileComponent(int x0, int y0, string desc, int en = 0, int num = 0, int c = 0, int vel = 0);
 		mobileComponent(int vel = 0);
 
@@ -163,6 +189,10 @@ namespace Components_N {
 	class robotScout : public virtual mobileComponent {
 	private:
 	public:
+		bool operator == (const robotScout& a) const
+		{
+			return (a == *this);
+		}
 
 		virtual int iAm() const { return robot_scout; }
 		robotScout(int x0, int y0, string desc, int en, int num, int c, int vel = 0);
@@ -180,6 +210,11 @@ namespace Components_N {
 	{
 	private:
 	public:
+
+		bool operator == (const robotCommander& a) const
+		{
+			return (a == *this);
+		}
 
 		robotCommander(int x0, int y0, string desc, int en, int num, int c, int numD = 0, int vel = 0);
 		virtual int iAm() const { return robot_commander; }

@@ -56,7 +56,7 @@ namespace Components_N {
 		if (enpr < 0)
 			throw std::exception(" >>> incorrect energy provision");
 
-		Module* mod = new generatorModule(false, pr, en, c, enpr);
+		Module* mod = new generatorModule(true, pr, en, c, enpr);
 		modules.push_back(mod);
 	};
 
@@ -108,7 +108,14 @@ namespace Components_N {
 	void Component::deleteModule(int num) {
 		if ((num < 0) || (num >= modules.size()))
 			throw std::exception(" >>> incorrect num of module");
-		modules.erase(modules.begin() + num);
+		if (modules[num]->getState() == 1)
+			this->setEnergy(energy - modules[num]->getEnergy());
+		try {
+			modules.erase(modules.begin() + num);
+		}
+		catch (std::exception & ex) {
+			std::cout << ex.what() << std::endl;
+		}
 	};
 
 	/*! Method to turn module on: gets type of module, check availability of the module
@@ -122,7 +129,28 @@ namespace Components_N {
 	void Component::moduleOn(int num) {
 		if ((num < 0) || (num >= modules.size()))
 			throw std::exception(" >>> incorrect num of module");
-		modules[num]->on();
+
+		if (modules[num]->iAm() != generator_Module) {
+			int enProv = 0;
+			std::vector<Modules_N::Module*>::iterator it = modules.begin();
+			while (it != modules.end())
+			{
+				if (((*it)->iAm() == generator_Module) && ((*it)->getState() == 1)) {
+					enProv += dynamic_cast<generatorModule*>((*it))->getEnergyProvision();
+				}
+				++it;
+			}
+			if (enProv < this->getEnergy() + modules[num]->getEnergy())
+				throw std::exception(" >>> no free energy");
+		}
+		if (modules[num]->getState() == 0)
+			this->setEnergy(energy + modules[num]->getEnergy());
+		try {
+			modules[num]->on();
+		}
+		catch (std::exception & ex) {
+			std::cout << ex.what() << std::endl;
+		}
 	};
 
 	/*!  Method to turn module off: gets type of module, check availability of the module
@@ -136,7 +164,14 @@ namespace Components_N {
 	void Component::moduleOff(int num) {
 		if ((num < 0) || (num >= modules.size()))
 			throw std::exception(" >>> incorrect num of module");
-		modules[num]->off();
+		if (modules[num]->getState() == 1)
+			this->setEnergy(energy - modules[num]->getEnergy());
+		try {
+			modules[num]->off();
+		}
+		catch (std::exception & ex) {
+			std::cout << ex.what() << std::endl;
+		}
 	};
 
 	////////////////////////////////////////////////////////////
@@ -168,7 +203,7 @@ namespace Components_N {
 
 		while (it != managedComponents[i]->getModules()->end())
 		{
-			if ((*it)->iAm() == sensor_Module) {
+			if (((*it)->iAm() == sensor_Module)&&((*it)->getState() == 1)) {
 				EnvironmentInfo EInf_old = dynamic_cast<sensorModule*>(*it)->getInfo(managedComponents[i]->getCoord(), env);
 
 				std::vector<Point>::iterator iter;

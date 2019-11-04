@@ -57,8 +57,12 @@ namespace ED_N {
 	unsigned environmentDescriptor::getCell(Point point) {
 		if (size.m == 0 || size.n == 0)
 			throw std::exception(">>> Environment is empty");
+		if (point.x < 0)
+			throw std::exception(" >>> x coordinate < 0");
 		if (point.x >= size.n)
 			throw std::exception(" >>> x coordinate bigger then horizontal size");
+		if (point.y < 0)
+			throw std::exception(" >>> y coordinate < 0");
 		if (point.y >= size.m)
 			throw std::exception(" >>> y coordinate bigger then vertical size");
 		return field[point.x].at(point.y);
@@ -68,8 +72,12 @@ namespace ED_N {
 	void environmentDescriptor::setCell(Point point, unsigned cell_type) {
 		if (size.m == 0 || size.n == 0)
 			throw std::exception(">>> Environment is empty");
+		if (point.x < 0)
+			throw std::exception(" >>> x coordinate < 0");
 		if(point.x >= size.n)
 			throw std::exception(" >>> x coordinate bigger then horizontal size");
+		if (point.y < 0)
+			throw std::exception(" >>> y coordinate < 0");
 		if (point.y >= size.m)
 			throw std::exception(" >>> y coordinate bigger then vertical size");
 		if ((cell_type != barrier) && (cell_type != interest_point))
@@ -106,8 +114,12 @@ namespace ED_N {
 
 		if (size.m == 0 || size.n == 0)
 			throw std::exception(">>> Environment is empty");
+		if (point.x < 0)
+			throw std::exception(" >>> x coordinate < 0");
 		if (point.x >= size.n)
 			throw std::exception(" >>> x coordinate bigger then horizontal size");
+		if (point.y < 0)
+			throw std::exception(" >>> y coordinate < 0");
 		if (point.y >= size.m)
 			throw std::exception(" >>> y coordinate bigger then vertical size");
 		if (en <= 0)
@@ -127,8 +139,12 @@ namespace ED_N {
 
 		if (size.m == 0 || size.n == 0)
 			throw std::exception(">>> Environment is empty");
+		if (point.x < 0)
+			throw std::exception(" >>> x coordinate < 0");
 		if (point.x >= size.n)
 			throw std::exception(" >>> x coordinate bigger then horizontal size");
+		if (point.y < 0)
+			throw std::exception(" >>> y coordinate < 0");
 		if (point.y >= size.m)
 			throw std::exception(" >>> y coordinate bigger then vertical size");
 		if (en <= 0)
@@ -151,8 +167,12 @@ namespace ED_N {
 
 		if (size.m == 0 || size.n == 0)
 			throw std::exception(">>> Environment is empty");
+		if (point.x < 0)
+			throw std::exception(" >>> x coordinate < 0");
 		if (point.x >= size.n)
 			throw std::exception(" >>> x coordinate bigger then horizontal size");
+		if (point.y < 0)
+			throw std::exception(" >>> y coordinate < 0");
 		if (point.y >= size.m)
 			throw std::exception(" >>> y coordinate bigger then vertical size");
 		if (en <= 0)
@@ -172,9 +192,13 @@ namespace ED_N {
 	void environmentDescriptor::AddObserveCenter(Point point, int en, int num, int c) {
 
 		if (size.m == 0 || size.n == 0)
-			throw std::exception(" >>> Environment is empty");
+			throw std::exception(">>> Environment is empty");
+		if (point.x < 0)
+			throw std::exception(" >>> x coordinate < 0");
 		if (point.x >= size.n)
 			throw std::exception(" >>> x coordinate bigger then horizontal size");
+		if (point.y < 0)
+			throw std::exception(" >>> y coordinate < 0");
 		if (point.y >= size.m)
 			throw std::exception(" >>> y coordinate bigger then vertical size");
 		if (en <= 0)
@@ -297,7 +321,7 @@ namespace ED_N {
 
 		else {
 
-			std::cout << "Componets in field: \n";
+			std::cout << "Components in field: \n";
 
 			std::vector<Components_N::Component*>::iterator c_it;
 			for (int i = 0; i < components.size(); ++i) {
