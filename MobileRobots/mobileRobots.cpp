@@ -35,8 +35,8 @@
 	* Coming soon
 	*/
 
-#include "AI.h"
-#include "environmentDescriptor.h"
+#include "AI/AI.h"
+#include "environmentDescriptor/environmentDescriptor.h"
 #include <iostream>
 #include <cstdlib>
 
@@ -75,6 +75,8 @@ void getClear()
 */
 int main() {
 
+	AI _AI;
+
 	unsigned menu3 = 1;
 	bool work3 = true;
 
@@ -89,12 +91,12 @@ int main() {
 
 	environmentDescriptor environment;
 
-
 	//////////////////////////////////////
 	//////////////////////////////////////
 	//FILL ENVIREONMENT
 	//////////////////////////////////////
 	//////////////////////////////////////
+
 
 	environment.setSize({ 16, 16 });
 	environment.setCell({ 0, 0 }, 2);
@@ -145,6 +147,7 @@ int main() {
 	environment.getRSComponent(3)->setModule_s(1, 150, 500, 4, 60, 3);
 	environment.getRSComponent(3)->setModule_s(1, 150, 500, 4, 60, 1);
 	environment.getRSComponent(3)->setModule_s(1, 150, 500, 4, 60, 2);
+
 	//4
 	environment.AddRobotScout({ 2, 13 }, 80, 5, 2, 600);
 	environment.getRSComponent(4)->setModule_s(1, 150, 500, 4, 60, 3);
@@ -739,7 +742,7 @@ int main() {
 							}
 
 
-							std::vector<Components_N::Component*>::iterator c_it;
+							vector<Components_N::Component*>::iterator c_it;
 							std::cout << "\tManaged components: ";
 							if (dynamic_cast<robotCommander*>(environment.getComponent(cnum))->getNComp()->size() != 0) {
 								c_it = dynamic_cast<robotCommander*>(environment.getComponent(cnum))->getNComp()->begin();
@@ -793,7 +796,7 @@ int main() {
 								break;
 							}
 
-							std::vector<Components_N::Component*>::iterator c_it;
+							vector<Components_N::Component*>::iterator c_it;
 							std::cout << "\tManaged components: ";
 							if (dynamic_cast<managementComponent*>(environment.getComponent(cnum))->getNComp()->size() != 0) {
 								c_it = dynamic_cast<managementComponent*>(environment.getComponent(cnum))->getNComp()->begin();
@@ -879,7 +882,7 @@ int main() {
 								break;
 							}
 
-							std::vector<Components_N::Component*>::iterator c_it;
+							vector<Components_N::Component*>::iterator c_it;
 							std::cout << "\tManaged components: ";
 							if (dynamic_cast<managementComponent*>(environment.getComponent(cnum))->getNComp()->size() != 0) {
 								c_it = dynamic_cast<managementComponent*>(environment.getComponent(cnum))->getNComp()->begin();
@@ -1064,7 +1067,7 @@ int main() {
 					try {
 						if (environment.getComponent(cnum)->getModule(ans)->getState() == 0) {
 							EnvironmentInfo EInf;
-							std::vector<Modules_N::Module*>::iterator it = environment.getComponent(cnum)->getModules()->begin();
+							vector<Modules_N::Module*>::iterator it = environment.getComponent(cnum)->getModules()->begin();
 
 							int enProv = 0;
 

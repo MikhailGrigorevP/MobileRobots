@@ -1,8 +1,10 @@
 #ifndef _AI_H_
 #define _AI_H_
 
-#include "structures.h"
-using std::vector;
+#include "../Structures/structures.h"
+using namespace my_std;
+//using namespace std;
+
 //! Artificial intelligence namespace
 /*! AI namespace
 */

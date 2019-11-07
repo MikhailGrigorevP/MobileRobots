@@ -1,9 +1,11 @@
 #pragma once
 
-#include <vector>
+//#include <vector>
+//using namespace std;
+#include "../Vector/vector.h"
+using namespace my_std;
 #include <string>
 #include <iostream>
-using std::vector;
 
 namespace ED_N {
 	class environmentDescriptor;
@@ -18,10 +20,16 @@ struct Point {
 	int x = 0;   //!< x coordinate
 	int y = 0;   //!< y coordinate
 
-	bool operator == (const Point& a) const
+	friend bool operator == (const Point& b, const Point& a)
 	{
-		return (x == a.x && y == a.y);
+		return ((a.x == b.x) && (a.y == b.y));
 	}
+
+	friend bool operator != (const Point& b, const Point& a)
+	{
+		return ((a.x != b.x) || (a.y != b.y));
+	}
+
 };
 
 //////! Cell of the field

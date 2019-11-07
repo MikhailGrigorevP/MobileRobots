@@ -31,13 +31,13 @@ TEST(environmentDescriptorT, ED_setters) {
 	environment.setSize({ 10, 10 });
 	Field_size point = { 10, 10 };
 	EXPECT_EQ(point, environment.getSize());
-
+	
 	environment.setSize({ 20, 20 });
 	point = { 20, 20 };
 	EXPECT_EQ(point, environment.getSize());
-
+	
 	EXPECT_EQ(none_cell, environment.getCell({ 0, 6 }));
-
+	
 	environment.setCell({ 8, 11 }, interest_point);
 	EXPECT_EQ(interest_point, environment.getCell({ 8, 11 }));
 
@@ -270,15 +270,18 @@ TEST(ComponentT, C_management_info) {
 	envInf = environment.getRCComponent(2)->getInfo(0, &environment);
 	envInfo2 = environment.getRCComponent(2)->getInfo(1, &environment);
 
-	vector<Point> points = {{ 2, 1 }, { 2, 4 }, { 7, 3 }};
+	vector<Point> points;
+	points.push_back({ 2, 1 });
+	points.push_back({ 2, 4 });
+	points.push_back({ 7, 3 });
 
 	EXPECT_EQ(points, envInf.barriers);
 
-	vector<Point> points2;
-	points2.push_back({ 9, 1 });
-	EXPECT_EQ(points2, envInf.pointsOfInterest);
-	points2.push_back({ 5, 1 });
-	//EXPECT_NE(points2, envInf.pointsOfInterest);
+	points.clear();
+	points.push_back({ 9, 1 });
+	EXPECT_EQ(points, envInf.pointsOfInterest);
+	points.push_back({ 5, 1 });
+	EXPECT_NE(points, envInf.pointsOfInterest);
 
 	EXPECT_EQ(environment.getRCComponent(2), envInfo2.components[0]);
 	EXPECT_NE(environment.getRCComponent(1), envInfo2.components[0]);
@@ -353,11 +356,11 @@ TEST(ModuleT, M_info) {
 
 	EXPECT_EQ(points, envInf.barriers);
 
-	vector<Point> points2;
-	points2.push_back({ 9, 1 });
-	EXPECT_EQ(points2, envInf.pointsOfInterest);
-	points2.push_back({ 5, 1 });
-	//EXPECT_NE(points2, envInf.pointsOfInterest);
+	points.clear();
+	points.push_back({ 9, 1 });
+	EXPECT_EQ(points, envInf.pointsOfInterest);
+	points.push_back({ 5, 1 });
+	EXPECT_NE(points, envInf.pointsOfInterest);
 
 	EXPECT_EQ(environment.getRCComponent(2), envInfo2.components[0]);
 	EXPECT_NE(environment.getRCComponent(1), envInfo2.components[0]);

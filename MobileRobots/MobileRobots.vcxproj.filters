@@ -18,36 +18,39 @@
     <None Include="ClassDiagram.cd" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Component.cpp">
-      <Filter>Исходные файлы</Filter>
-    </ClCompile>
     <ClCompile Include="mobileRobots.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
-    <ClCompile Include="Module.cpp">
+    <ClCompile Include="Module\Module.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
-    <ClCompile Include="AI.cpp">
+    <ClCompile Include="environmentDescriptor\environmentDescriptor.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
-    <ClCompile Include="environmentDescriptor.cpp">
+    <ClCompile Include="Component\Component.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
+    <ClCompile Include="AI\AI.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Component.h">
+    <ClInclude Include="Module\Module.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
-    <ClInclude Include="Module.h">
+    <ClInclude Include="environmentDescriptor\environmentDescriptor.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
-    <ClInclude Include="AI.h">
+    <ClInclude Include="Component\Component.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
-    <ClInclude Include="environmentDescriptor.h">
+    <ClInclude Include="AI\AI.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
-    <ClInclude Include="structures.h">
+    <ClInclude Include="Structures\structures.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="Vector\vector.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
   </ItemGroup>

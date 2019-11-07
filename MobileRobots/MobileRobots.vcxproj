@@ -126,18 +126,19 @@
     <None Include="ClassDiagram.cd" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="AI.cpp" />
-    <ClCompile Include="Component.cpp" />
-    <ClCompile Include="environmentDescriptor.cpp" />
+    <ClCompile Include="AI\AI.cpp" />
+    <ClCompile Include="Component\Component.cpp" />
+    <ClCompile Include="environmentDescriptor\environmentDescriptor.cpp" />
     <ClCompile Include="mobileRobots.cpp" />
-    <ClCompile Include="Module.cpp" />
+    <ClCompile Include="Module\Module.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="AI.h" />
-    <ClInclude Include="Component.h" />
-    <ClInclude Include="environmentDescriptor.h" />
-    <ClInclude Include="Module.h" />
-    <ClInclude Include="structures.h" />
+    <ClInclude Include="AI\AI.h" />
+    <ClInclude Include="Component\Component.h" />
+    <ClInclude Include="environmentDescriptor\environmentDescriptor.h" />
+    <ClInclude Include="Module\Module.h" />
+    <ClInclude Include="Structures\structures.h" />
+    <ClInclude Include="Vector\vector.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

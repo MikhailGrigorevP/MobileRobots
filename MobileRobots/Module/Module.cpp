@@ -1,5 +1,5 @@
 #include "Module.h"
-#include "environmentDescriptor.h"
+#include "../environmentDescriptor/environmentDescriptor.h"
 
 #include <math.h>
 #define PI 3.14159265
@@ -49,8 +49,8 @@ namespace Modules_N {
 						if (env->getCell({ i,j }) == interest_point)
 							currInfo.pointsOfInterest.push_back({ i, j });
 
-						std::vector<Components_N::Component*> comp = env->getComponents();
-						std::vector<Components_N::Component*>::iterator it;
+						vector<Components_N::Component*> comp = env->getComponents();
+						vector<Components_N::Component*>::iterator it;
 
 						it = comp.begin();
 
@@ -84,8 +84,8 @@ namespace Modules_N {
 						if (env->getCell({ i,j }) == interest_point)
 							currInfo.pointsOfInterest.push_back({ i, j });
 
-						std::vector<Components_N::Component*> comp = env->getComponents();
-						std::vector<Components_N::Component*>::iterator it;
+						vector<Components_N::Component*> comp = env->getComponents();
+						vector<Components_N::Component*>::iterator it;
 
 						it = comp.begin();
 
@@ -119,8 +119,8 @@ namespace Modules_N {
 						if (env->getCell({ i,j }) == interest_point)
 							currInfo.pointsOfInterest.push_back({ i, j });
 
-						std::vector<Components_N::Component*> comp = env->getComponents();
-						std::vector<Components_N::Component*>::iterator it;
+						vector<Components_N::Component*> comp = env->getComponents();
+						vector<Components_N::Component*>::iterator it;
 
 						it = comp.begin();
 
@@ -157,8 +157,8 @@ namespace Modules_N {
 						if (env->getCell({ i,j }) == interest_point)
 							currInfo.pointsOfInterest.push_back({ i, j });
 
-						std::vector<Components_N::Component*> comp = env->getComponents();
-						std::vector<Components_N::Component*>::iterator it;
+						vector<Components_N::Component*> comp = env->getComponents();
+						vector<Components_N::Component*>::iterator it;
 
 						it = comp.begin();
 
@@ -202,7 +202,7 @@ namespace Modules_N {
 		if (i >= dynamic_cast<managementComponent*>(current)->getNComp()->size())
 			throw std::exception(">>> incorrect num");
 
-		dynamic_cast<managementComponent*>(current)->getNComp()->erase(dynamic_cast<managementComponent*>(current)->getNComp()->begin() + i);
+		dynamic_cast<managementComponent*>(current)->getNComp()->erase(i);
 	}
 
 }

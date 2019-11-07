@@ -1,9 +1,9 @@
 ﻿#include <iostream>
 #include <string>
-#include "Module.h"
+#include "../Module/Module.h"
+#pragma once;
 
 using std::string;
-using std::vector;
 using namespace Modules_N;
 
 #ifndef _COMPONENT_H_
@@ -37,9 +37,14 @@ namespace Components_N {
 		int x, y;  //! Coordinates
 	public:
 
-		bool operator == (const Component& a) const
+		friend bool operator == (const Component& b, const Component& a)
 		{
-			return (a == *this);
+			return ((a.x == b.x) && (a.y == b.y));
+		}
+
+		friend bool operator != (const Component &b, const Component& a)
+		{
+			return ((a.x != b.x) || (a.y != b.y));
 		}
 
 		vector<Module*>* getModules() {
@@ -112,6 +117,8 @@ namespace Components_N {
 
 		void moduleOff(int type);
 	};
+
+
 
 	//! Command center
 	/*! This virtual class is also "Command center"

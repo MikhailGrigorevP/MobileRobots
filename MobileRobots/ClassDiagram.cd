@@ -3,25 +3,22 @@
   <Class Name="Components_N::managementComponent">
     <Position X="6.5" Y="4.5" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAAAABAAABAAAAIAAAAAAAQAAAAAAAAAAIAAQCAgA=</HashCode>
-      <FileName>Component.h</FileName>
+      <HashCode>AAAAEAABAAABAAAAIQAAAQAAQAAAAAAAAAAIAAQCAgA=</HashCode>
+      <FileName>Component\Component.h</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Components_N::Component">
     <Position X="9" Y="0.5" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AACiAAEAQAABAAQAMDAAUGAHAAAQACCAAABgAAQAAgA=</HashCode>
-      <FileName>Component.h</FileName>
+      <HashCode>AACiAAEEQAABAAQAMDAAUWAHAAAQACCAAEBgAAQAAgA=</HashCode>
+      <FileName>Component\Component.h</FileName>
     </TypeIdentifier>
-    <ShowAsAssociation>
-      <Field Name="modules" />
-    </ShowAsAssociation>
   </Class>
   <Class Name="Components_N::mobileComponent">
     <Position X="12" Y="4" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAAAIAAAAFAAAAACAAAAAAAAAAAQAAAAQAAAAAAAA=</HashCode>
-      <FileName>Component.h</FileName>
+      <HashCode>AAAAAAIAAAAFAAAAACAAAQAAAAAAAQAAAAQAAAAAAAA=</HashCode>
+      <FileName>Component\Component.h</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Components_N::robotCommander">
@@ -32,92 +29,106 @@
       </InheritanceModifierLabel>
     </InheritanceLine>
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAAABAAAAAAAAAAAAAAAAAABAAAAEAAAAAAA=</HashCode>
-      <FileName>Component.h</FileName>
+      <HashCode>AAAAAAAAAAABAAAAAAAAAQAAAAAAAABAAAAEAAAAAAA=</HashCode>
+      <FileName>Component\Component.h</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Components_N::robotScout">
     <Position X="11.75" Y="7.75" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AABAAAAAAAABAAAAAAAAAAAAABAAAAAAAAAAAAAAAAA=</HashCode>
-      <FileName>Component.h</FileName>
+      <HashCode>AABAAAAAAAABAAAAAAAAAQAAABAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Component\Component.h</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Modules_N::Module">
     <Position X="2.75" Y="0.75" Width="1.5" />
     <TypeIdentifier>
       <HashCode>QAAAgEEAAASBCAQAAAAAAAAAAAAQAAAEAAAACAQAAAA=</HashCode>
-      <FileName>Module.h</FileName>
+      <FileName>Module\Module.h</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Modules_N::generatorModule">
     <Position X="0.75" Y="5.5" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAAAABAAAABAAgAAAAAAAAACAAAAAAgAQAAAA=</HashCode>
-      <FileName>Module.h</FileName>
+      <HashCode>AAAAAAAAAAABAAAABAAgAAAAAAAAACAAAAAAgAAAAAA=</HashCode>
+      <FileName>Module\Module.h</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Modules_N::managementModule">
     <Position X="4.75" Y="5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAEACAACAIBAAAAAAAAEAAAAAAAAAACAAAAAAAAEQA=</HashCode>
-      <FileName>Module.h</FileName>
+      <FileName>Module\Module.h</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Modules_N::sensorModule">
     <Position X="2.75" Y="5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>gCCAAAAACAABIAAAAAIAAAAAQAAAAAAAAAAAAABAAQA=</HashCode>
-      <FileName>Module.h</FileName>
+      <FileName>Module\Module.h</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="AI_N::AI">
     <Position X="11.75" Y="0.75" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AQAAAAAAAgAACAAAAAAAAAAAAQAAAAAAAAAAAAAAAAA=</HashCode>
-      <FileName>AI.h</FileName>
+      <FileName>AI\AI.h</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="ED_N::environmentDescriptor">
     <Position X="13.75" Y="0.75" Width="2" />
     <TypeIdentifier>
-      <HashCode>AECAAEAAhIAAAggEAKCAAAAAAAAAQABCBAlQAAAAAAA=</HashCode>
-      <FileName>environmentDescriptor.h</FileName>
+      <HashCode>AECAAEAghIAAAggEAKCAAAQAAAAAQABADAlQAAAAAAA=</HashCode>
+      <FileName>environmentDescriptor\environmentDescriptor.h</FileName>
     </TypeIdentifier>
   </Class>
-  <Class Name="std::vector&lt;_Ty, _Alloc&gt;" Collapsed="true">
+  <Struct Name="Point" Collapsed="true">
+    <Position X="0.5" Y="2.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAABgAAAAAAA=</HashCode>
+      <FileName>Structures\structures.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="Field_size" Collapsed="true">
+    <Position X="0.5" Y="0.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAEgAAAAAAAAA=</HashCode>
+      <FileName>Structures\structures.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="EnvironmentInfo" Collapsed="true">
+    <Position X="0.5" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>CAAAAAAAAAAAAAAAAACAAAAAgAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Structures\structures.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Enum Name="CellType" Collapsed="true">
+    <Position X="0.5" Y="3" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAEAQAAAAAAAAAAAAAgAAAAAAAEAAAAAAAA=</HashCode>
+      <FileName>Structures\structures.h</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="ComponentType" Collapsed="true">
     <Position X="6.5" Y="0.75" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AWAEk4EqCrBsCEBAAOMIIAAyAAUEQBIghQkwgkAFUko=</HashCode>
-      <FileName>C:\Program Files (x86)\Microsoft Visual Studio\2019\Community2\VC\Tools\MSVC\14.23.28105\include\vector</FileName>
-    </TypeIdentifier>
-  </Class>
-  <Struct Name="EnvironmentInfo" Collapsed="true">
-    <Position X="0.5" Y="1.25" Width="1.5" />
-    <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
-      <FileName>structures.h</FileName>
-    </TypeIdentifier>
-  </Struct>
-  <Struct Name="Point" Collapsed="true">
-    <Position X="0.5" Y="0.5" Width="1.5" />
-    <TypeIdentifier>
-      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABgAAAAAAA=</HashCode>
-      <FileName>structures.h</FileName>
-    </TypeIdentifier>
-  </Struct>
-  <Enum Name="DirectionType" Collapsed="true">
-    <Position X="0.5" Y="2" Width="1.5" />
-    <TypeIdentifier>
-      <HashCode>AAAAAAAAAAACAAAAAAAAAAAAAAAIAAAAAAAAAgAAgAA=</HashCode>
-      <FileName>structures.h</FileName>
+      <HashCode>AAAAAAAAAAAAAgAAAAAgCAAAAAEAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Structures\structures.h</FileName>
     </TypeIdentifier>
   </Enum>
   <Enum Name="ModuleType" Collapsed="true">
-    <Position X="0.5" Y="2.75" Width="1.5" />
+    <Position X="5.25" Y="1.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQEAAgAAAAAAAA=</HashCode>
-      <FileName>structures.h</FileName>
+      <FileName>Structures\structures.h</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="DirectionType" Collapsed="true">
+    <Position X="0.5" Y="4.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAACAAAAAAAAAAAAAAAIAAAAAAAAAgAAgAA=</HashCode>
+      <FileName>Structures\structures.h</FileName>
     </TypeIdentifier>
   </Enum>
   <Font Name="Segoe UI" Size="9" />

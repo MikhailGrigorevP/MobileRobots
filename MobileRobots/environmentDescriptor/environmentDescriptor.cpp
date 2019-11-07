@@ -2,6 +2,7 @@
 
 namespace ED_N {
 
+	using namespace my_std;
 
 	void returnDir(int dir) {
 		switch (dir) {
@@ -21,15 +22,34 @@ namespace ED_N {
 	}
 
 	//! Constructor
-	environmentDescriptor::environmentDescriptor(int m0, int n0) : size{ m0, n0} {};
+	environmentDescriptor::environmentDescriptor(int m0, int n0) : size{ m0, n0} {
+
+		if (m0 < 0 || n0 < 0)
+			throw std::exception(">>> incorrect size");
+
+		for (int i = 0; i < n0; ++i) {
+			field.push_back(vector<unsigned>());
+			for (int j = 0; j < m0; ++j) {
+				field[i].push_back(none_cell);
+			}
+		}
+	};
 
 	//! Constructor
-	environmentDescriptor::environmentDescriptor(Field_size field_size) : size{ field_size.m, field_size.n } {};
+	environmentDescriptor::environmentDescriptor(Field_size field_size) : size{ field_size.m, field_size.n } {
+
+		if (field_size.m < 0 || field_size.n < 0)
+			throw std::exception(">>> incorrect size");
+		for (int i = 0; i < size.n; ++i) {
+			field.push_back(vector<unsigned>());
+			for (int j = 0; j < size.m; ++j) {
+				field[i].push_back(none_cell);
+			}
+		}
+	};
 
 	//! Destructor
 	environmentDescriptor::~environmentDescriptor() {
-		field.~vector();
-		components.~vector();
 	};
 
 	//! get size of field
@@ -45,7 +65,7 @@ namespace ED_N {
 		size.n = field_size.n;
 
 		for (int i = 0; i < size.n; ++i) {
-			field.push_back(std::vector<unsigned>());
+			field.push_back(vector<unsigned>());
 			for (int j = 0; j < size.m; ++j) {
 				field[i].push_back(none_cell);
 			}
@@ -54,7 +74,7 @@ namespace ED_N {
 	};
 
 	//! get type of cell
-	unsigned environmentDescriptor::getCell(Point point) {
+	unsigned environmentDescriptor:: getCell(Point point) {
 		if (size.m == 0 || size.n == 0)
 			throw std::exception(">>> Environment is empty");
 		if (point.x < 0)
@@ -65,7 +85,7 @@ namespace ED_N {
 			throw std::exception(" >>> y coordinate < 0");
 		if (point.y >= size.m)
 			throw std::exception(" >>> y coordinate bigger then vertical size");
-		return field[point.x].at(point.y);
+		return field[point.x][point.y];
 	};
 
 	//! set type of cell
@@ -83,7 +103,7 @@ namespace ED_N {
 		if ((cell_type != barrier) && (cell_type != interest_point))
 			throw std::exception(" >>> incorrect type of cell");
 
-		field[point.x].at(point.y) = cell_type;
+		field[point.x][point.y] = cell_type;
 	};
 
 	// Input
@@ -300,7 +320,7 @@ namespace ED_N {
 
 		for (int j = 0; j < size.m; ++j) {
 			for (int i = 0; i < size.n; ++i) {
-				switch (field[i].at(j)) {
+				switch (field[i][j]) {
 				case none_cell:
 					std::cout << "~";
 					break;
@@ -323,7 +343,7 @@ namespace ED_N {
 
 			std::cout << "Components in field: \n";
 
-			std::vector<Components_N::Component*>::iterator c_it;
+			vector<Components_N::Component*>::iterator c_it;
 			for (int i = 0; i < components.size(); ++i) {
 				switch (components[i]->iAm()) {
 				case observe_center:
@@ -381,8 +401,8 @@ namespace ED_N {
 						std::cout << "\t" << j << ". ";
 
 						EnvironmentInfo envinfo;
-						std::vector<Point>::iterator p_it, b_it;
-						std::vector<Components_N::Component*>::iterator c_it;
+						vector<Point>::iterator p_it, b_it;
+						vector<Components_N::Component*>::iterator c_it;
 
 
 						switch ((components[i]->getModule(j))->iAm()) {
@@ -466,8 +486,8 @@ namespace ED_N {
 
 	void environmentDescriptor::showInfo(EnvironmentInfo envinfo) {
 
-		std::vector<Point>::iterator p_it, b_it;
-		std::vector<Components_N::Component*>::iterator c_it;
+		vector<Point>::iterator p_it, b_it;
+		vector<Components_N::Component*>::iterator c_it;
 
 		std::cout << "\t\tPoints of interest: ";
 

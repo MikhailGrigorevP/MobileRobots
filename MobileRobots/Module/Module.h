@@ -1,5 +1,5 @@
 #include <iostream>
-#include "structures.h"
+#include "../Structures/structures.h"
 
 #ifndef _MODULE_H_
 #define _MODULE_H_

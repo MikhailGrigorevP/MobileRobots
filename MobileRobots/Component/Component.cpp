@@ -1,7 +1,8 @@
 #include "Component.h"
 #include <algorithm>
 namespace Components_N {
-
+	using namespace my_std;
+	//using namespace std;
 
 	/*! Simple Constructor gets
 	* x0 and y0 to set coordinates of module,
@@ -35,7 +36,7 @@ namespace Components_N {
 
 	/*! virtual destructor delete dynamic array of component's modules
 	*/
-	Component::~Component() { modules.~vector(); };
+	Component::~Component() { };
 
 	/*! Method to set module: gets type of module, check free slots and install module.
 	*
@@ -111,7 +112,7 @@ namespace Components_N {
 		if (modules[num]->getState() == 1)
 			this->setEnergy(energy - modules[num]->getEnergy());
 		try {
-			modules.erase(modules.begin() + num);
+			modules.erase(num);
 		}
 		catch (std::exception & ex) {
 			std::cout << ex.what() << std::endl;
@@ -132,7 +133,7 @@ namespace Components_N {
 
 		if (modules[num]->iAm() != generator_Module) {
 			int enProv = 0;
-			std::vector<Modules_N::Module*>::iterator it = modules.begin();
+			vector<Modules_N::Module*>::iterator it = modules.begin();
 			while (it != modules.end())
 			{
 				if (((*it)->iAm() == generator_Module) && ((*it)->getState() == 1)) {
@@ -199,14 +200,14 @@ namespace Components_N {
 		if (i >= managedComponents.size())
 			throw std::exception(">>> incorrect num");
 		EnvironmentInfo EInf;
-		std::vector<Modules_N::Module*>::iterator it = managedComponents[i]->getModules()->begin();
+		vector<Modules_N::Module*>::iterator it = managedComponents[i]->getModules()->begin();
 
 		while (it != managedComponents[i]->getModules()->end())
 		{
 			if (((*it)->iAm() == sensor_Module)&&((*it)->getState() == 1)) {
 				EnvironmentInfo EInf_old = dynamic_cast<sensorModule*>(*it)->getInfo(managedComponents[i]->getCoord(), env);
 
-				std::vector<Point>::iterator iter;
+				vector<Point>::iterator iter;
 				iter = EInf_old.barriers.begin();
 				while (iter != EInf_old.barriers.end())
 				{
@@ -225,7 +226,7 @@ namespace Components_N {
 					++iter;
 				}
 
-				std::vector<Component*>::iterator iterc;
+				vector<Component*>::iterator iterc;
 				iterc = EInf_old.components.begin();
 				while (iterc != EInf_old.components.end())
 				{

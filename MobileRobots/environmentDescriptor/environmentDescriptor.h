@@ -1,9 +1,10 @@
 #ifndef _ENVIRONMENTDESCRIPTOR_H_
 #define _ENVIRONMENTDESCRIPTOR_H_
 
-#include "Component.h"
+#include "../Component/Component.h"
 
-using std::vector;
+
+using namespace my_std;
 using namespace Components_N;
 //! Environment desriptor namespace
 /*! ED namespace
