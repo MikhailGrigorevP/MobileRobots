@@ -5,7 +5,13 @@
 #include <stdexcept>
 #include <memory>
 
+//! Vector namespace
+/*! My realization of <vector> from stl 
+*/
 namespace my_std {
+
+
+	/*!Iterators */
 
 	template<class T>
 	class const_Iterator : public std::iterator<std::random_access_iterator_tag, T>
@@ -52,6 +58,7 @@ namespace my_std {
 		Iterator  operator++ (int) { Iterator it(this->p); ++this->p; return it; }
 	};
 
+	/*!Class */
 	template<class T, class Allocator = std::allocator<T>>
 	class vector
 	{
@@ -66,10 +73,11 @@ namespace my_std {
 
 		size_t capacity_of_size(size_t size) { return (size / _additional_size + 1) * _additional_size; }
 	
-		void destroy_array(T*& _array, size_t _constructed_count) {
-			while (_constructed_count--) {
-				allocator_t::destroy(_allocator, _array + _constructed_count);
+		void destroy_array(T*& _array, size_t& _constructed_count) {
+			for (size_t i = 0; i < _constructed_count; ++i) {
+				allocator_t::destroy(_allocator, _array + i);
 			}
+			_constructed_count = 0;
 		}
 	
 		void destroy_current_array() { destroy_array(_array, _size); }
@@ -92,9 +100,6 @@ namespace my_std {
 		}
 	
 	public:
-
-		using const_iterator = const_Iterator<T>;
-		using iterator = Iterator<T>;
 
 		// Constructors
 		vector() {
@@ -212,6 +217,10 @@ namespace my_std {
 			return *(_array + index);
 		}
 
+
+		using const_iterator = const_Iterator<T>;
+		using iterator = Iterator<T>;
+
 		// Iterators
 		iterator                begin()        noexcept { return iterator(_array); }
 		const_iterator          begin()  const noexcept { return const_iterator(_array); }
@@ -280,6 +289,7 @@ namespace my_std {
 		friend bool operator != (const vector& _Left, const vector& _Right);
 	};
 
+	/*!Friend operators */
 	template<class T, class Allocator = std::allocator<T>>
 	inline bool operator==(const typename vector<T, Allocator>& _Left, const typename vector<T, Allocator>& _Right)
 	{

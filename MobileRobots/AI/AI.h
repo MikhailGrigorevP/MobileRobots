@@ -2,6 +2,8 @@
 #define _AI_H_
 
 #include "../Structures/structures.h"
+
+#include "../environmentDescriptor/environmentDescriptor.h"
 using namespace my_std;
 //using namespace std;
 
@@ -29,8 +31,8 @@ namespace AI_N {
 		AI() {};
 		//! Destructor
 		~AI() { interestPonts.~vector(); };
-		//! Method that returns all points of intererst
-		vector<Point> findInterestPoints() {};
+
+		vector<Point> findInterestPoints(ED_N::environmentDescriptor* environment);
 	};
 	/** @} */
 

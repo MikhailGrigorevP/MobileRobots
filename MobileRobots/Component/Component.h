@@ -1,10 +1,12 @@
 ﻿#include <iostream>
 #include <string>
 #include "../Module/Module.h"
+#include "../Vector/vector.h"
+using namespace my_std;
 #pragma once;
 
 using std::string;
-using namespace Modules_N;
+using namespace Modules_N; 
 
 #ifndef _COMPONENT_H_
 #define _COMPONENT_H_
@@ -156,7 +158,8 @@ namespace Components_N {
 
 		virtual int getNumD() { return numOfDevices; }
 		virtual int iAm() const { return command_center; }
-		EnvironmentInfo getInfo(int i, ED_N::environmentDescriptor* env);
+
+		EnvironmentInfo getInfo(int i, ED_N::environmentDescriptor* env, vector<vector<unsigned>>& field = nofield);
 
 		virtual void moveRobot(int i, int direction);
 	};

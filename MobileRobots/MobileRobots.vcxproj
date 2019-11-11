@@ -76,9 +76,12 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>D:\SDL2-2.0.8\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
+      <AdditionalLibraryDirectories>D:\SDL2-2.0.8\lib\x86;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>SDL2.lib;SDL2main.lib;SDL2test.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -131,12 +134,14 @@
     <ClCompile Include="environmentDescriptor\environmentDescriptor.cpp" />
     <ClCompile Include="mobileRobots.cpp" />
     <ClCompile Include="Module\Module.cpp" />
+    <ClCompile Include="Render\render.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AI\AI.h" />
     <ClInclude Include="Component\Component.h" />
     <ClInclude Include="environmentDescriptor\environmentDescriptor.h" />
     <ClInclude Include="Module\Module.h" />
+    <ClInclude Include="Render\render.h" />
     <ClInclude Include="Structures\structures.h" />
     <ClInclude Include="Vector\vector.h" />
   </ItemGroup>

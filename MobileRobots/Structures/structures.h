@@ -54,7 +54,7 @@ struct Field_size {
 };
 
 //! enum of cell's type of field
-enum CellType { none_cell, barrier, interest_point, notexist };
+enum CellType { none_cell, barrier, interest_point, notexist, ai_seen };
 //! enum of components' type for methods
 enum ComponentType { observe_center, command_center, robot_commander, robot_scout };
 //! enum of modules' type for methods

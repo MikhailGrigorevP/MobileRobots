@@ -45,6 +45,8 @@ namespace Components_N {
 	* Throw exception if you try to set management module on unmanegement component
 	*/
 
+	/*!
+	Set generator on the component*/
 	void Component::setModule_g(int pr, int en, int c, int enpr) {
 		if(modules.size() == slotsNum)
 			throw std::exception(" >>> not enough space for modules");
@@ -61,6 +63,8 @@ namespace Components_N {
 		modules.push_back(mod);
 	};
 
+	/*!
+	Set sensor on the component*/
 	void Component::setModule_s(int pr, int en, int c, int r, int ang, int direct) {
 		if (modules.size() == slotsNum)
 			throw std::exception(" >>> not enough space for modules");
@@ -81,6 +85,8 @@ namespace Components_N {
 		modules.push_back(mod);
 	};
 
+	/*!
+	Set management module on the component*/
 	void Component::setModule_m(int pr, int en, int c, int r, int n) {
 		if (modules.size() == slotsNum)
 			throw std::exception(" >>> not enough space for modules");
@@ -179,7 +185,6 @@ namespace Components_N {
 	//managementComponent
 	////////////////////////////////////////////////////////////
 
-
 	/*! Simple Constructor gets all variables for "Component" constructor and numD for numOfDevices */
 	managementComponent:: managementComponent(int x0, int y0, int en, int num, int c, int numD, string desc) :
 		Component(x0, y0, desc, en, num, c),
@@ -194,7 +199,7 @@ namespace Components_N {
 	*
 	* throw exception, if there is no managed robot
 	*/
-	EnvironmentInfo managementComponent::getInfo(int i, ED_N::environmentDescriptor* env) {
+	EnvironmentInfo managementComponent::getInfo(int i, ED_N::environmentDescriptor* env, vector<vector<unsigned>>& field) {
 		if (!env)
 			throw std::exception(" >>> incorrect environment");
 		if (i >= managedComponents.size())
@@ -205,7 +210,7 @@ namespace Components_N {
 		while (it != managedComponents[i]->getModules()->end())
 		{
 			if (((*it)->iAm() == sensor_Module)&&((*it)->getState() == 1)) {
-				EnvironmentInfo EInf_old = dynamic_cast<sensorModule*>(*it)->getInfo(managedComponents[i]->getCoord(), env);
+				EnvironmentInfo EInf_old = dynamic_cast<sensorModule*>(*it)->getInfo(managedComponents[i]->getCoord(), env, field);
 
 				vector<Point>::iterator iter;
 				iter = EInf_old.barriers.begin();

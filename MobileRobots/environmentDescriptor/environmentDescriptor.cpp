@@ -4,6 +4,7 @@ namespace ED_N {
 
 	using namespace my_std;
 
+	/*! return direction */
 	void returnDir(int dir) {
 		switch (dir) {
 		case left:
@@ -21,7 +22,7 @@ namespace ED_N {
 		}
 	}
 
-	//! Constructor
+	/*! Constructor */
 	environmentDescriptor::environmentDescriptor(int m0, int n0) : size{ m0, n0} {
 
 		if (m0 < 0 || n0 < 0)
@@ -35,7 +36,7 @@ namespace ED_N {
 		}
 	};
 
-	//! Constructor
+	/*! Constructor */
 	environmentDescriptor::environmentDescriptor(Field_size field_size) : size{ field_size.m, field_size.n } {
 
 		if (field_size.m < 0 || field_size.n < 0)
@@ -48,16 +49,16 @@ namespace ED_N {
 		}
 	};
 
-	//! Destructor
+	/*! Destructor */
 	environmentDescriptor::~environmentDescriptor() {
 	};
 
-	//! get size of field
+	/*! get size of field */
 	Field_size environmentDescriptor::getSize() {
 		return size;
 	};
 
-	//! set size of field
+	/*! set size of field */
 	void environmentDescriptor::setSize(Field_size field_size) {
 		if (field_size.m < 0 || field_size.n < 0)
 			throw std::exception(">>> incorrect size");
@@ -73,7 +74,7 @@ namespace ED_N {
 
 	};
 
-	//! get type of cell
+	/*! get type of cell */
 	unsigned environmentDescriptor:: getCell(Point point) {
 		if (size.m == 0 || size.n == 0)
 			throw std::exception(">>> Environment is empty");
@@ -88,7 +89,7 @@ namespace ED_N {
 		return field[point.x][point.y];
 	};
 
-	//! set type of cell
+	/*! set type of cell */
 	void environmentDescriptor::setCell(Point point, unsigned cell_type) {
 		if (size.m == 0 || size.n == 0)
 			throw std::exception(">>> Environment is empty");
@@ -100,13 +101,13 @@ namespace ED_N {
 			throw std::exception(" >>> y coordinate < 0");
 		if (point.y >= size.m)
 			throw std::exception(" >>> y coordinate bigger then vertical size");
-		if ((cell_type != barrier) && (cell_type != interest_point))
+		if ((cell_type != barrier) && (cell_type != interest_point) && (cell_type != ai_seen))
 			throw std::exception(" >>> incorrect type of cell");
 
 		field[point.x][point.y] = cell_type;
 	};
 
-	// Input
+	/*! Input */
 	std::istream& operator >> (std::istream& s, environmentDescriptor& envD) {
 
 		std::cout << ">> ";
@@ -119,7 +120,7 @@ namespace ED_N {
 		return s;
 	}
 
-	// Output
+	/*! Output */
 	std::ostream& operator << (std::ostream& o , const environmentDescriptor& envD) {
 		if (envD.size.m == 0 || envD.size.n == 0) 
 			throw std::exception(">>> Environment is empty");
@@ -129,7 +130,7 @@ namespace ED_N {
 		return o;
 	}
 
-
+	/* Add command center to Environment*/
 	void environmentDescriptor::AddCommandCenter(Point point, int en, int num, int numD, int c) {
 
 		if (size.m == 0 || size.n == 0)
@@ -155,6 +156,7 @@ namespace ED_N {
 		components.push_back(component);
 	};
 
+	/* Add robot commander to Environment*/
 	void environmentDescriptor::AddRobotCommander(Point point, int en, int num, int numD, int vel, int c) {
 
 		if (size.m == 0 || size.n == 0)
@@ -183,6 +185,7 @@ namespace ED_N {
 			components.push_back(component);
 	};
 
+	/* Add robot scout to Environment*/
 	void environmentDescriptor::AddRobotScout(Point point, int en, int num, int vel, int c) {
 
 		if (size.m == 0 || size.n == 0)
@@ -209,6 +212,7 @@ namespace ED_N {
 
 	};
 
+	/* Add observe center Environment*/
 	void environmentDescriptor::AddObserveCenter(Point point, int en, int num, int c) {
 
 		if (size.m == 0 || size.n == 0)
@@ -234,6 +238,7 @@ namespace ED_N {
 
 	}
 
+	/* Show components */
 	void environmentDescriptor::showComponentsNM() {
 		if (size.m == 0 || size.n == 0)
 			throw std::exception(">>> Environment is empty");
@@ -264,6 +269,7 @@ namespace ED_N {
 		std::cout << std::endl;
 	}
 
+	/* Show All components with modules*/
 	void environmentDescriptor::showComponents() {
 		if (size.m == 0 || size.n == 0)
 			throw std::exception(">>> Environment is empty");
@@ -314,6 +320,33 @@ namespace ED_N {
 		std::cout << std::endl;
 	}
 
+	/* Draw just maps*/
+	void environmentDescriptor::drawJustMap() {
+		if (size.m == 0 || size.n == 0)
+			throw std::exception(">>> Environment is empty");
+		for (int j = 0; j < size.m; ++j) {
+			for (int i = 0; i < size.n; ++i) {
+				switch (field[i][j]) {
+				case none_cell:
+					std::cout << "~";
+					break;
+				case barrier:
+					std::cout << "#";
+					break;
+				case interest_point:
+					std::cout << "*";
+					break;
+				case ai_seen:
+					std::cout << "o";
+					break;
+				}
+			}
+			std::cout << std::endl;
+		}
+
+	}
+
+	/* Draw all environment*/
 	void environmentDescriptor::drawMap() {
 		if (size.m == 0 || size.n == 0)
 			throw std::exception(">>> Environment is empty");
@@ -329,6 +362,9 @@ namespace ED_N {
 					break;
 				case interest_point:
 					std::cout << "*";
+					break;
+				case ai_seen:
+					std::cout << "o";
 					break;
 				}
 			}
@@ -483,7 +519,7 @@ namespace ED_N {
 
 	}
 
-
+	/* Show info from EnvironmentInfo*/
 	void environmentDescriptor::showInfo(EnvironmentInfo envinfo) {
 
 		vector<Point>::iterator p_it, b_it;

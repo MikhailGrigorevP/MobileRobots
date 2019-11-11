@@ -274,10 +274,10 @@ TEST(ComponentT, C_management_info) {
 
 	EXPECT_EQ(points, envInf.barriers);
 
-	vector<Point> points2;
-	points2.push_back({ 9, 1 });
-	EXPECT_EQ(points2, envInf.pointsOfInterest);
-	points2.push_back({ 5, 1 });
+	points.clear();
+	points.push_back({ 9, 1 });
+	EXPECT_EQ(points, envInf.pointsOfInterest);
+	points.push_back({ 5, 1 });
 	//EXPECT_NE(points2, envInf.pointsOfInterest);
 
 	EXPECT_EQ(environment.getRCComponent(2), envInfo2.components[0]);
@@ -353,10 +353,10 @@ TEST(ModuleT, M_info) {
 
 	EXPECT_EQ(points, envInf.barriers);
 
-	vector<Point> points2;
-	points2.push_back({ 9, 1 });
-	EXPECT_EQ(points2, envInf.pointsOfInterest);
-	points2.push_back({ 5, 1 });
+	points.clear();
+	points.push_back({ 9, 1 });
+	EXPECT_EQ(points, envInf.pointsOfInterest);
+	points.push_back({ 5, 1 });
 	//EXPECT_NE(points2, envInf.pointsOfInterest);
 
 	EXPECT_EQ(environment.getRCComponent(2), envInfo2.components[0]);

@@ -24,10 +24,22 @@ namespace ED_N {
 	public:
 
 
+
+		void getAllManagementComponents(vector<managementComponent*> &managementComponents) {
+			vector<Components_N::Component*>::iterator c_it;
+				c_it = components.begin();
+				while (c_it != components.end())
+				{
+					if (((*c_it)->iAm() == robot_commander) || ((*c_it)->iAm() == command_center))
+						managementComponents.push_back(dynamic_cast<managementComponent*>(*c_it));
+					c_it++;
+				}
+			
+		}
+
 		robotCommander* getRCComponent(int i) {
 			return dynamic_cast<robotCommander*>(components[i]);
 		}
-
 
 		managementComponent* getCCComponent(int i) {
 			return dynamic_cast<managementComponent*>(components[i]);
@@ -41,8 +53,8 @@ namespace ED_N {
 			return components[i];
 		}
 
-		vector<Component*> getComponents() {
-			return components;
+		vector<Component*>* getComponents() {
+			return &components;
 		}
 
 		environmentDescriptor(Field_size field_size);
@@ -58,6 +70,7 @@ namespace ED_N {
 		void setSize(Field_size field_size);
 	
 		void drawMap();
+		void drawJustMap();
 
 		void showComponents();
 		void showComponentsNM();

@@ -16,9 +16,8 @@ namespace Modules_N {
 		state = 0;
 	};
 
-
 	//!get information from environment
-	EnvironmentInfo sensorModule::getInfo(Point curr_location, ED_N::environmentDescriptor *env) {
+	EnvironmentInfo sensorModule::getInfo(Point curr_location, ED_N::environmentDescriptor *env, vector<vector<unsigned>> &field) {
 
 		EnvironmentInfo currInfo;
 
@@ -44,17 +43,25 @@ namespace Modules_N {
 				for (int j = y_start; j <= y_end; j++)
 				{
 					if ((env->getCell({ i,j }) != notexist) && (i != curr_location.x || j != curr_location.y)) {
-						if (env->getCell({ i,j }) == barrier)
-							currInfo.barriers.push_back({ i, j });
-						if (env->getCell({ i,j }) == interest_point)
+						if (env->getCell({ i,j }) == barrier) {
+							currInfo.barriers.push_back({ i, j }); 
+							if (field.size() != 2)
+								field[i][j] = barrier;
+						}
+						else if (env->getCell({ i,j }) == interest_point) {
 							currInfo.pointsOfInterest.push_back({ i, j });
+							if (field.size() != 2)
+								field[i][j] = interest_point;
+						}
+						else if (field.size() != 2)
+							field[i][j] = ai_seen;
 
-						vector<Components_N::Component*> comp = env->getComponents();
+						vector<Components_N::Component*>* comp = env->getComponents();
 						vector<Components_N::Component*>::iterator it;
 
-						it = comp.begin();
+						it = comp->begin();
 
-						while (it != comp.end())
+						while (it != comp->end())
 						{
 							if ((i == (*it)->getCoord().x) && (j == (*it)->getCoord().y))
 								currInfo.components.push_back(*it);
@@ -79,17 +86,25 @@ namespace Modules_N {
 				for (int j = y_start; j <= y_end; j++)
 				{
 					if ((env->getCell({ i,j }) != notexist) && (i != curr_location.x || j != curr_location.y)) {
-						if (env->getCell({ i,j }) == barrier)
+						if (env->getCell({ i,j }) == barrier) {
 							currInfo.barriers.push_back({ i, j });
-						if (env->getCell({ i,j }) == interest_point)
+							if (field.size() != 2)
+								field[i][j] = barrier;
+						}
+						else if (env->getCell({ i,j }) == interest_point) {
 							currInfo.pointsOfInterest.push_back({ i, j });
+							if (field.size() != 2)
+								field[i][j] = interest_point;
+						}
+						else if (field.size() != 2)
+							field[i][j] = ai_seen;
 
-						vector<Components_N::Component*> comp = env->getComponents();
+						vector<Components_N::Component*>* comp = env->getComponents();
 						vector<Components_N::Component*>::iterator it;
 
-						it = comp.begin();
+						it = comp->begin();
 
-						while (it != comp.end())
+						while (it != comp->end())
 						{
 							if ((i == (*it)->getCoord().x) && (j == (*it)->getCoord().y))
 								currInfo.components.push_back(*it);
@@ -114,17 +129,25 @@ namespace Modules_N {
 				for (int i = x_start; i <= x_end; i++)
 				{
 					if ((env->getCell({ i,j }) != notexist) && (i != curr_location.x || j != curr_location.y)) {
-						if (env->getCell({ i,j }) == barrier)
+						if (env->getCell({ i,j }) == barrier) {
 							currInfo.barriers.push_back({ i, j });
-						if (env->getCell({ i,j }) == interest_point)
+							if (field.size() != 2)
+								field[i][j] = barrier;
+						}
+						else if (env->getCell({ i,j }) == interest_point) {
 							currInfo.pointsOfInterest.push_back({ i, j });
+							if (field.size() != 2)
+								field[i][j] = interest_point;
+						}
+						else if (field.size() != 2)
+							field[i][j] = ai_seen;
 
-						vector<Components_N::Component*> comp = env->getComponents();
+						vector<Components_N::Component*>* comp = env->getComponents();
 						vector<Components_N::Component*>::iterator it;
 
-						it = comp.begin();
+						it = comp->begin();
 
-						while (it != comp.end())
+						while (it != comp->end())
 						{
 							if ((i == (*it)->getCoord().x) && (j == (*it)->getCoord().y))
 								currInfo.components.push_back(*it);
@@ -152,17 +175,25 @@ namespace Modules_N {
 				for (int i = x_start; i <= x_end; i++)
 				{
 					if ((env->getCell({ i,j }) != notexist) && (i != curr_location.x || j != curr_location.y)) {
-						if (env->getCell({ i,j }) == barrier)
+						if (env->getCell({ i,j }) == barrier) {
 							currInfo.barriers.push_back({ i, j });
-						if (env->getCell({ i,j }) == interest_point)
+							if (field.size() != 2)
+								field[i][j] = barrier;
+						}
+						else if (env->getCell({ i,j }) == interest_point) {
 							currInfo.pointsOfInterest.push_back({ i, j });
+							if (field.size() != 2)
+								field[i][j] = interest_point;
+						}
+						else if (field.size() != 2)
+							field[i][j] = ai_seen;
 
-						vector<Components_N::Component*> comp = env->getComponents();
+						vector<Components_N::Component*>* comp = env->getComponents();
 						vector<Components_N::Component*>::iterator it;
 
-						it = comp.begin();
+						it = comp->begin();
 
-						while (it != comp.end())
+						while (it != comp->end())
 						{
 							if ((i == (*it)->getCoord().x) && (j == (*it)->getCoord().y))
 								currInfo.components.push_back(*it);

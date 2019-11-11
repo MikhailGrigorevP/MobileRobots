@@ -4,6 +4,9 @@
 #ifndef _MODULE_H_
 #define _MODULE_H_
 
+static vector<vector<unsigned>> nofield { { 0 },
+										 {  } };
+
 namespace ED_N {
 	class environmentDescriptor;
 }
@@ -142,7 +145,7 @@ namespace Modules_N {
 	protected:
 	public:
 
-		EnvironmentInfo getInfo(Point curr_location, ED_N::environmentDescriptor* env);
+		EnvironmentInfo getInfo(Point curr_location, ED_N::environmentDescriptor* env, vector<vector<unsigned>> &field = nofield);
 
 		virtual int getR() {
 			return radius;
