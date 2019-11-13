@@ -3,8 +3,9 @@
 
 #include "../Component/Component.h"
 
-
 using namespace my_std;
+//using std::vector;
+
 using namespace Components_N;
 //! Environment desriptor namespace
 /*! ED namespace

@@ -178,6 +178,61 @@ void menu_InitEnvironment(ED_N::environmentDescriptor& environment) {
 	//////////////////////////////////////
 
 };
+void menu_InitEnvironment_2(ED_N::environmentDescriptor& environment) {
+
+	environment.setSize({ 9, 9 });
+
+	environment.setCell({ 1, 1 }, none_cell);
+	environment.setCell({ 1, 2 }, none_cell);
+	environment.setCell({ 2, 2 }, none_cell);
+	environment.setCell({ 3, 3 }, none_cell);
+	environment.setCell({ 3, 2 }, none_cell);
+	environment.setCell({ 2, 3 }, barrier);
+	environment.setCell({ 4, 3 }, none_cell);
+	environment.setCell({ 5, 3 }, none_cell);
+	environment.setCell({ 5, 2 }, none_cell);
+	environment.setCell({ 5, 1 }, none_cell);
+	environment.setCell({ 6, 1 }, interest_point);
+	environment.setCell({ 3, 4 }, none_cell);
+	environment.setCell({ 4, 4 }, none_cell);
+	environment.setCell({ 5, 5 }, none_cell);
+	environment.setCell({ 4, 5 }, none_cell);
+	environment.setCell({ 3, 5 }, none_cell);
+	environment.setCell({ 2, 5 }, none_cell);
+	environment.setCell({ 1, 5 }, interest_point);
+	environment.setCell({ 3, 6 }, none_cell);
+	environment.setCell({ 6, 5 }, none_cell);
+	environment.setCell({ 4, 6 }, none_cell);
+	environment.setCell({ 5, 6 }, none_cell);
+	environment.setCell({ 2, 7 }, none_cell);
+	environment.setCell({ 3, 7 }, none_cell);
+	environment.setCell({ 2, 8 }, none_cell);
+	environment.setCell({ 5, 7 }, none_cell);
+	environment.setCell({ 6, 7 }, none_cell);
+	environment.setCell({ 6, 8 }, interest_point);
+
+
+	environment.AddRobotScout({ 3, 4 }, 80, 5, 1, 600);
+	environment.getComponent(0)->setModule_g(1, 100, 125, 4500);
+	environment.getRSComponent(0)->setModule_s(1, 150, 500, 4, 60, 0);
+	environment.getComponent(0)->moduleOn(1);
+
+	environment.AddRobotCommander({ 4, 5 }, 150, 4, 2, 1, 600);
+	environment.getComponent(1)->setModule_g(1, 100, 125, 4500);
+	environment.getComponent(1)->setModule_m(2, 150, 250, 10, 4);
+
+	environment.AddRobotScout({ 6, 5 }, 80, 5, 1, 600);
+	environment.getComponent(0)->setModule_g(1, 100, 125, 4500);
+	environment.getRSComponent(0)->setModule_s(1, 150, 500, 4, 60, 2);
+	environment.getComponent(0)->moduleOn(1);
+
+	dynamic_cast<managementComponent*>(environment.getComponent(1))->getMModule(1)->sendResourse(environment.getRCComponent(1), environment.getComponent(0));
+	dynamic_cast<managementComponent*>(environment.getComponent(1))->getMModule(1)->sendResourse(environment.getRCComponent(1), environment.getComponent(2));
+
+	//////////////////////////////////////
+	//////////////////////////////////////
+
+};
 
 //Menu 0
 void WorkWithEnvironment(ED_N::environmentDescriptor& environment) {
@@ -615,7 +670,7 @@ void WorkWithMC(ED_N::environmentDescriptor& environment) {
 
 	do {
 		if (menu)
-			for (size_t i = 0; i != menu_1_SZ; ++i)
+			for (size_t i = 0; i != menu_3_SZ; ++i)
 				std::cout << MENU_3[i] << std::endl;
 
 		std::cout << ">> "; std::cin >> menu;
@@ -1157,7 +1212,8 @@ int main(int argc, char* args[]) {
 
 	environmentDescriptor environment;
 
-	menu_InitEnvironment(environment);
+	//menu_InitEnvironment(environment);
+	menu_InitEnvironment_2(environment);
 
 	do {
 

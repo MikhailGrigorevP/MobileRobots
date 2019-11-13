@@ -3,8 +3,8 @@
 #include "../Module/Module.h"
 #include "../Vector/vector.h"
 using namespace my_std;
+//using std::vector;
 #pragma once;
-
 using std::string;
 using namespace Modules_N; 
 
@@ -35,24 +35,14 @@ namespace Components_N {
 		int slotsNum; //! number of slots for modules
 		vector<Module*> modules; //! array for modules 
 		int cost; //! cost of component 
+
 	protected:
 		int x, y;  //! Coordinates
+		void setEnergy(int en) { energy = en; }
+
 	public:
 
-		friend bool operator == (const Component& b, const Component& a)
-		{
-			return ((a.x == b.x) && (a.y == b.y));
-		}
-
-		friend bool operator != (const Component &b, const Component& a)
-		{
-			return ((a.x != b.x) || (a.y != b.y));
-		}
-
-		vector<Module*>* getModules() {
-			return &modules;
-		}
-
+		//! constructors
 
 		Component() :
 			x(0),
@@ -63,8 +53,31 @@ namespace Components_N {
 			cost(0) {
 
 		};
+		Component(int x0, int y0, string desc, int en, int num, int c);
+		Component(Point point, string desc, int en, int num, int c);
 
+		//! Destructor
 
+		virtual ~Component();
+
+		//! getters
+
+		virtual int iAm() const { return observe_center; }
+
+		Point getCoord() { return { x, y }; }
+		string getDesc() { return description; }
+		int getEnergy() { return energy; }
+		int getSlotsNum() { return slotsNum; }
+		int getModulesSize() { return modules.size(); }
+		int getNum() { return slotsNum; }
+		int getCost() { return cost; }
+		virtual int getNumD() { return 0; }
+		virtual int getVel() { return 0; }
+
+		//! Modules getters
+		vector<Module*>* getModules() {
+			return &modules;
+		}
 		Module* getModule(int i) {
 			if (i < 0)
 				throw std::exception(" >>> incorrect num");
@@ -72,55 +85,38 @@ namespace Components_N {
 				throw std::exception(" >>> incorrect num");
 			return modules[i];
 		}
-
 		generatorModule* getGModule(int i) {
 			return dynamic_cast<generatorModule*>(modules[i]);
 		}
-
 		sensorModule* getSModule(int i) {
 			return dynamic_cast<sensorModule*>(modules[i]);
 		}
-
 		managementModule* getMModule(int i) {
 			return dynamic_cast<managementModule*>(modules[i]);
 		}
-		int getModulesSize() {
-			return modules.size();
+
+		//! operators overload
+		friend bool operator == (const Component& b, const Component& a)
+		{
+			return ((a.x == b.x) && (a.y == b.y));
+		}
+		friend bool operator != (const Component &b, const Component& a)
+		{
+			return ((a.x != b.x) || (a.y != b.y));
 		}
 
-		Point getCoord() { return { x, y }; }
-		string getDesc() { return description; }
-		int getEnergy() { return energy; }
-		int getSlotsNum() { return slotsNum; }
-
-		void setEnergy(int en) {  energy = en; }
-		int getNum() { return slotsNum; }
-		int getCost() { return cost; }
-		virtual int getNumD() { return 0; }
-		virtual int getVel() { return 0; }
-
-		Component(int x0, int y0, string desc, int en, int num, int c);
-
-		Component(Point point, string desc, int en, int num, int c);
-
-		virtual ~Component();
-
-		virtual int iAm() const {return observe_center;}
+		//! setters
 
 		void setModule_g(int pr, int en, int c, int enpr);
-
 		void setModule_s(int pr, int en, int c, int r, int ang, int direct);
-
 		void setModule_m(int pr, int en, int c, int r, int n);
 
-		void deleteModule(int type);
+		//! Modules
 
 		void moduleOn(int type);
-
 		void moduleOff(int type);
+		void deleteModule(int type);
 	};
-
-
 
 	//! Command center
 	/*! This virtual class is also "Command center"

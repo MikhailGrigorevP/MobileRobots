@@ -3,6 +3,7 @@
 namespace ED_N {
 
 	using namespace my_std;
+	//using std::vector;
 
 	/*! return direction */
 	void returnDir(int dir) {
@@ -31,7 +32,7 @@ namespace ED_N {
 		for (int i = 0; i < n0; ++i) {
 			field.push_back(vector<unsigned>());
 			for (int j = 0; j < m0; ++j) {
-				field[i].push_back(none_cell);
+				field[i].push_back(notexist);
 			}
 		}
 	};
@@ -68,7 +69,7 @@ namespace ED_N {
 		for (int i = 0; i < size.n; ++i) {
 			field.push_back(vector<unsigned>());
 			for (int j = 0; j < size.m; ++j) {
-				field[i].push_back(none_cell);
+				field[i].push_back(notexist);
 			}
 		}
 
@@ -101,7 +102,7 @@ namespace ED_N {
 			throw std::exception(" >>> y coordinate < 0");
 		if (point.y >= size.m)
 			throw std::exception(" >>> y coordinate bigger then vertical size");
-		if ((cell_type != barrier) && (cell_type != interest_point) && (cell_type != ai_seen))
+		if ((cell_type != barrier) && (cell_type != none_cell) && (cell_type != interest_point) && (cell_type != ai_seen))
 			throw std::exception(" >>> incorrect type of cell");
 
 		field[point.x][point.y] = cell_type;
@@ -339,6 +340,9 @@ namespace ED_N {
 				case ai_seen:
 					std::cout << "o";
 					break;
+				case notexist:
+					std::cout << "x";
+					break;
 				}
 			}
 			std::cout << std::endl;
@@ -365,6 +369,9 @@ namespace ED_N {
 					break;
 				case ai_seen:
 					std::cout << "o";
+					break;
+				case notexist:
+					std::cout << "x";
 					break;
 				}
 			}

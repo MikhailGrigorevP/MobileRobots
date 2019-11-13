@@ -53,7 +53,7 @@ namespace Modules_N {
 							if (field.size() != 2)
 								field[i][j] = interest_point;
 						}
-						else if (field.size() != 2)
+						else if ((field.size() != 2) && (field[i][j] == notexist))
 							field[i][j] = ai_seen;
 
 						vector<Components_N::Component*>* comp = env->getComponents();
@@ -63,8 +63,25 @@ namespace Modules_N {
 
 						while (it != comp->end())
 						{
-							if ((i == (*it)->getCoord().x) && (j == (*it)->getCoord().y))
+							if ((i == (*it)->getCoord().x) && (j == (*it)->getCoord().y)){
+								if (field.size() != 2) {
+									switch ((*it)->iAm()) {
+									case robot_commander:
+										field[i][j] = rc;
+										break;
+									case observe_center:
+										field[i][j] = oc;
+										break;
+									case robot_scout:
+										field[i][j] = rs;
+										break;
+									case command_center:
+										field[i][j] = cc;
+										break;
+									}
+								}
 								currInfo.components.push_back(*it);
+						}
 							++it;
 
 						}
@@ -96,7 +113,7 @@ namespace Modules_N {
 							if (field.size() != 2)
 								field[i][j] = interest_point;
 						}
-						else if (field.size() != 2)
+						else if ((field.size() != 2) && (field[i][j] == notexist))
 							field[i][j] = ai_seen;
 
 						vector<Components_N::Component*>* comp = env->getComponents();
@@ -106,8 +123,25 @@ namespace Modules_N {
 
 						while (it != comp->end())
 						{
-							if ((i == (*it)->getCoord().x) && (j == (*it)->getCoord().y))
+							if ((i == (*it)->getCoord().x) && (j == (*it)->getCoord().y)){
+								if (field.size() != 2) {
+									switch ((*it)->iAm()) {
+									case robot_commander:
+										field[i][j] = rc;
+										break;
+									case observe_center:
+										field[i][j] = oc;
+										break;
+									case robot_scout:
+										field[i][j] = rs;
+										break;
+									case command_center:
+										field[i][j] = cc;
+										break;
+									}
+								}
 								currInfo.components.push_back(*it);
+						}
 							++it;
 
 						}
@@ -139,7 +173,7 @@ namespace Modules_N {
 							if (field.size() != 2)
 								field[i][j] = interest_point;
 						}
-						else if (field.size() != 2)
+						else if ((field.size() != 2) && (field[i][j] == notexist))
 							field[i][j] = ai_seen;
 
 						vector<Components_N::Component*>* comp = env->getComponents();
@@ -149,8 +183,25 @@ namespace Modules_N {
 
 						while (it != comp->end())
 						{
-							if ((i == (*it)->getCoord().x) && (j == (*it)->getCoord().y))
+							if ((i == (*it)->getCoord().x) && (j == (*it)->getCoord().y)) {
+								if (field.size() != 2) {
+									switch ((*it)->iAm()) {
+									case robot_commander:
+										field[i][j] = rc;
+										break;
+									case observe_center:
+										field[i][j] = oc;
+										break;
+									case robot_scout:
+										field[i][j] = rs;
+										break;
+									case command_center:
+										field[i][j] = cc;
+										break;
+									}
+								}
 								currInfo.components.push_back(*it);
+							}
 							++it;
 
 						}
@@ -185,7 +236,7 @@ namespace Modules_N {
 							if (field.size() != 2)
 								field[i][j] = interest_point;
 						}
-						else if (field.size() != 2)
+						else if ((field.size() != 2) && (field[i][j] == notexist))
 							field[i][j] = ai_seen;
 
 						vector<Components_N::Component*>* comp = env->getComponents();
@@ -195,8 +246,25 @@ namespace Modules_N {
 
 						while (it != comp->end())
 						{
-							if ((i == (*it)->getCoord().x) && (j == (*it)->getCoord().y))
+							if ((i == (*it)->getCoord().x) && (j == (*it)->getCoord().y)) {
+								if (field.size() != 2) {
+									switch ((*it)->iAm()) {
+									case robot_commander:
+										field[i][j] = rc;
+										break;
+									case observe_center:
+										field[i][j] = oc;
+										break;
+									case robot_scout:
+										field[i][j] = rs;
+										break;
+									case command_center:
+										field[i][j] = cc;
+										break;
+									}
+								}
 								currInfo.components.push_back(*it);
+							}
 							++it;
 
 						}
@@ -233,7 +301,7 @@ namespace Modules_N {
 		if (i >= dynamic_cast<managementComponent*>(current)->getNComp()->size())
 			throw std::exception(">>> incorrect num");
 
-		dynamic_cast<managementComponent*>(current)->getNComp()->erase(i);
+		dynamic_cast<managementComponent*>(current)->getNComp()->erase(dynamic_cast<managementComponent*>(current)->getNComp()->begin() + i);
 	}
 
 }

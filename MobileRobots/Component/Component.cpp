@@ -2,7 +2,7 @@
 #include <algorithm>
 namespace Components_N {
 	using namespace my_std;
-	//using namespace std;
+	//using std::vector;
 
 	/*! Simple Constructor gets
 	* x0 and y0 to set coordinates of module,
@@ -118,7 +118,7 @@ namespace Components_N {
 		if (modules[num]->getState() == 1)
 			this->setEnergy(energy - modules[num]->getEnergy());
 		try {
-			modules.erase(num);
+			modules.erase(modules.begin() + num);
 		}
 		catch (std::exception & ex) {
 			std::cout << ex.what() << std::endl;

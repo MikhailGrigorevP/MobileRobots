@@ -41,10 +41,13 @@ namespace Modules_N {
 		* en to set energy,
 		* c to set cost
 		*/
+		
 		//! turn module on
 		virtual void on();
+
 		//! turn module off
 		virtual void off();
+
 		Module(int st = 0, int pr = 0, int en = 0, int c = 0) : 
 			state(st), 
 			priority(pr), 
@@ -52,8 +55,10 @@ namespace Modules_N {
 			cost(c) {};
 		//! virtual destructor
 		virtual  ~Module() {};
+
+		//! getters
+
 		virtual int iAm() const = 0;
-		//! get energy of module 
 
 		virtual int getEnergy() {
 			return energy;
@@ -155,6 +160,16 @@ namespace Modules_N {
 		};
 		virtual int getDir() {
 			return direction;
+		};
+		virtual void turn() {
+			if (direction == left)
+				direction = up;
+			else if (direction == up)
+				direction = right;
+			else if (direction == right)
+				direction = down;
+			else
+				direction = left;
 		};
 		virtual int iAm() const { return sensor_Module; }
 		//!	Simple constructor
