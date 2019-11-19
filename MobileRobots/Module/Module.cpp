@@ -289,8 +289,8 @@ namespace Modules_N {
 		int y1 = current->getCoord().y;
 		int y2 = component->getCoord().y;
 
-		if (sqrt((x1-x2)*(x1-x2)+(y1-y2)*(y1-y2)) > radius)
-			throw std::exception(" >>> component is too far");
+		//if (sqrt((x1-x2)*(x1-x2)+(y1-y2)*(y1-y2)) > radius)
+		//	throw std::exception(" >>> component is too far");
 
 		current->getNComp()->push_back(component);
 	

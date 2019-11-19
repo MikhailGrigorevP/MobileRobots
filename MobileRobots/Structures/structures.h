@@ -38,20 +38,21 @@ struct Point {
 			return true;
 		else if (b.x > a.x)
 			return false;
-		else if (b.y > a.y)
-			return false;
+		else if (b.y < a.y)
+			return true;
 		
 
-		return true;
+		return false;
 	}
 
 };
 
+enum VisitorStatus { V_not, V_partly, V_visited };
 
 struct Vertex {
 	int x = 0;   //!< x coordinate
 	int y = 0;   //!< y coordinate
-	bool visited;
+	int visited = V_not;
 
 	friend bool operator == (const Vertex& b, const Vertex& a)
 	{
@@ -100,7 +101,7 @@ struct Field_size {
 };
 
 //! enum of cell's type of field
-enum CellType { none_cell, barrier, interest_point, notexist, ai_seen, rc, rs, cc, oc };
+enum CellType { none_cell, barrier, interest_point, notexist, ai_seen, rc, rs, rsd, cc, oc };
 //! enum of components' type for methods
 enum ComponentType { observe_center, command_center, robot_commander, robot_scout };
 //! enum of modules' type for methods

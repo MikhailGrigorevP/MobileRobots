@@ -328,8 +328,28 @@ namespace ED_N {
 		for (int j = 0; j < size.m; ++j) {
 			for (int i = 0; i < size.n; ++i) {
 				switch (field[i][j]) {
-				case none_cell:
-					std::cout << "~";
+				case none_cell:if (((i > 0) && (field[i - 1][j] != notexist)) && ((j > 0) && (field[i][j - 1] != notexist)) && ((j < size.m - 1) && (field[i][j + 1] != notexist)) && ((i < size.n - 1) && (field[i + 1][j] != notexist)))
+					std::cout << (unsigned char)(206);
+							  else if (((j > 0) && (field[i][j - 1] != notexist)) && ((j < size.m - 1) && (field[i][j + 1] != notexist)) && ((i < size.n - 1) && (field[i + 1][j] != notexist)))
+					std::cout << (unsigned char)(204);
+							  else if (((i > 0) && (field[i - 1][j] != notexist)) && ((j > 0) && (field[i][j - 1] != notexist)) && ((j < size.m - 1) && (field[i][j + 1] != notexist)))
+					std::cout << (unsigned char)(185);
+							  else if (((i > 0) && (field[i - 1][j] != notexist)) && ((j < size.m - 1) && (field[i][j + 1] != notexist)) && ((i < size.n - 1) && (field[i + 1][j] != notexist)))
+					std::cout << (unsigned char)(203);
+							  else if (((i > 0) && (field[i - 1][j] != notexist)) && ((j > 0) && (field[i][j - 1] != notexist)) && ((i < size.n - 1) && (field[i + 1][j] != notexist)))
+					std::cout << (unsigned char)(202);
+							  else if (((i > 0) && (field[i - 1][j] != notexist)) && ((j < size.m - 1) && (field[i][j + 1] != notexist)))
+					std::cout << (unsigned char)(187);
+							  else if (((j > 0) && (field[i][j - 1] != notexist)) && ((i < size.n - 1) && (field[i + 1][j] != notexist)))
+					std::cout << (unsigned char)(200);
+							  else if (((i > 0) && (field[i - 1][j] != notexist)) && ((j > 0) && (field[i][j - 1] != notexist)))
+					std::cout << (unsigned char)(188);
+							  else if (((j < size.m - 1) && (field[i][j + 1] != notexist)) && ((i < size.n - 1) && (field[i + 1][j] != notexist)))
+					std::cout << (unsigned char)(201);
+							  else if (((i > 0) && (field[i - 1][j] != notexist)) || ((i < size.n - 1) && (field[i + 1][j] != notexist)))
+					std::cout << (unsigned char)(205);
+							  else
+					std::cout << (unsigned char)(186);
 					break;
 				case barrier:
 					std::cout << "#";
@@ -337,11 +357,8 @@ namespace ED_N {
 				case interest_point:
 					std::cout << "*";
 					break;
-				case ai_seen:
-					std::cout << "o";
-					break;
 				case notexist:
-					std::cout << "x";
+					std::cout << " ";
 					break;
 				}
 			}
@@ -358,8 +375,28 @@ namespace ED_N {
 		for (int j = 0; j < size.m; ++j) {
 			for (int i = 0; i < size.n; ++i) {
 				switch (field[i][j]) {
-				case none_cell:
-					std::cout << "~";
+				case none_cell:if (((i > 0) && (field[i - 1][j] != notexist)) && ((j > 0) && (field[i][j - 1] != notexist)) && ((j < size.m - 1) && (field[i][j + 1] != notexist)) && ((i < size.n - 1) && (field[i + 1][j] != notexist)))
+					std::cout << (unsigned char)(206);
+							  else if (((j > 0) && (field[i][j - 1] != notexist)) && ((j < size.m - 1) && (field[i][j + 1] != notexist)) && ((i < size.n - 1) && (field[i + 1][j] != notexist)))
+					std::cout << (unsigned char)(204);
+							  else if (((i > 0) && (field[i - 1][j] != notexist)) && ((j > 0) && (field[i][j - 1] != notexist)) && ((j < size.m - 1) && (field[i][j + 1] != notexist)))
+					std::cout << (unsigned char)(185);
+							  else if (((i > 0) && (field[i - 1][j] != notexist)) && ((j < size.m - 1) && (field[i][j + 1] != notexist)) && ((i < size.n - 1) && (field[i + 1][j] != notexist)))
+					std::cout << (unsigned char)(203);
+							  else if (((i > 0) && (field[i - 1][j] != notexist)) && ((j > 0) && (field[i][j - 1] != notexist)) && ((i < size.n - 1) && (field[i + 1][j] != notexist)))
+					std::cout << (unsigned char)(202);
+							  else if (((i > 0) && (field[i - 1][j] != notexist)) && ((j < size.m - 1) && (field[i][j + 1] != notexist)))
+					std::cout << (unsigned char)(187);
+							  else if (((j > 0) && (field[i][j - 1] != notexist)) && ((i < size.n - 1) && (field[i + 1][j] != notexist)))
+					std::cout << (unsigned char)(200);
+							  else if (((i > 0) && (field[i - 1][j] != notexist)) && ((j > 0) && (field[i][j - 1] != notexist)))
+					std::cout << (unsigned char)(188);
+							  else if (((j < size.m - 1) && (field[i][j + 1] != notexist)) && ((i < size.n - 1) && (field[i + 1][j] != notexist)))
+					std::cout << (unsigned char)(201);
+							  else if (((i > 0) && (field[i - 1][j] != notexist)) || ((i < size.n - 1) && (field[i + 1][j] != notexist)))
+					std::cout << (unsigned char)(205);
+							  else
+					std::cout << (unsigned char)(186);
 					break;
 				case barrier:
 					std::cout << "#";
@@ -367,11 +404,8 @@ namespace ED_N {
 				case interest_point:
 					std::cout << "*";
 					break;
-				case ai_seen:
-					std::cout << "o";
-					break;
 				case notexist:
-					std::cout << "x";
+					std::cout << " ";
 					break;
 				}
 			}

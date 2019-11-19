@@ -87,7 +87,7 @@ namespace ED_N {
 		
 		unsigned getCell(Point point);
 		
-		void setCell(Point point, unsigned cell_type);
+		void setCell(Point point, unsigned cell_type = none_cell);
 
 		// Input
 		friend std::istream& operator >> (std::istream& s, environmentDescriptor& envD);
