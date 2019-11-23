@@ -1,10 +1,10 @@
 #pragma once
 
-//#include <vector>
-//using std::vector;
+#include <vector>
+using std::vector;
 
-#include "../Vector/vector.h"
-using namespace my_std;
+//#include "../Vector/vector.h"
+//using namespace my_std;
 #include <string>
 #include <iostream>
 
@@ -40,11 +40,9 @@ struct Point {
 			return false;
 		else if (b.y < a.y)
 			return true;
-		
 
 		return false;
 	}
-
 };
 
 enum VisitorStatus { V_not, V_partly, V_visited };
@@ -75,9 +73,7 @@ struct Vertex {
 
 		return false;
 	}
-
 };
-
 
 //////! Cell of the field
 /////*! Using for environment
@@ -101,7 +97,7 @@ struct Field_size {
 };
 
 //! enum of cell's type of field
-enum CellType { none_cell, barrier, interest_point, notexist, ai_seen, rc, rs, rsd, cc, oc };
+enum CellType { none_cell, barrier, interest_point, notexist, ai_seen, rc, rs, rsd, cc, oc, border };
 //! enum of components' type for methods
 enum ComponentType { observe_center, command_center, robot_commander, robot_scout };
 //! enum of modules' type for methods
@@ -110,9 +106,11 @@ enum ModuleType { management_Module, generator_Module, sensor_Module };
 //! enum of directions' type for movement
 enum DirectionType { left, right, up, down };
 
+enum Commander_mode { waiting_mode, following_mode, state_mode };
+
 //! struct for environment information
 struct EnvironmentInfo {
 	vector<Components_N::Component*> components;  //!< used components
-	vector<Point> pointsOfInterest;  //!< points of interest 
-	vector<Point> barriers;  //!< barriers 
+	vector<Point> pointsOfInterest;  //!< points of interest
+	vector<Point> barriers;  //!< barriers
 };

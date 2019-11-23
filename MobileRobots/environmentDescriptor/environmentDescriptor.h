@@ -3,15 +3,14 @@
 
 #include "../Component/Component.h"
 
-using namespace my_std;
-//using std::vector;
+//using namespace my_std;
+using std::vector;
 
 using namespace Components_N;
 //! Environment desriptor namespace
 /*! ED namespace
 */
 namespace ED_N {
-
 	//! Environment desriptor
 	/*! Environment desriptor class
 	*/
@@ -19,23 +18,20 @@ namespace ED_N {
 	{
 	private:
 		Field_size size;  //!< field size
-		vector<vector<unsigned>> field;  //!< field 
+		vector<vector<unsigned>> field;  //!< field
 		vector<Component*> components;  //!< used components
-	
+
 	public:
 
-
-
-		void getAllManagementComponents(vector<managementComponent*> &managementComponents) {
+		void getAllManagementComponents(vector<managementComponent*>& managementComponents) {
 			vector<Components_N::Component*>::iterator c_it;
-				c_it = components.begin();
-				while (c_it != components.end())
-				{
-					if (((*c_it)->iAm() == robot_commander) || ((*c_it)->iAm() == command_center))
-						managementComponents.push_back(dynamic_cast<managementComponent*>(*c_it));
-					c_it++;
-				}
-			
+			c_it = components.begin();
+			while (c_it != components.end())
+			{
+				if (((*c_it)->iAm() == robot_commander) || ((*c_it)->iAm() == command_center))
+					managementComponents.push_back(dynamic_cast<managementComponent*>(*c_it));
+				c_it++;
+			}
 		}
 
 		robotCommander* getRCComponent(int i) {
@@ -49,7 +45,7 @@ namespace ED_N {
 		robotScout* getRSComponent(int i) {
 			return dynamic_cast<robotScout*>(components[i]);
 		}
-		
+
 		Component* getComponent(int i) {
 			return components[i];
 		}
@@ -59,17 +55,17 @@ namespace ED_N {
 		}
 
 		environmentDescriptor(Field_size field_size);
-		
+
 		environmentDescriptor(int m0 = 0, int n0 = 0);
-		
+
 		~environmentDescriptor();
-		
+
 		int getCompCount() { return components.size(); };
 
 		Field_size getSize();
-		
+
 		void setSize(Field_size field_size);
-	
+
 		void drawMap();
 		void drawJustMap();
 
@@ -77,16 +73,16 @@ namespace ED_N {
 		void showComponentsNM();
 		void showInfo(EnvironmentInfo envinfo);
 
-		void AddObserveCenter(Point point,  int en, int num, int c);
+		void AddObserveCenter(Point point, int en, int num, int c);
 
 		void AddCommandCenter(Point point, int en, int num, int numD, int c);
 
 		void AddRobotCommander(Point point, int en, int num, int numD, int vel, int c);
 
 		void AddRobotScout(Point point, int en, int num, int vel, int c);
-		
+
 		unsigned getCell(Point point);
-		
+
 		void setCell(Point point, unsigned cell_type = none_cell);
 
 		// Input

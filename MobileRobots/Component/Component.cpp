@@ -1,8 +1,8 @@
 #include "Component.h"
 #include <algorithm>
 namespace Components_N {
-	using namespace my_std;
-	//using std::vector;
+	//using namespace my_std;
+	using std::vector;
 
 	/*! Simple Constructor gets
 	* x0 and y0 to set coordinates of module,
@@ -48,7 +48,7 @@ namespace Components_N {
 	/*!
 	Set generator on the component*/
 	void Component::setModule_g(int pr, int en, int c, int enpr) {
-		if(modules.size() == slotsNum)
+		if (modules.size() == slotsNum)
 			throw std::exception(" >>> not enough space for modules");
 		if (pr < 0)
 			throw std::exception(" >>> incorrect prioritet");
@@ -100,12 +100,11 @@ namespace Components_N {
 			throw std::exception(" >>> incorrect radius");
 		if (n < 0)
 			throw std::exception(" >>> incorrect num of managed devices");
-		if ((this->iAm() == robot_scout)||(this->iAm() == observe_center))
+		if ((this->iAm() == robot_scout) || (this->iAm() == observe_center))
 			throw std::exception(" >>> You can't set management module on unmanageble component");
 
 		Module* mod = new managementModule(false, pr, en, c, r, n);
 		modules.push_back(mod);
-	
 	};
 
 	/*! Method to delete module: gets type of module, check availability of the module
@@ -186,9 +185,11 @@ namespace Components_N {
 	////////////////////////////////////////////////////////////
 
 	/*! Simple Constructor gets all variables for "Component" constructor and numD for numOfDevices */
-	managementComponent:: managementComponent(int x0, int y0, int en, int num, int c, int numD, string desc) :
+	managementComponent::managementComponent(int x0, int y0, int en, int num, int c, int numD, string desc) :
 		Component(x0, y0, desc, en, num, c),
-		numOfDevices(numD) {};
+		numOfDevices(numD) {
+	Component:setActive();
+	};
 	/*! Constructor to set num of managed devices */
 	managementComponent::managementComponent(int numD) : numOfDevices(numD) {
 	};
@@ -209,7 +210,7 @@ namespace Components_N {
 
 		while (it != managedComponents[i]->getModules()->end())
 		{
-			if (((*it)->iAm() == sensor_Module)&&((*it)->getState() == 1)) {
+			if (((*it)->iAm() == sensor_Module) && ((*it)->getState() == 1)) {
 				EnvironmentInfo EInf_old = dynamic_cast<sensorModule*>(*it)->getInfo(managedComponents[i]->getCoord(), env, field);
 
 				vector<Point>::iterator iter;
@@ -251,10 +252,10 @@ namespace Components_N {
 	*
 	* it calls moveRobotInDirection function from mobileComponent
 	*/
-	void managementComponent::moveRobot(int i, int direction) {
+	void managementComponent::moveRobot(int i, int direction, int max_step) {
 		if (i >= managedComponents.size())
 			throw std::exception(">>> incorrect num");
-		if ((direction < 0 )|| (direction > 3))
+		if ((direction < 0) || (direction > 3))
 			throw std::exception(">>> incorrect direction");
 		switch (managedComponents[i]->iAm()) {
 		case robot_scout:
@@ -274,7 +275,7 @@ namespace Components_N {
 	////////////////////////////////////////////////////////////
 
 	/*! Simple Constructor gets all variables for "Component" constructor and vel for velocity */
-	mobileComponent:: mobileComponent(int x0, int y0, string desc, int en, int num, int c, int vel) :
+	mobileComponent::mobileComponent(int x0, int y0, string desc, int en, int num, int c, int vel) :
 		Component(x0, y0, desc, en, num, c),
 		velocity(vel) {};
 	/*! Constructor to set velocity of managed devices */
@@ -284,20 +285,22 @@ namespace Components_N {
 	mobileComponent::~mobileComponent() {
 	};
 	/*! move robot in given direction: throw exception, if there is no managed robot */
-	void mobileComponent::moveRobotInDirection(int direction) {
+	void mobileComponent::moveRobotInDirection(int direction, int max_step) {
+		if (max_step == 0)
+			max_step = velocity;
 		switch (direction)
 		{
 		case left:
-			x -= velocity;
+			x -= max_step;
 			break;
 		case right:
-			x += velocity;
+			x += max_step;
 			break;
 		case down:
-			y += velocity;
+			y += max_step;
 			break;
 		case up:
-			y -= velocity;
+			y -= max_step;
 			break;
 		default:
 			throw std::exception(" >>> incorrect direction");
@@ -313,7 +316,6 @@ namespace Components_N {
 	robotScout::robotScout(int x0, int y0, string desc, int en, int num, int c, int vel) :
 		Component(x0, y0, desc, en, num, c),
 		mobileComponent(vel) {
-	
 	};
 	/*! destructor */
 	robotScout::~robotScout() {};
@@ -327,9 +329,9 @@ namespace Components_N {
 		Component(x0, y0, desc, en, num, c),
 		mobileComponent(vel),
 		managementComponent(numD) {
+	Component:setActive();
+
 	};
 	/*! destructor */
 	robotCommander::~robotCommander() {};
-
 }
-

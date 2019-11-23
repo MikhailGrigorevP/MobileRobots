@@ -13,19 +13,14 @@
 #include "../MobileRobots/Module/Module.cpp"
 #include "../MobileRobots/Structures/structures.h"
 
-
-
 TEST(environmentDescriptorT, ED_constructor) {
-
 	ED_N::environmentDescriptor environment;
 
 	Field_size point = { 0, 0 };
 	EXPECT_EQ(point, environment.getSize());
-
 }
 
 TEST(environmentDescriptorT, ED_setters) {
-
 	ED_N::environmentDescriptor environment(16, 16);
 
 	environment.setSize({ 10, 10 });
@@ -40,11 +35,9 @@ TEST(environmentDescriptorT, ED_setters) {
 
 	environment.setCell({ 8, 11 }, interest_point);
 	EXPECT_EQ(interest_point, environment.getCell({ 8, 11 }));
-
 }
 
 TEST(environmentDescriptorT, ED_exception) {
-
 	ED_N::environmentDescriptor environment;
 
 	ASSERT_ANY_THROW(environment.setSize({ -2, 10 }));
@@ -63,11 +56,9 @@ TEST(environmentDescriptorT, ED_exception) {
 	ASSERT_ANY_THROW(environment.setCell({ -8, 11 }, interest_point));
 	ASSERT_ANY_THROW(environment.setCell({ 8, 111 }, interest_point));
 	ASSERT_ANY_THROW(environment.setCell({ 88, 11 }, interest_point));
-
 }
 
 TEST(ComponentT, C_constructors) {
-
 	Components_N::Component component_0;
 
 	Point point = { 0, 0 };
@@ -116,11 +107,9 @@ TEST(ComponentT, C_constructors) {
 	EXPECT_EQ(100, component_4.getEnergy());
 	EXPECT_EQ(4, component_4.getSlotsNum());
 	EXPECT_EQ(5, component_4.getNumD());
-
 }
 
 TEST(ComponentT, C_move) {
-
 	Components_N::robotScout component(0, 6, "Constructor", 100, 4, 250, 2);
 
 	Point point = { 0, 6 };
@@ -145,11 +134,9 @@ TEST(ComponentT, C_move) {
 
 	point = { 0, 6 };
 	EXPECT_EQ(point, component.getCoord());
-
 }
 
 TEST(ComponentT, C_modules) {
-
 	Components_N::managementComponent component(0, 6, 100, 4, 250, 5, "Constructor");
 
 	component.setModule_g(1, 150, 180, 5000);
@@ -165,9 +152,7 @@ TEST(ComponentT, C_modules) {
 	ASSERT_ANY_THROW(component.moduleOn(1));
 }
 
-
 TEST(ComponentT, C_modules_Exception) {
-
 	Components_N::managementComponent component(0, 6, 100, 4, 250, 5, "Constructor");
 
 	component.setModule_g(1, 150, 180, 5000);
@@ -181,11 +166,9 @@ TEST(ComponentT, C_modules_Exception) {
 
 	component.setModule_s(1, 9000, 180, 8, 180, left);
 	ASSERT_ANY_THROW(component.moduleOn(2));
-
 }
 
 TEST(ComponentT, C_management) {
-
 	Components_N::managementComponent component(0, 3, 100, 4, 250, 5, "Constructor");
 	component.setModule_g(1, 150, 180, 5000);
 	component.setModule_m(1, 150, 180, 8, 5);
@@ -208,11 +191,9 @@ TEST(ComponentT, C_management) {
 	point = { 0, 9 };
 	EXPECT_EQ(point, component.getComp(0)->getCoord());
 	ASSERT_ANY_THROW(component.getComp(1));
-
 }
 
 TEST(ComponentT, C_management_info) {
-
 	ED_N::environmentDescriptor environment;
 
 	environment.setSize({ 16, 16 });
@@ -282,13 +263,9 @@ TEST(ComponentT, C_management_info) {
 
 	EXPECT_EQ(environment.getRCComponent(2), envInfo2.components[0]);
 	EXPECT_NE(environment.getRCComponent(1), envInfo2.components[0]);
-
-
 }
 
-
 TEST(ModuleT, M_info) {
-
 	ED_N::environmentDescriptor environment;
 
 	environment.setSize({ 16, 16 });
@@ -339,7 +316,6 @@ TEST(ModuleT, M_info) {
 	environment.getComponent(2)->moduleOn(0);
 	environment.getComponent(2)->setModule_m(2, 150, 250, 9, 4);
 
-
 	EnvironmentInfo envInf, envInfo2;
 
 	Point point = environment.getRSComponent(0)->getCoord();
@@ -361,11 +337,9 @@ TEST(ModuleT, M_info) {
 
 	EXPECT_EQ(environment.getRCComponent(2), envInfo2.components[0]);
 	EXPECT_NE(environment.getRCComponent(1), envInfo2.components[0]);
-
 }
 
 TEST(ModuleT, M_constructors) {
-
 	Modules_N::generatorModule modul(1, 1, 150, 180, 5000);
 
 	EXPECT_EQ(180, modul.getCost());
@@ -392,11 +366,9 @@ TEST(ModuleT, M_constructors) {
 	EXPECT_EQ(180, modul_2.getAng());
 	EXPECT_EQ(left, modul_2.getDir());
 	EXPECT_EQ(8, modul_2.getR());
-
 }
 
 TEST(ModuleT, M_toggle) {
-
 	Modules_N::generatorModule modul(1, 1, 150, 180, 5000);
 
 	modul.off();
@@ -404,5 +376,4 @@ TEST(ModuleT, M_toggle) {
 
 	modul.on();
 	EXPECT_EQ(1, modul.getState());
-
 }

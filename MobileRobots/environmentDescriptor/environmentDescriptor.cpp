@@ -1,9 +1,8 @@
 #include "environmentDescriptor.h"
 
 namespace ED_N {
-
-	using namespace my_std;
-	//using std::vector;
+	//using namespace my_std;
+	using std::vector;
 
 	/*! return direction */
 	void returnDir(int dir) {
@@ -24,8 +23,7 @@ namespace ED_N {
 	}
 
 	/*! Constructor */
-	environmentDescriptor::environmentDescriptor(int m0, int n0) : size{ m0, n0} {
-
+	environmentDescriptor::environmentDescriptor(int m0, int n0) : size{ m0, n0 } {
 		if (m0 < 0 || n0 < 0)
 			throw std::exception(">>> incorrect size");
 
@@ -39,7 +37,6 @@ namespace ED_N {
 
 	/*! Constructor */
 	environmentDescriptor::environmentDescriptor(Field_size field_size) : size{ field_size.m, field_size.n } {
-
 		if (field_size.m < 0 || field_size.n < 0)
 			throw std::exception(">>> incorrect size");
 		for (int i = 0; i < size.n; ++i) {
@@ -72,11 +69,10 @@ namespace ED_N {
 				field[i].push_back(notexist);
 			}
 		}
-
 	};
 
 	/*! get type of cell */
-	unsigned environmentDescriptor:: getCell(Point point) {
+	unsigned environmentDescriptor::getCell(Point point) {
 		if (size.m == 0 || size.n == 0)
 			throw std::exception(">>> Environment is empty");
 		if (point.x < 0)
@@ -96,7 +92,7 @@ namespace ED_N {
 			throw std::exception(">>> Environment is empty");
 		if (point.x < 0)
 			throw std::exception(" >>> x coordinate < 0");
-		if(point.x >= size.n)
+		if (point.x >= size.n)
 			throw std::exception(" >>> x coordinate bigger then horizontal size");
 		if (point.y < 0)
 			throw std::exception(" >>> y coordinate < 0");
@@ -110,7 +106,6 @@ namespace ED_N {
 
 	/*! Input */
 	std::istream& operator >> (std::istream& s, environmentDescriptor& envD) {
-
 		std::cout << ">> ";
 		Field_size field_size;
 		s >> field_size.m >> field_size.n;
@@ -122,8 +117,8 @@ namespace ED_N {
 	}
 
 	/*! Output */
-	std::ostream& operator << (std::ostream& o , const environmentDescriptor& envD) {
-		if (envD.size.m == 0 || envD.size.n == 0) 
+	std::ostream& operator << (std::ostream& o, const environmentDescriptor& envD) {
+		if (envD.size.m == 0 || envD.size.n == 0)
 			throw std::exception(">>> Environment is empty");
 
 		else
@@ -133,7 +128,6 @@ namespace ED_N {
 
 	/* Add command center to Environment*/
 	void environmentDescriptor::AddCommandCenter(Point point, int en, int num, int numD, int c) {
-
 		if (size.m == 0 || size.n == 0)
 			throw std::exception(">>> Environment is empty");
 		if (point.x < 0)
@@ -153,13 +147,12 @@ namespace ED_N {
 		if (numD <= 0)
 			throw std::exception(" >>> incorrect num of managed modules");
 
-		managementComponent* component = new managementComponent (point.x, point.y, en, num, c, numD, "Command center");
+		managementComponent* component = new managementComponent(point.x, point.y, en, num, c, numD, "Command center");
 		components.push_back(component);
 	};
 
 	/* Add robot commander to Environment*/
 	void environmentDescriptor::AddRobotCommander(Point point, int en, int num, int numD, int vel, int c) {
-
 		if (size.m == 0 || size.n == 0)
 			throw std::exception(">>> Environment is empty");
 		if (point.x < 0)
@@ -181,14 +174,12 @@ namespace ED_N {
 		if (vel <= 0)
 			throw std::exception(" >>> incorrect velocity");
 
-
 		robotCommander* component = new robotCommander(point.x, point.y, "Robot commander", en, num, c, numD, vel);
-			components.push_back(component);
+		components.push_back(component);
 	};
 
 	/* Add robot scout to Environment*/
 	void environmentDescriptor::AddRobotScout(Point point, int en, int num, int vel, int c) {
-
 		if (size.m == 0 || size.n == 0)
 			throw std::exception(">>> Environment is empty");
 		if (point.x < 0)
@@ -210,12 +201,10 @@ namespace ED_N {
 
 		robotScout* component = new robotScout(point.x, point.y, "Robot commander", en, num, c, vel);
 		components.push_back(component);
-
 	};
 
 	/* Add observe center Environment*/
 	void environmentDescriptor::AddObserveCenter(Point point, int en, int num, int c) {
-
 		if (size.m == 0 || size.n == 0)
 			throw std::exception(">>> Environment is empty");
 		if (point.x < 0)
@@ -233,17 +222,14 @@ namespace ED_N {
 		if (c <= 0)
 			throw std::exception(" >>> incorrect cost");
 
-		Component* component = new Component (point.x, point.y, "Observe center", en, num, c);
+		Component* component = new Component(point.x, point.y, "Observe center", en, num, c);
 		components.push_back(component);
-
-
 	}
 
 	/* Show components */
 	void environmentDescriptor::showComponentsNM() {
 		if (size.m == 0 || size.n == 0)
 			throw std::exception(">>> Environment is empty");
-
 
 		if (components.size() == 0)
 			std::cout << "No any components in field: \n";
@@ -274,7 +260,6 @@ namespace ED_N {
 	void environmentDescriptor::showComponents() {
 		if (size.m == 0 || size.n == 0)
 			throw std::exception(">>> Environment is empty");
-
 
 		if (components.size() == 0)
 			std::cout << "No any components in field: \n";
@@ -311,7 +296,6 @@ namespace ED_N {
 						case management_Module:
 							std::cout << "Management Module ";
 							break;
-
 						}
 						std::cout << std::endl;
 					}
@@ -364,7 +348,6 @@ namespace ED_N {
 			}
 			std::cout << std::endl;
 		}
-
 	}
 
 	/* Draw all environment*/
@@ -413,11 +396,10 @@ namespace ED_N {
 		}
 		std::cout << "Where:\n" << "\t~ - is free cell\n" << "\t# - is barrier\n" << "\t* - is point of interest\n\n";
 
-		if(components.size() == 0)
+		if (components.size() == 0)
 			std::cout << "No any components in field: \n";
 
 		else {
-
 			std::cout << "Components in field: \n";
 
 			vector<Components_N::Component*>::iterator c_it;
@@ -481,12 +463,11 @@ namespace ED_N {
 						vector<Point>::iterator p_it, b_it;
 						vector<Components_N::Component*>::iterator c_it;
 
-
 						switch ((components[i]->getModule(j))->iAm()) {
 						case generator_Module:
-							std::cout << "Generator Module with prioritet - " << components[i]->getGModule(j)->getPriority() << 
-								", energy - " << components[i]->getGModule(j)->getEnergy() << 
-								", cost - " << components[i]->getGModule(j)->getCost() << 
+							std::cout << "Generator Module with prioritet - " << components[i]->getGModule(j)->getPriority() <<
+								", energy - " << components[i]->getGModule(j)->getEnergy() <<
+								", cost - " << components[i]->getGModule(j)->getCost() <<
 								", state - " << components[i]->getGModule(j)->getState() <<
 								", energy provision - " << components[i]->getGModule(j)->getEnergyProvision();
 							break;
@@ -539,7 +520,6 @@ namespace ED_N {
 							else
 								std::cout << "components weren't found";
 
-
 							break;
 						case management_Module:
 							std::cout << "Management Module with prioritet - " << components[i]->getMModule(j)->getPriority() <<
@@ -549,7 +529,6 @@ namespace ED_N {
 								", radius - " << components[i]->getMModule(j)->getR() <<
 								", angle - " << components[i]->getMModule(j)->getN();
 							break;
-
 						}
 						std::cout << std::endl;
 					}
@@ -557,12 +536,10 @@ namespace ED_N {
 			}
 			std::cout << std::endl;
 		}
-
 	}
 
 	/* Show info from EnvironmentInfo*/
 	void environmentDescriptor::showInfo(EnvironmentInfo envinfo) {
-
 		vector<Point>::iterator p_it, b_it;
 		vector<Components_N::Component*>::iterator c_it;
 
@@ -602,9 +579,7 @@ namespace ED_N {
 		}
 		else
 			std::cout << "components weren't found";
-		
+
 		std::cout << std::endl;
 	}
-	
-
 }

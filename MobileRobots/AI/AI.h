@@ -5,9 +5,9 @@
 #include <queue>
 #include "../Structures/structures.h"
 
-using namespace my_std;
+//using namespace my_std;
 using std::queue;
-//using std::vector;
+using std::vector;
 #include "../environmentDescriptor/environmentDescriptor.h"
 
 //! Artificial intelligence namespace
@@ -15,7 +15,6 @@ using std::queue;
 */
 
 namespace AI_N {
-
 	/** \defgroup groupSearchingPoints Searching points of interest
 	 * \brief AI is used to find all points of interest.
 	 *
@@ -23,9 +22,9 @@ namespace AI_N {
 	 * - findInterestPoints
 	 * @{
 	 */
-	//! Artificial intelligence
-	/*! AI class
- 	*/
+	 //! Artificial intelligence
+	 /*! AI class
+	 */
 
 	class AI
 	{
@@ -39,15 +38,10 @@ namespace AI_N {
 		//! Destructor
 		~AI() { interestPonts.~vector(); };
 
-		void bfs(Point start, Point e, vector<vector<unsigned>>& field);
+		void bfs(int c_num, Point start, Point e, vector<vector<unsigned>>& field);
 		vector<Point> findInterestPoints(ED_N::environmentDescriptor* environment);
-		void dfs(ED_N::environmentDescriptor* environment, vector<vector<unsigned>>& field,  managementComponent* component);
+		void dfs(ED_N::environmentDescriptor* environment, vector<vector<unsigned>>& field, vector<Components_N::managementComponent*> components);
 	};
 	/** @} */
-
-	
-
-
 }
 #endif
-

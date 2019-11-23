@@ -2,11 +2,11 @@
 #include <string>
 #include "../Module/Module.h"
 #include "../Vector/vector.h"
-using namespace my_std;
-//using std::vector;
+//using namespace my_std;
+using std::vector;
 #pragma once;
 using std::string;
-using namespace Modules_N; 
+using namespace Modules_N;
 
 #ifndef _COMPONENT_H_
 #define _COMPONENT_H_
@@ -23,18 +23,18 @@ using namespace Modules_N;
  * 4. robotScout
  *
  * 5. robotCommander
- * 
+ *
  */
 namespace Components_N {
-
 	//! Observe center, also Parent component
-	class Component{
+	class Component {
 	private:
+		bool active = false;
 		string description;  //! Description
 		int energy;  //! Energy of component
 		int slotsNum; //! number of slots for modules
-		vector<Module*> modules; //! array for modules 
-		int cost; //! cost of component 
+		vector<Module*> modules; //! array for modules
+		int cost; //! cost of component
 
 	protected:
 		int x, y;  //! Coordinates
@@ -51,7 +51,6 @@ namespace Components_N {
 			energy(0),
 			slotsNum(0),
 			cost(0) {
-
 		};
 		Component(int x0, int y0, string desc, int en, int num, int c);
 		Component(Point point, string desc, int en, int num, int c);
@@ -69,6 +68,7 @@ namespace Components_N {
 		int getEnergy() { return energy; }
 		int getSlotsNum() { return slotsNum; }
 		int getModulesSize() { return modules.size(); }
+		int getActive() { return active; }
 		int getNum() { return slotsNum; }
 		int getCost() { return cost; }
 		virtual int getNumD() { return 0; }
@@ -100,7 +100,7 @@ namespace Components_N {
 		{
 			return ((a.x == b.x) && (a.y == b.y));
 		}
-		friend bool operator != (const Component &b, const Component& a)
+		friend bool operator != (const Component& b, const Component& a)
 		{
 			return ((a.x != b.x) || (a.y != b.y));
 		}
@@ -111,6 +111,13 @@ namespace Components_N {
 		void setModule_s(int pr, int en, int c, int r, int ang, int direct);
 		void setModule_m(int pr, int en, int c, int r, int n);
 
+		void setActive() {
+			active = true;
+		};
+
+		void setDead() {
+			active = false;
+		};
 		//! Modules
 
 		void moduleOn(int type);
@@ -123,7 +130,7 @@ namespace Components_N {
 	*
 	* inheritor of "Component" with num of meneged devices
 	*/
-	class managementComponent : public virtual  Component 
+	class managementComponent : public virtual  Component
 	{
 	private:
 		int numOfDevices = 0;  //!< num of managed devices
@@ -132,7 +139,6 @@ namespace Components_N {
 		managementComponent(int x0, int y0, int en, int num, int c, int numD, string desc);
 		managementComponent(int numD = 0);
 
-
 		bool operator == (const managementComponent& a) const
 		{
 			return (a == *this);
@@ -140,7 +146,7 @@ namespace Components_N {
 
 		vector<Component*>* getNComp() {
 			return &managedComponents;
-		} 
+		}
 
 		Component* getComp(int i) {
 			if (i < 0)
@@ -157,7 +163,7 @@ namespace Components_N {
 
 		EnvironmentInfo getInfo(int i, ED_N::environmentDescriptor* env, vector<vector<unsigned>>& field = nofield);
 
-		virtual void moveRobot(int i, int direction);
+		virtual void moveRobot(int i, int direction, int max_step = 0);
 	};
 
 	//! Mobile component
@@ -165,12 +171,11 @@ namespace Components_N {
 	*
 	* inheritor of "Component" with velocity of managed devices
 	*/
-	class mobileComponent : public virtual  Component 
+	class mobileComponent : public virtual  Component
 	{
 	private:
 		int velocity = 0;  //!< velocity of mobile component
 	public:
-
 
 		bool operator == (const mobileComponent& a) const
 		{
@@ -182,7 +187,7 @@ namespace Components_N {
 		int getVel() { return velocity; }
 		virtual ~mobileComponent();
 		virtual int iAm() const = 0;
-		virtual void moveRobotInDirection(int direction);
+		virtual void moveRobotInDirection(int direction, int max_step = 0);
 	};
 
 	//! Robot scout - mobile component
@@ -224,8 +229,7 @@ namespace Components_N {
 
 		robotCommander(int x0, int y0, string desc, int en, int num, int c, int numD = 0, int vel = 0);
 		virtual int iAm() const { return robot_commander; }
-	    ~robotCommander();
+		~robotCommander();
 	};
-
 }
 #endif

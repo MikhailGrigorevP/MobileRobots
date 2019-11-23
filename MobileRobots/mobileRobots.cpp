@@ -9,41 +9,38 @@
  * - \subpage howItWorkPage "How does it work?"
  *
  */
-/*! \page componentsPage What is robotic component?
-  *
-  * Coming soon
-  *
-  */
-/*! \page modulePage What is component's module?
-  *
-  * Coming soon
-  *
-  */
-/*! \page howItWorkPage How does it work
+ /*! \page componentsPage What is robotic component?
    *
-   * This page is about how robotic complex work
-   * Following sections describe robotic complex:
-   * - \ref groupSearchingPoints ""
-   * - \ref groupMovement "Movement"
+   * Coming soon
+   *
    */
-/** \defgroup groupMovement Movement
-	* Coming soon
-	*/
+   /*! \page modulePage What is component's module?
+	 *
+	 * Coming soon
+	 *
+	 */
+	 /*! \page howItWorkPage How does it work
+		*
+		* This page is about how robotic complex work
+		* Following sections describe robotic complex:
+		* - \ref groupSearchingPoints ""
+		* - \ref groupMovement "Movement"
+		*/
+		/** \defgroup groupMovement Movement
+			* Coming soon
+			*/
 
 #include "AI/AI.h"
 #include "environmentDescriptor/environmentDescriptor.h"
 #include <iostream>
 #include <cstdlib>
-#include "Render/render.h"
-#include "SDL.h"
 #include <functional>
 
-
+#include "SDL.h"
 using namespace Components_N;
 using namespace Modules_N;
 using namespace AI_N;
 using namespace ED_N;
-
 
 const char* MENU_0[]{ "1. Work with Environment", "2. Work with components", "3. Show all information", "4. Find points of interest", "0. Exit" };
 const unsigned menu_0_SZ = sizeof(MENU_0) / sizeof(MENU_0[0]);
@@ -61,7 +58,6 @@ void SetCell(ED_N::environmentDescriptor& environment);
 void GetCell(ED_N::environmentDescriptor& environment);
 void AddComp(ED_N::environmentDescriptor& environment);
 vector<std::function<void(ED_N::environmentDescriptor&)> > menu_0 = { SetField, GetField, SetCell, GetCell, AddComp };
-
 
 const char* MENU_2[]{ "1. Show all components", "2. Add/delete component's module", "3. Work with managed components", "4. Move robot", "5. On/off component's module", "0. <- Back to Main menu" };
 const unsigned menu_2_SZ = sizeof(MENU_2) / sizeof(MENU_2[0]);
@@ -88,7 +84,7 @@ void getClear()
 
 #include <fstream>
 using std::ifstream;
-void readFromFile (ED_N::environmentDescriptor& environment)
+void readFromFile(ED_N::environmentDescriptor& environment)
 {
 	ifstream file("map.txt");
 	string str;
@@ -99,7 +95,7 @@ void readFromFile (ED_N::environmentDescriptor& environment)
 	while (!file.eof()) {
 		m++;
 		getline(file, str);
-		if(str.size())
+		if (str.size())
 			n = str.size();
 	}
 	file.seekg(0);
@@ -125,7 +121,6 @@ void readFromFile (ED_N::environmentDescriptor& environment)
 		++j;
 	}
 }
-
 
 //Init
 void menu_InitEnvironment(ED_N::environmentDescriptor& environment) {
@@ -217,10 +212,8 @@ void menu_InitEnvironment(ED_N::environmentDescriptor& environment) {
 
 	//////////////////////////////////////
 	//////////////////////////////////////
-
 };
 void menu_InitEnvironment_2(ED_N::environmentDescriptor& environment) {
-
 	readFromFile(environment);
 
 	environment.AddRobotScout({ 5, 3 }, 80, 5, 1, 600);
@@ -237,7 +230,7 @@ void menu_InitEnvironment_2(ED_N::environmentDescriptor& environment) {
 	environment.getRSComponent(2)->setModule_s(1, 150, 500, 1, 60, 2);
 	environment.getComponent(2)->moduleOn(1);
 
-	environment.AddObserveCenter({ 4, 7}, 80, 5, 600);
+	environment.AddObserveCenter({ 4, 7 }, 80, 5, 600);
 	environment.getComponent(3)->setModule_g(1, 100, 125, 4500);
 	environment.getComponent(3)->setModule_s(1, 150, 500, 4, 60, 0);
 	environment.getComponent(3)->setModule_s(1, 150, 500, 4, 60, 1);
@@ -248,16 +241,56 @@ void menu_InitEnvironment_2(ED_N::environmentDescriptor& environment) {
 	environment.getComponent(3)->moduleOn(3);
 	environment.getComponent(3)->moduleOn(4);
 
+	environment.AddRobotScout({ 13, 3 }, 80, 5, 1, 600);
+	environment.getComponent(4)->setModule_g(1, 100, 125, 4500);
+	environment.getRSComponent(4)->setModule_s(1, 150, 500, 1, 60, 0);
+	environment.getComponent(4)->moduleOn(1);
+
+	environment.AddRobotCommander({ 12, 1 }, 150, 4, 2, 1, 600);
+	environment.getComponent(5)->setModule_g(1, 100, 125, 4500);
+	environment.getComponent(5)->setModule_m(2, 150, 250, 3, 4);
+
+	environment.AddRobotScout({ 19, 23 }, 80, 5, 1, 600);
+	environment.getComponent(6)->setModule_g(1, 100, 125, 4500);
+	environment.getRSComponent(6)->setModule_s(1, 150, 500, 2, 60, 0);
+	environment.getComponent(6)->moduleOn(1);
+
+	environment.AddRobotCommander({ 18, 22 }, 150, 4, 2, 1, 600);
+	environment.getComponent(7)->setModule_g(1, 100, 125, 4500);
+	environment.getComponent(7)->setModule_m(2, 150, 250, 3, 4);
+
+	environment.AddRobotScout({ 22, 12 }, 80, 5, 1, 600);
+	environment.getComponent(8)->setModule_g(1, 100, 125, 4500);
+	environment.getRSComponent(8)->setModule_s(1, 150, 500, 2, 60, 0);
+	environment.getComponent(8)->moduleOn(1);
+
+	environment.AddRobotCommander({ 23, 12 }, 150, 4, 2, 1, 600);
+	environment.getComponent(9)->setModule_g(1, 100, 125, 4500);
+	environment.getComponent(9)->setModule_m(2, 150, 250, 3, 4);
+
+	environment.AddRobotScout({ 3, 9 }, 80, 5, 1, 600);
+	environment.getComponent(10)->setModule_g(1, 100, 125, 4500);
+	environment.getRSComponent(10)->setModule_s(1, 150, 500, 2, 60, 0);
+	environment.getComponent(10)->moduleOn(1);
+
+	environment.AddCommandCenter({ 2, 8 }, 150, 4, 2, 600);
+	environment.getComponent(11)->setModule_g(1, 100, 125, 4500);
+	environment.getComponent(11)->setModule_m(2, 150, 250, 8, 4);
+
 	dynamic_cast<managementComponent*>(environment.getComponent(1))->getMModule(1)->sendResourse(environment.getRCComponent(1), environment.getComponent(0));
 	dynamic_cast<managementComponent*>(environment.getComponent(1))->getMModule(1)->sendResourse(environment.getRCComponent(1), environment.getComponent(2));
 
+	dynamic_cast<managementComponent*>(environment.getComponent(5))->getMModule(1)->sendResourse(environment.getRCComponent(5), environment.getComponent(4));
 
+	dynamic_cast<managementComponent*>(environment.getComponent(7))->getMModule(1)->sendResourse(environment.getRCComponent(7), environment.getComponent(6));
+
+	dynamic_cast<managementComponent*>(environment.getComponent(9))->getMModule(1)->sendResourse(environment.getRCComponent(9), environment.getComponent(8));
 };
 
 //Menu 0
 void WorkWithEnvironment(ED_N::environmentDescriptor& environment) {
 	unsigned menu = 1;
-	bool work = true;	
+	bool work = true;
 	if (system("CLS"))
 		system("clear");
 
@@ -292,11 +325,9 @@ void WorkWithEnvironment(ED_N::environmentDescriptor& environment) {
 				}
 			} while ((work) && !(std::cin.good()));
 		}
-
 	} while (work);
 }
 void WorkWithComponents(ED_N::environmentDescriptor& environment) {
-
 	unsigned menu = 1;
 	bool work = true;
 	if (system("CLS"))
@@ -333,9 +364,7 @@ void WorkWithComponents(ED_N::environmentDescriptor& environment) {
 				}
 			} while ((work) && !(std::cin.good()));
 		}
-
 	} while (work);
-
 };
 void ShowAllInformation(ED_N::environmentDescriptor& environment) {
 	try {
@@ -351,8 +380,6 @@ void FindInterestPoints(ED_N::environmentDescriptor& environment) {
 
 	vector<Point> pointsOfInterest;
 	pointsOfInterest = _AI.findInterestPoints(&environment);
-
-	//render* _render = new render("NameOfGame", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1024, 768, false);
 
 	vector<Point>::iterator p_it;
 
@@ -392,7 +419,6 @@ void GetField(ED_N::environmentDescriptor& environment) {
 	}
 }
 void SetCell(ED_N::environmentDescriptor& environment) {
-
 	Point point;
 	bool input;
 	int type;
@@ -427,7 +453,6 @@ void SetCell(ED_N::environmentDescriptor& environment) {
 	} while (input);
 }
 void GetCell(ED_N::environmentDescriptor& environment) {
-
 	Point point;
 	int type;
 
@@ -577,7 +602,6 @@ void ModuleEdit(ED_N::environmentDescriptor& environment) {
 	}
 
 	if (ans) {
-
 		if (environment.getComponent(cnum)->getModulesSize() == 0) {
 			std::cout << "\tNo modules in this components";
 			return;
@@ -595,7 +619,6 @@ void ModuleEdit(ED_N::environmentDescriptor& environment) {
 				case management_Module:
 					std::cout << "Management Module ";
 					break;
-
 				}
 				std::cout << std::endl;
 			}
@@ -677,12 +700,10 @@ void ModuleEdit(ED_N::environmentDescriptor& environment) {
 				std::cout << ex.what() << std::endl;
 			}
 			break; }
-
 		}
 	}
 }
 void WorkWithMC(ED_N::environmentDescriptor& environment) {
-
 	unsigned menu = 1;
 	bool work = true;
 	if (system("CLS"))
@@ -719,9 +740,7 @@ void WorkWithMC(ED_N::environmentDescriptor& environment) {
 				}
 			} while ((work) && !(std::cin.good()));
 		}
-
 	} while (work);
-
 }
 void Move(ED_N::environmentDescriptor& environment) {
 	int cnum, type;
@@ -836,7 +855,6 @@ void ModuleTurn(ED_N::environmentDescriptor& environment) {
 			case management_Module:
 				std::cout << "Management Module, state: " << environment.getComponent(cnum)->getModule(j)->getState();
 				break;
-
 			}
 			std::cout << std::endl;
 		}
@@ -873,7 +891,6 @@ void ModuleTurn(ED_N::environmentDescriptor& environment) {
 		else {
 			environment.getComponent(cnum)->moduleOff(ans);
 		}
-
 	}
 	catch (std::exception & ex) {
 		std::cout << ex.what() << std::endl;
@@ -881,7 +898,7 @@ void ModuleTurn(ED_N::environmentDescriptor& environment) {
 }
 
 //Menu 3
-void AddResourse(ED_N::environmentDescriptor& environment){
+void AddResourse(ED_N::environmentDescriptor& environment) {
 	int mnum, cnum, ans;
 	try {
 		environment.showComponentsNM();
@@ -898,12 +915,10 @@ void AddResourse(ED_N::environmentDescriptor& environment){
 		return;
 	}
 
-
 	if ((environment.getComponent(cnum)->iAm() != robot_commander) && (environment.getComponent(cnum)->iAm() != command_center)) {
 		std::cout << " >>> you can't manage unmanageble things";
 		return;
 	}
-
 
 	if (environment.getComponent(cnum)->getModulesSize() == 0) {
 		std::cout << "\tNo modules in this components";
@@ -923,7 +938,6 @@ void AddResourse(ED_N::environmentDescriptor& environment){
 			case management_Module:
 				std::cout << "Management Module";
 				break;
-
 			}
 		}
 		std::cout << std::endl;
@@ -984,12 +998,10 @@ void DeleteResourse(ED_N::environmentDescriptor& environment) {
 		return;
 	}
 
-
 	if ((environment.getComponent(cnum)->iAm() != robot_commander) && (environment.getComponent(cnum)->iAm() != command_center)) {
 		std::cout << " >>> you can't manage unmanageble things";
 		return;
 	}
-
 
 	if (environment.getComponent(cnum)->getModulesSize() == 0) {
 		std::cout << "\tNo modules in this components";
@@ -1009,7 +1021,6 @@ void DeleteResourse(ED_N::environmentDescriptor& environment) {
 			case management_Module:
 				std::cout << "Management Module";
 				break;
-
 			}
 		}
 		std::cout << std::endl;
@@ -1028,18 +1039,15 @@ void DeleteResourse(ED_N::environmentDescriptor& environment) {
 		return;
 	}
 
-
 	if (environment.getComponent(cnum)->getMModule(ans)->getState() == 0) {
 		std::cout << " >>> module is switched off";
 		return;
 	}
 
-
 	if ((environment.getComponent(cnum)->getMModule(ans)->iAm() != management_Module)) {
 		std::cout << " >>> you can't manage unmanageble things";
 		return;
 	}
-
 
 	vector<Components_N::Component*>::iterator c_it;
 	std::cout << "\tManaged components: ";
@@ -1090,7 +1098,6 @@ void MoveRobot(ED_N::environmentDescriptor& environment) {
 		return;
 	}
 
-
 	if ((environment.getComponent(cnum)->iAm() != robot_commander) && (environment.getComponent(cnum)->iAm() != command_center)) {
 		std::cout << " >>> you can't manage unmanageble things";
 		return;
@@ -1125,10 +1132,8 @@ void MoveRobot(ED_N::environmentDescriptor& environment) {
 		return;
 	}
 
-
 	std::cout << ">>> Input direction, where to move ( 0 - left, 1 - right, 2 - up, 3 - down)" << std::endl;
 	std::cin >> type;
-
 
 	pr = true;
 	switch (type) {
@@ -1214,18 +1219,14 @@ void GetInfo(ED_N::environmentDescriptor& environment) {
 	}
 }
 
-
-
 //! Main
 /*! Main
 *
-* 
+*
 *
 */
 
-
 int main(int argc, char* args[]) {
-
 	unsigned menu = 1;
 	bool work = true;
 
@@ -1235,7 +1236,6 @@ int main(int argc, char* args[]) {
 	menu_InitEnvironment_2(environment);
 
 	do {
-
 		if (menu)
 			for (size_t i = 0; i != menu_0_SZ; ++i)
 				std::cout << MENU_0[i] << std::endl;
@@ -1267,7 +1267,6 @@ int main(int argc, char* args[]) {
 				}
 			} while ((work) && !(std::cin.good()));
 		}
-
 	} while (work);
 
 	return 0;

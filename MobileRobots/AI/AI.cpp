@@ -1,17 +1,82 @@
 ﻿#include "AI.h"
 #include <chrono>
-//using std::vector;
+#include <algorithm>
+#include "..//Render/render.h"
+#include "SDL.h"
+
+using std::vector;
 using std::cout;
 using std::map;
 using std::stack;
 using std::pair;
-using namespace my_std;
+//using namespace my_std;
 
 static bool IS_ACTIVE = true;
 
 static vector<Point> no_vector = {};
-
+int num = 0;
 namespace AI_N {
+	bool checkMoveAbility(vector<vector<unsigned>>& field, int x, int y, int dist, int vel, bool isIgnoreCommander = false) {
+		int steps = 0;
+		if (dist == right) {
+			for (int i = x + 1; i <= x + vel; ++i) {
+				if ((i == (x + 1)) && isIgnoreCommander && field[i][y] == rc) {
+					++steps;
+					continue;
+				}
+
+				if (i >= field.size())
+					return steps;
+				if (field[i][y] != ai_seen)
+					return steps;
+				++steps;
+			}
+		}
+		else if (dist == left) {
+			for (int i = x - 1; i >= x - vel; --i) {
+				if ((i == (x - 1)) && isIgnoreCommander && field[i][y] == rc) {
+					++steps;
+					continue;
+				}
+
+				if (i < 0)
+					return steps;
+
+				if (field[i][y] != ai_seen) {
+					return steps;
+				}
+				++steps;
+			}
+		}
+		else if (dist == down) {
+			for (int i = y + 1; i <= y + vel; ++i) {
+				if ((i == (y + 1)) && isIgnoreCommander && field[x][i] == rc) {
+					++steps;
+					continue;
+				}
+				if (i >= field.size())
+					return steps;
+				if (field[x][i] != ai_seen)
+					return steps;
+				++steps;
+			}
+		}
+		else if (dist == up) {
+			for (int i = y - 1; i >= y - vel; --i) {
+				if ((i == (y - 1)) && isIgnoreCommander && field[x][i] == rc) {
+					++steps;
+					continue;
+				}
+				if (i < 0)
+					return steps;
+				if (field[x][i] != ai_seen)
+					return steps;
+				++steps;
+			}
+		}
+		return steps;
+	}
+
 	void showfield(Field_size field_Size, vector<vector<unsigned>>& field, vector<Point>& pointsOfInterest = no_vector) {
 		if (field_Size.m == 0 || field_Size.n == 0)
 			throw std::exception(">>> Environment is empty");
@@ -74,7 +139,6 @@ namespace AI_N {
 			}
 			std::cout << std::endl;
 		}
-
 	}
 
 	void showfield(Field_size field_Size, vector<vector<int>>& field, vector<Point>& pointsOfInterest = no_vector) {
@@ -98,25 +162,22 @@ namespace AI_N {
 				std::cout << std::endl;
 			}
 		}
-
 	}
 
-	void show(ED_N::environmentDescriptor* environment, int x, int y, managementComponent* component, vector<vector<unsigned>>& field) {
+	void show(ED_N::environmentDescriptor* environment, vector<vector<unsigned>>& field) {
 		if (IS_ACTIVE) {
 			if (system("CLS"))
 				system("clear");
-			std::cout << "\n>> rc " << component->getCoord().x << " " << component->getCoord().y << std::endl;
-			std::cout << "\n>> rs " << x << " " << y << std::endl;
 			showfield(environment->getSize(), field);
-			std::cout << "\n";
+			//std::cout << "\n\n Step: "<<num<<"\n\n";
+			std::cout << "\n Real Map:\n\n";
+			environment->drawJustMap();
 		}
 	}
 
+	vector<std::stack<Point>> way_back;
 
-	std::stack<Point> way_back;
-
-	void AI::bfs(Point v, Point e, vector<vector<unsigned>>& field) {
-
+	void AI::bfs(int c_num, Point v, Point e, vector<vector<unsigned>>& field) {
 		queue<Point> q;
 		Point s = v;
 		vector<Point> p;
@@ -124,14 +185,11 @@ namespace AI_N {
 		std::map<Point, vector<Vertex>> _n_graph;
 
 		for (int j = 0; j < field.size(); ++j) {
-
 			mark.push_back(vector<int>());
 			for (int i = 0; i < field[j].size(); ++i) {
-
 				mark[j].push_back(0);
 				Point potential_end;
 				if (field[i][j] != notexist) {
-
 					vector<Vertex> nVertex;
 					potential_end = { i - 1, j };
 					if ((i > 0 && (field[i - 1][j] == ai_seen)) || (potential_end == e))
@@ -189,594 +247,752 @@ namespace AI_N {
 			int num = e.y * field.size() + e.x;
 			int end = s.y * field.size() + s.x;
 			while (num != end) {
-				way_back.push(p[num]);
+				way_back[c_num].push(p[num]);
 				num = p[num].y * field.size() + p[num].x;
 			}
-			way_back.pop();
+			way_back[c_num].pop();
 		};
 		return;
 	}
+	
+	vector<vector<stack<Point>>> _stacks;
+	void AI::dfs(ED_N::environmentDescriptor* environment, vector<vector<unsigned>>& field, vector<Components_N::managementComponent*> components) {
 
-	vector<stack<Point>> _stacks;
-	void AI::dfs(ED_N::environmentDescriptor* environment, vector<vector<unsigned>>& field, managementComponent* component) {
+		const int FPS = 20;
+		const int frameDelay = 1000 / FPS;
+		Uint32 frameStart;
+		int frameTime;
+
+		render* _render = new render("NameOfGame", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1024, 850, false);
 
 		vector<Component*> dead_robots;
 		vector<stack<Point>> _dead_stacks;
-
+		vector<Point> active_points;
 		vector<Component*> UselessObserveCenters;
+
+		vector <stack<unsigned>> _states;
 
 		bool scanning;
 
-		bool last_chance = false;
+		for (size_t i = 0; i < components.size(); i++)
+		{
+			way_back.push_back(std::stack<Point>());
+		}
 
-		do {
+		bool _ai_ = true;
 
-			scanning = false;
+		vector<Components_N::managementComponent*>::iterator component;
+		while (_ai_) {
+			_ai_ = false;
+			int c_n = 0;
+			component = components.begin();
 
-			int x2 = component->getCoord().x;
-			int y2 = component->getCoord().y;
-			int radius = 0;
-			vector<Modules_N::Module*>::iterator it = component->getModules()->begin();
-			while (it != component->getModules()->end())
+			for (size_t i = 0; i < components.size(); i++)
 			{
-				if ((*it)->iAm() == management_Module) {
-					radius = dynamic_cast<managementModule*>(*it)->getR();
-					break;
-				}
-				it++;
+				if (components[i]->getActive() == true)
+					_ai_ = true;
 			}
 
-			int save = -1;
 
-			for (size_t j = 0; j < component->getNComp()->size(); j++)
+			frameStart = SDL_GetTicks();
+			while (component != components.end())
 			{
-				int x = component->getComp(j)->getCoord().x;
-				int y = component->getComp(j)->getCoord().y;
-				Point nopoint = { -1, -1 };
-				if ((sqrt((x - x2) * (x - x2) + (y - y2) * (y - y2)) > radius) && (save == -1)) {
-					save = j;
-				}
-				else if ((sqrt((x - x2) * (x - x2) + (y - y2) * (y - y2)) > radius) && (save >= 0)) {
-					vector<Modules_N::Module*>::iterator it = component->getModules()->begin();
-					while (it != component->getModules()->end())
+				++num;
+
+				//show(environment, field);
+				//	showfield(environment->getSize(), visited_vertex);
+
+				bool comander = false;
+				if ((*component)->iAm() == robot_commander)
+					comander = true;
+
+				if ((*component)->getActive() == false) {
+
+					int x2 = (*component)->getCoord().x;
+					int y2 = (*component)->getCoord().y;
+
+					int radius;
+					vector<Modules_N::Module*>::iterator it = (*component)->getModules()->begin();
+					while (it != (*component)->getModules()->end())
 					{
 						if ((*it)->iAm() == management_Module) {
-							dead_robots.push_back(component->getComp(j));
-							field[component->getComp(j)->getCoord().x][component->getComp(j)->getCoord().y] = rsd;
-							dynamic_cast<managementModule*>(*it)->freeResourse(component, j);
-							_dead_stacks.push_back(_stacks[j]);
-							_dead_stacks[0].push({ x,y });
-							_stacks.erase(j);
-							--j;
+							radius = dynamic_cast<managementModule*>(*it)->getR();
 							break;
 						}
 						it++;
 					}
-				}
+					//SCANNING DEAD
+					for (size_t i = 0; i < dead_robots.size(); i++)
+					{
+						if ((*component)->getNComp()->size() == (*component)->getNum())
+							break;
+						int x = dead_robots[i]->getCoord().x;
+						int y = dead_robots[i]->getCoord().y;
 
-				//GIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIVE A CHANCE 
-				else if ((sqrt((x - x2) * (x - x2) + (y - y2) * (y - y2)) <= radius) && (save >= 0)) {
 
-					if ((!_stacks[j].empty()) && (_stacks[j].top() != nopoint)) {
-						vector<Modules_N::Module*>::iterator it = component->getModules()->begin();
-						while (it != component->getModules()->end()) {
-							if ((*it)->iAm() == management_Module) {
-								dead_robots.push_back(component->getComp(save));
-								field[component->getComp(save)->getCoord().x][component->getComp(save)->getCoord().y] = rsd;
-								dynamic_cast<managementModule*>(*it)->freeResourse(component, save);
-								_dead_stacks.push_back(_stacks[save]);
+						if (sqrt((x - x2) * (x - x2) + (y - y2) * (y - y2)) <= radius) {
+							(*component)->setActive();
+							_states[c_n].push(waiting_mode);
+							while (it != (*component)->getModules()->end())
+							{
+								if ((*it)->iAm() == management_Module) {
+									dynamic_cast<managementModule*>(*it)->sendResourse((*component), dead_robots[i]);
+									_stacks[c_n].push_back(_dead_stacks[i]);
+									field[dead_robots[i]->getCoord().x][dead_robots[i]->getCoord().y] = rs;
 
-								_dead_stacks[0].push({ x,y });
-								_stacks.erase(save);
-								save = -2;
-								--j;
-								break;
+									vector<Component*>::iterator temp = dead_robots.begin();
+									vector<stack<Point>>::iterator temp2 = _dead_stacks.begin();
+
+									_dead_stacks.erase(temp2 + i);
+									dead_robots.erase(temp + i);
+									--i;
+									break;
+								}
+								it++;
 							}
-							++it;
-						}
-					}
-					else {
-						vector<Modules_N::Module*>::iterator it = component->getModules()->begin();
-						while (it != component->getModules()->end()) {
-							if ((*it)->iAm() == management_Module) {
-								dead_robots.push_back(component->getComp(save));
-								field[component->getComp(save)->getCoord().x][component->getComp(save)->getCoord().y] = rsd;
-								dynamic_cast<managementModule*>(*it)->freeResourse(component, save);
-								_dead_stacks.push_back(_stacks[save]);
-
-								_dead_stacks[0].push({ x,y });
-								_stacks.erase(save);
-								save = -2;
-								--j;
-								break;
-							}
-							++it;
-						}
-					}
-				}
-
-			}
-
-			if (save >= 0) {
-
-				int x = component->getComp(save)->getCoord().x;
-				int y = component->getComp(save)->getCoord().y;
-
-				while (sqrt((x - component->getCoord().x) * (x - component->getCoord().x) + (y - component->getCoord().y) * (y - component->getCoord().y)) > 1) {
-
-					show(environment, x, y, component, field);
-
-					showfield(environment->getSize(), visited_vertex);
-
-					if (way_back.size() != 0) {
-
-						int x2 = component->getCoord().x;
-						int y2 = component->getCoord().y;
-
-						if (way_back.top().x > x2) {
-							field[x2][y2] = ai_seen;
-							dynamic_cast<robotCommander*>(component)->moveRobotInDirection(right);
-							field[component->getCoord().x][component->getCoord().y] = rc;
-						}
-						else if (way_back.top().x < x2) {
-							field[x2][y2] = ai_seen;
-							dynamic_cast<robotCommander*>(component)->moveRobotInDirection(left);
-							field[component->getCoord().x][component->getCoord().y] = rc;
-						}
-						else if (way_back.top().y > y2) {
-							field[x2][y2] = ai_seen;
-							dynamic_cast<robotCommander*>(component)->moveRobotInDirection(down);
-							field[component->getCoord().x][component->getCoord().y] = rc;
-						}
-						else if (way_back.top().y < y2) {
-							field[x2][y2] = ai_seen;
-							dynamic_cast<robotCommander*>(component)->moveRobotInDirection(up);
-							field[component->getCoord().x][component->getCoord().y] = rc;
-						}
-						way_back.pop();
-
-						x2 = component->getCoord().x;
-						y2 = component->getCoord().y;
-
-						continue;
-					}
-
-					else {
-						this->bfs({ x2, y2 }, { x,y }, field);
-					}
-
-				}
-
-			}
-
-			//SCANNING DEAD
-			for (size_t i = 0; i < dead_robots.size(); i++)
-			{
-				if (component->getNumD() <= component->getNum())
-					break;
-				int x = dead_robots[i]->getCoord().x;
-				int y = dead_robots[i]->getCoord().y;
-				if (sqrt((x - x2) * (x - x2) + (y - y2) * (y - y2)) > radius)
-					break;
-				if (sqrt((x - x2) * (x - x2) + (y - y2) * (y - y2)) <= radius)
-					while (it != component->getModules()->end())
-					{
-						if ((*it)->iAm() == management_Module) {
-							dynamic_cast<managementModule*>(*it)->sendResourse(component, dead_robots[i]);
-							_stacks.push_back(_dead_stacks[i]);
-							field[dead_robots[i]->getCoord().x][dead_robots[i]->getCoord().y] = rs;
-							_dead_stacks.erase(i);
-							dead_robots.erase(i);
-							--i;
 							break;
 						}
-						it++;
-					}
-			}
 
-			//SCANNING OC
-			for (size_t i = 0; i < UselessObserveCenters.size(); i++)
-			{
-				if (component->getNumD() <= component->getNComp()->size())
-					break;
+						if (sqrt((x - x2) * (x - x2) + (y - y2) * (y - y2)) > radius) {
+							this->bfs(c_n, { x2, y2 }, { x,y }, field);
+							_states[c_n].push(following_mode);
 
-				int x = UselessObserveCenters[i]->getCoord().x;
-				int y = UselessObserveCenters[i]->getCoord().y;
-				if (sqrt((x - x2) * (x - x2) + (y - y2) * (y - y2)) > radius)
-					break;
-				if (sqrt((x - x2) * (x - x2) + (y - y2) * (y - y2)) <= radius) {
-					while (it != component->getModules()->end())
-					{
-						if ((*it)->iAm() == management_Module) {
-							dynamic_cast<managementModule*>(*it)->sendResourse(component, UselessObserveCenters[i]);
-							component->getInfo(component->getNComp()->size() - 1, environment, field);
-							dynamic_cast<managementModule*>(*it)->freeResourse(component, component->getNComp()->size() - 1);
-							if (UselessObserveCenters.size() > 1)
-								UselessObserveCenters.erase(i);
-							else
-								UselessObserveCenters.clear();
 						}
-						++it;
-					}
-				}
-			}
-
-
-			while (!way_back.empty())
-				way_back.pop();
-
-			if (last_chance && dead_robots.size() != 0) {
-
-				int x = dead_robots[0]->getCoord().x;
-				int y = dead_robots[0]->getCoord().y;
-
-
-				while (sqrt((x - component->getCoord().x) * (x - component->getCoord().x) + (y - component->getCoord().y) * (y - component->getCoord().y)) > radius) {
-
-					show(environment, x, y, component, field);
-
-					showfield(environment->getSize(), visited_vertex);
-					if (way_back.size() != 0) {
-
-						int x2 = component->getCoord().x;
-						int y2 = component->getCoord().y;
-
-						if (way_back.top().x > x2) {
-							field[x2][y2] = ai_seen;
-							dynamic_cast<robotCommander*>(component)->moveRobotInDirection(right);
-							field[component->getCoord().x][component->getCoord().y] = rc;
-						}
-						else if (way_back.top().x < x2) {
-							field[x2][y2] = ai_seen;
-							dynamic_cast<robotCommander*>(component)->moveRobotInDirection(left);
-							field[component->getCoord().x][component->getCoord().y] = rc;
-						}
-						else if (way_back.top().y > y2) {
-							field[x2][y2] = ai_seen;
-							dynamic_cast<robotCommander*>(component)->moveRobotInDirection(down);
-							field[component->getCoord().x][component->getCoord().y] = rc;
-						}
-						else if (way_back.top().y < y2) {
-							field[x2][y2] = ai_seen;
-							dynamic_cast<robotCommander*>(component)->moveRobotInDirection(up);
-							field[component->getCoord().x][component->getCoord().y] = rc;
-						}
-						way_back.pop();
-
-						x2 = component->getCoord().x;
-						y2 = component->getCoord().y;
-
-						continue;
 					}
 
-					else {
-						this->bfs({ x2, y2 }, { x,y }, field);
-					}
-					last_chance = false;
-				}
-
-				it = component->getModules()->begin();
-				if (sqrt((x - component->getCoord().x) * (x - component->getCoord().x) + (y - component->getCoord().y) * (y - component->getCoord().y)) <= radius)
-					while (it != component->getModules()->end())
-					{
-						if ((*it)->iAm() == management_Module) {
-							dynamic_cast<managementModule*>(*it)->sendResourse(component, dead_robots[0]);
-							_stacks.push_back(_dead_stacks[0]);
-							field[dead_robots[0]->getCoord().x][dead_robots[0]->getCoord().y] = rs;
-							_dead_stacks.erase(0);
-							dead_robots.erase(0);
-							break;
-						}
-						it++;
-					}
-			}
-
-			//COMPOENTS
-			for (size_t j = 0; j < component->getNComp()->size(); j++)
-			{
-
-
-				Point nopoint = { -1,-1 };
-				if ((_stacks[j].size()) && (_stacks[j].top() == nopoint))
+					++component;
+					++c_n;
 					continue;
-
-				Point vertex = { component->getComp(j)->getCoord().x, component->getComp(j)->getCoord().y };
-
-				int x = component->getComp(j)->getCoord().x;
-				int y = component->getComp(j)->getCoord().y;
-				//Coord_Set
-				field[component->getCoord().x][component->getCoord().y] = rc;
-				field[component->getComp(j)->getCoord().x][component->getComp(j)->getCoord().y] = rs;
-
-				//SCAN VERTEX
-				if (visited_vertex[vertex.x][vertex.y] == V_not) {
-					visited_vertex[vertex.x][vertex.y] = V_partly;
-
-					vector<Component*> diffComponents;
-					//GET ALL INFO FROM ROBOT
-					for (size_t i = 0; i < 4; i++)
-					{
-						diffComponents = component->getInfo(j, environment, field).components;
-						
-						vector<Component*>::iterator it0 = diffComponents.begin();
-						while (it0 != diffComponents.end())
-						{
-							if (((*it0)->iAm() == observe_center)&& (visited_vertex[(*it0)->getCoord().x][(*it0)->getCoord().y]!=V_visited) ) {
-								UselessObserveCenters.push_back(*it0);
-								visited_vertex[(*it0)->getCoord().x][(*it0)->getCoord().y] = V_visited;
-								field[(*it0)->getCoord().x][(*it0)->getCoord().y] = oc;
-							}
-							++it0;
-						}
-
-						vector<Modules_N::Module*>::iterator it = component->getComp(j)->getModules()->begin();
-						while (it != component->getComp(j)->getModules()->end())
-						{
-							if ((*it)->iAm() == sensor_Module)
-								dynamic_cast<sensorModule*>(*it)->turn();
-							++it;
-						}
-					}
-
-					//CHECK CELLS AROUND THE ROBOT
-					vector<Vertex> newVertex;
-					Point test_point;
-					test_point = { x - 1,y };
-					if ((y > 0) && (field[x - 1][y] == ai_seen) && visited_vertex[x - 1][y] == V_not)
-						newVertex.push_back({ x - 1, y });
-					test_point = { x,y - 1 };
-					if ((y > 0) && (field[x][y - 1] == ai_seen) && visited_vertex[x][y - 1] == V_not)
-						newVertex.push_back({ x, y - 1 });
-					test_point = { x,y + 1 };
-					if ((y < environment->getSize().m - 1) && (field[x][y + 1] == ai_seen) && visited_vertex[x][y + 1] == V_not)
-						newVertex.push_back({ x, y + 1 });
-					test_point = { x + 1,y };
-					if ((x < environment->getSize().n - 1) && (field[x + 1][y] == ai_seen) && visited_vertex[x + 1][y] == V_not)
-						newVertex.push_back({ x + 1, y });
-
-					//IF NO NEW WAYS -> V == visited
-					if (newVertex.size() == 0) {
-
-						visited_vertex[vertex.x][vertex.y] = V_visited;
-					}
-
-					_graph.insert(pair<Point, vector<Vertex>>(vertex, newVertex));
-					_stacks[j].push(vertex);
 				}
 
-				//SCAN WAYS
-				if (visited_vertex[vertex.x][vertex.y] == V_partly) {
-					if (_stacks[j].top() != vertex)
-						_stacks[j].push(vertex);
-					vector<Vertex>::iterator iter;
-					iter = _graph[vertex].begin();
-					int ways_left = false;
-					for (iter; iter != _graph[vertex].end(); iter++)
+				if (_states.size() == c_n) {
+					_states.push_back(stack<unsigned>());
+					_states[c_n].push(waiting_mode);
+				}
+
+				scanning = false;
+
+				int x2 = (*component)->getCoord().x;
+				int y2 = (*component)->getCoord().y;
+
+				//WAITING_MODE
+				if (_states[c_n].top() == waiting_mode) {
+					int radius = 0;
+					vector<Modules_N::Module*>::iterator it = (*component)->getModules()->begin();
+					while (it != (*component)->getModules()->end())
 					{
-						if ((*iter).visited == V_not) {
-							ways_left = true;
-							(*iter).visited = V_visited;
+						if ((*it)->iAm() == management_Module) {
+							radius = dynamic_cast<managementModule*>(*it)->getR();
+							break;
+						}
+						it++;
+					}
 
+					int save;
+					if (comander)
+						save = -1;
+					else
+						save = -2;
 
-							if ((*iter).x < x) {
-								if (field[(*iter).x][(*iter).y] == rc) {
-									if ((*iter).x > 0 && (field[(*iter).x - 1][(*iter).y] == ai_seen)) {
-										field[component->getCoord().x][component->getCoord().y] = ai_seen;
-										dynamic_cast<robotCommander*>(component)->moveRobotInDirection(left);
-										field[component->getCoord().x][component->getCoord().y] = rc;
-									}
-									else if ((*iter).y < environment->getSize().m - 1 && (field[(*iter).x][(*iter).y + 1] == ai_seen)) {
-										field[component->getCoord().x][component->getCoord().y] = ai_seen;
-										dynamic_cast<robotCommander*>(component)->moveRobotInDirection(down);
-										field[component->getCoord().x][component->getCoord().y] = rc;
-									}
-									else if ((*iter).y > 0 && (field[(*iter).x][(*iter).y - 1] == ai_seen)) {
-										field[component->getCoord().x][component->getCoord().y] = ai_seen;
-										dynamic_cast<robotCommander*>(component)->moveRobotInDirection(up);
-										field[component->getCoord().x][component->getCoord().y] = rc;
-									}
-								}
-								field[component->getComp(j)->getCoord().x][component->getComp(j)->getCoord().y] = ai_seen;
-								component->moveRobot(j, left);
-								field[component->getComp(j)->getCoord().x][component->getComp(j)->getCoord().y] = rs;
-							}
-							else if ((*iter).x > x) {
-								if (field[(*iter).x][(*iter).y] == rc) {
-									if ((*iter).x < environment->getSize().n - 1 && (field[(*iter).x + 1][(*iter).y] == ai_seen)) {
-										field[component->getCoord().x][component->getCoord().y] = ai_seen;
-										dynamic_cast<robotCommander*>(component)->moveRobotInDirection(right);
-										field[component->getCoord().x][component->getCoord().y] = rc;
-									}
-									else if ((*iter).y < environment->getSize().m - 1 && (field[(*iter).x][(*iter).y + 1] == ai_seen)) {
-										field[component->getCoord().x][component->getCoord().y] = ai_seen;
-										dynamic_cast<robotCommander*>(component)->moveRobotInDirection(down);
-										field[component->getCoord().x][component->getCoord().y] = rc;
-									}
-									else if ((*iter).y > 0 && (field[(*iter).x][(*iter).y - 1] == ai_seen)) {
-										field[component->getCoord().x][component->getCoord().y] = ai_seen;
-										dynamic_cast<robotCommander*>(component)->moveRobotInDirection(up);
-										field[component->getCoord().x][component->getCoord().y] = rc;
-									}
-								}
-								field[component->getComp(j)->getCoord().x][component->getComp(j)->getCoord().y] = ai_seen;
-								component->moveRobot(j, right);
-								field[component->getComp(j)->getCoord().x][component->getComp(j)->getCoord().y] = rs;
-							}
-							else if ((*iter).y < y) {
+					//SCANNING DEAD
+					for (size_t i = 0; i < dead_robots.size(); i++)
+					{
+						if ((*component)->getNumD() <= (*component)->getNum())
+							break;
+						int x = dead_robots[i]->getCoord().x;
+						int y = dead_robots[i]->getCoord().y;
+						if (sqrt((x - x2) * (x - x2) + (y - y2) * (y - y2)) <= radius) {
+							while (it != (*component)->getModules()->end())
+							{
+								if ((*it)->iAm() == management_Module) {
+									dynamic_cast<managementModule*>(*it)->sendResourse((*component), dead_robots[i]);
+									_stacks[c_n].push_back(_dead_stacks[i]);
+									field[dead_robots[i]->getCoord().x][dead_robots[i]->getCoord().y] = rs;
 
-								if (field[(*iter).x][(*iter).y] == rc) {
-									if ((*iter).x > 0 && (field[(*iter).x - 1][(*iter).y] == ai_seen)) {
-										field[component->getCoord().x][component->getCoord().y] = ai_seen;
-										dynamic_cast<robotCommander*>(component)->moveRobotInDirection(left);
-										field[component->getCoord().x][component->getCoord().y] = rc;
-									}
-									else if ((*iter).x < environment->getSize().n - 1 && (field[(*iter).x + 1][(*iter).y] == ai_seen)) {
-										field[component->getCoord().x][component->getCoord().y] = ai_seen;
-										dynamic_cast<robotCommander*>(component)->moveRobotInDirection(right);
-										field[component->getCoord().x][component->getCoord().y] = rc;
-									}
-									else if ((*iter).y > 0 && (field[(*iter).x][(*iter).y - 1] == ai_seen)) {
-										field[component->getCoord().x][component->getCoord().y] = ai_seen;
-										dynamic_cast<robotCommander*>(component)->moveRobotInDirection(up);
-										field[component->getCoord().x][component->getCoord().y] = rc;
-									}
+									vector<Component*>::iterator temp = dead_robots.begin();
+									vector<stack<Point>>::iterator temp2 = _dead_stacks.begin();
+
+									_dead_stacks.erase(temp2 + i);
+									dead_robots.erase(temp + i);
+									--i;
+									break;
 								}
-								field[component->getComp(j)->getCoord().x][component->getComp(j)->getCoord().y] = ai_seen;
-								component->moveRobot(j, up);
-								field[component->getComp(j)->getCoord().x][component->getComp(j)->getCoord().y] = rs;
-							}
-							else if ((*iter).y > y) {
-								if (field[(*iter).x][(*iter).y] == rc) {
-									if ((*iter).x > 0 && (field[(*iter).x - 1][(*iter).y] == ai_seen)) {
-										field[component->getCoord().x][component->getCoord().y] = ai_seen;
-										dynamic_cast<robotCommander*>(component)->moveRobotInDirection(left);
-										field[component->getCoord().x][component->getCoord().y] = rc;
-									}
-									else if ((*iter).x < environment->getSize().n - 1 && (field[(*iter).x + 1][(*iter).y] == ai_seen)) {
-										field[component->getCoord().x][component->getCoord().y] = ai_seen;
-										dynamic_cast<robotCommander*>(component)->moveRobotInDirection(right);
-										field[component->getCoord().x][component->getCoord().y] = rc;
-									}
-									else if ((*iter).y < environment->getSize().m - 1 && (field[(*iter).x][(*iter).y + 1] == ai_seen)) {
-										field[component->getCoord().x][component->getCoord().y] = ai_seen;
-										dynamic_cast<robotCommander*>(component)->moveRobotInDirection(down);
-										field[component->getCoord().x][component->getCoord().y] = rc;
-									}
-								}
-								field[component->getComp(j)->getCoord().x][component->getComp(j)->getCoord().y] = ai_seen;
-								component->moveRobot(j, down);
-								field[component->getComp(j)->getCoord().x][component->getComp(j)->getCoord().y] = rs;
+								it++;
 							}
 							break;
 						}
-					}
-					if (!ways_left)
-						visited_vertex[vertex.x][vertex.y] = V_visited;
-				}
-				if (visited_vertex[vertex.x][vertex.y] == V_visited)
-					_stacks[j].pop();
 
-				if (_stacks[j].size() != 0) {
-					if (_stacks[j].top() == nopoint) {
-						last_chance = false;
-						break;
+						if (sqrt((x - x2) * (x - x2) + (y - y2) * (y - y2)) > radius) {
+							this->bfs(c_n, { x2, y2 }, { x,y }, field);
+							_states[c_n].push(following_mode);
+
+						}
 					}
 
-					scanning = true;
-					if (visited_vertex[vertex.x][vertex.y] == V_visited) {
-						if ((_stacks[j].top().x > x) && (field[x + 1][y] != notexist)) {
-							if (field[_stacks[j].top().x][_stacks[j].top().y] == rc) {
-								if (field[_stacks[j].top().x][_stacks[j].top().y] == rc) {
-									if (field[_stacks[j].top().x + 1][_stacks[j].top().y] == ai_seen) {
-										field[component->getCoord().x][component->getCoord().y] = ai_seen;
-										dynamic_cast<robotCommander*>(component)->moveRobotInDirection(right);
-										field[component->getCoord().x][component->getCoord().y] = rc;
+					//SCANNING OC
+					for (size_t i = 0; i < UselessObserveCenters.size(); i++)
+					{
+						if ((*component)->getNumD() <= (*component)->getNComp()->size())
+							break;
+
+						int x = UselessObserveCenters[i]->getCoord().x;
+						int y = UselessObserveCenters[i]->getCoord().y;
+						if (sqrt((x - x2) * (x - x2) + (y - y2) * (y - y2)) > radius)
+							break;
+						if (sqrt((x - x2) * (x - x2) + (y - y2) * (y - y2)) <= radius) {
+							while (it != (*component)->getModules()->end())
+							{
+								if ((*it)->iAm() == management_Module) {
+									dynamic_cast<managementModule*>(*it)->sendResourse((*component), UselessObserveCenters[i]);
+									vector<Component*> diffComponents = (*component)->getInfo((*component)->getNComp()->size() - 1, environment, field).components;
+									vector<Component*>::iterator it0 = diffComponents.begin();
+									while (it0 != diffComponents.end())
+									{
+										if (((*it0)->iAm() == observe_center) && (visited_vertex[(*it0)->getCoord().x][(*it0)->getCoord().y] != V_visited)) {
+											UselessObserveCenters.push_back(*it0);
+											visited_vertex[(*it0)->getCoord().x][(*it0)->getCoord().y] = V_visited;
+											field[(*it0)->getCoord().x][(*it0)->getCoord().y] = oc;
+										}
+										else if (((*it0)->iAm() == robot_scout) && (*it0)->getActive() == false) {
+											dead_robots.push_back((*it0));
+											(*it0)->setActive();
+											_dead_stacks.push_back(std::stack<Point>());
+											_dead_stacks[_dead_stacks.size() - 1].push((*it0)->getCoord());
+											field[(*it0)->getCoord().x][(*it0)->getCoord().y] = rsd;
+										}
+										++it0;
 									}
-									else if (field[_stacks[j].top().x][_stacks[j].top().y + 1] == ai_seen) {
-										field[component->getCoord().x][component->getCoord().y] = ai_seen;
-										dynamic_cast<robotCommander*>(component)->moveRobotInDirection(down);
-										field[component->getCoord().x][component->getCoord().y] = rc;
+									dynamic_cast<managementModule*>(*it)->freeResourse((*component), (*component)->getNComp()->size() - 1);
+									vector<Component*>::iterator temp = UselessObserveCenters.begin();
+									if (UselessObserveCenters.size() > 1)
+										UselessObserveCenters.erase(temp + i);
+									else
+										UselessObserveCenters.clear();
+								}
+								++it;
+							}
+						}
+					}
+
+					//SCANING COMPONENTS
+					for (size_t j = 0; j < (*component)->getNComp()->size(); j++)
+					{
+						int x = (*component)->getComp(j)->getCoord().x;
+						int y = (*component)->getComp(j)->getCoord().y;
+						Point nopoint = { -1, -1 };
+						if ((sqrt((x - x2) * (x - x2) + (y - y2) * (y - y2)) > radius) && (save == -1)) {
+							save = j;
+						}
+						else if ((sqrt((x - x2) * (x - x2) + (y - y2) * (y - y2)) > radius) && (save != -1)) {
+							vector<Modules_N::Module*>::iterator it = (*component)->getModules()->begin();
+							while (it != (*component)->getModules()->end())
+							{
+								if ((*it)->iAm() == management_Module) {
+									dead_robots.push_back((*component)->getComp(j));
+									field[(*component)->getComp(j)->getCoord().x][(*component)->getComp(j)->getCoord().y] = rsd;
+									dynamic_cast<managementModule*>(*it)->freeResourse((*component), j);
+									_dead_stacks.push_back(_stacks[c_n][j]);
+									_dead_stacks[0].push({ x,y });
+									vector<stack<Point>>::iterator temp2 = _stacks[c_n].begin();
+									_stacks[c_n].erase(temp2 + j);
+									--j;
+									break;
+								}
+								it++;
+							}
+						}
+
+						else if ((sqrt((x - x2) * (x - x2) + (y - y2) * (y - y2)) <= radius) && (save == -1))
+							save = -2;
+
+						//GIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIVE A CHANCE
+						else if ((sqrt((x - x2) * (x - x2) + (y - y2) * (y - y2)) <= radius) && (save >= 0)) {
+							if ((!_stacks[c_n][j].empty()) && (_stacks[c_n][j].top() != nopoint)) {
+								vector<Modules_N::Module*>::iterator it = (*component)->getModules()->begin();
+								while (it != (*component)->getModules()->end()) {
+									if ((*it)->iAm() == management_Module) {
+										dead_robots.push_back((*component)->getComp(save));
+										field[(*component)->getComp(save)->getCoord().x][(*component)->getComp(save)->getCoord().y] = rsd;
+										dynamic_cast<managementModule*>(*it)->freeResourse((*component), save);
+										_dead_stacks.push_back(_stacks[c_n][save]);
+
+										_dead_stacks[0].push({ x,y });
+										vector<stack<Point>>::iterator temp2 = _stacks[c_n].begin();
+										_stacks[c_n].erase(temp2 + save);
+										save = -2;
+										--j;
+										break;
 									}
-									else if (field[_stacks[j].top().x][_stacks[j].top().y - 1] == ai_seen) {
-										field[component->getCoord().x][component->getCoord().y] = ai_seen;
-										dynamic_cast<robotCommander*>(component)->moveRobotInDirection(up);
-										field[component->getCoord().x][component->getCoord().y] = rc;
+									++it;
+								}
+							}
+							else {
+								vector<Modules_N::Module*>::iterator it = (*component)->getModules()->begin();
+								while (it != (*component)->getModules()->end()) {
+									if ((*it)->iAm() == management_Module) {
+										dead_robots.push_back((*component)->getComp(save));
+										field[(*component)->getComp(save)->getCoord().x][(*component)->getComp(save)->getCoord().y] = rsd;
+										dynamic_cast<managementModule*>(*it)->freeResourse((*component), save);
+										_dead_stacks.push_back(_stacks[c_n][save]);
+
+										_dead_stacks[0].push({ x,y });
+										vector<stack<Point>>::iterator temp2 = _stacks[c_n].begin();
+										_stacks[c_n].erase(temp2 + save);
+										save = -2;
+										--j;
+										break;
 									}
+									++it;
 								}
 							}
-							field[component->getComp(j)->getCoord().x][component->getComp(j)->getCoord().y] = ai_seen;
-							component->moveRobot(j, right);
-							field[component->getComp(j)->getCoord().x][component->getComp(j)->getCoord().y] = rs;
 						}
-						else if ((_stacks[j].top().x < x) && (field[x - 1][y] != notexist)) {
-							if (field[_stacks[j].top().x][_stacks[j].top().y] == rc) {
-								if (field[_stacks[j].top().x - 1][_stacks[j].top().y] == ai_seen) {
-									field[component->getCoord().x][component->getCoord().y] = ai_seen;
-									dynamic_cast<robotCommander*>(component)->moveRobotInDirection(left);
-									field[component->getCoord().x][component->getCoord().y] = rc;
-								}
-								else if (field[_stacks[j].top().x][_stacks[j].top().y + 1] == ai_seen) {
-									field[component->getCoord().x][component->getCoord().y] = ai_seen;
-									dynamic_cast<robotCommander*>(component)->moveRobotInDirection(down);
-									field[component->getCoord().x][component->getCoord().y] = rc;
-								}
-								else if (field[_stacks[j].top().x][_stacks[j].top().y - 1] == ai_seen) {
-									field[component->getCoord().x][component->getCoord().y] = ai_seen;
-									dynamic_cast<robotCommander*>(component)->moveRobotInDirection(up);
-									field[component->getCoord().x][component->getCoord().y] = rc;
-								}
-							}
-							field[component->getComp(j)->getCoord().x][component->getComp(j)->getCoord().y] = ai_seen;
-							component->moveRobot(j, left);
-							field[component->getComp(j)->getCoord().x][component->getComp(j)->getCoord().y] = rs;
-						}
-						else if ((_stacks[j].top().y > y) && (field[x][y + 1] != notexist)) {
-							if (field[_stacks[j].top().x][_stacks[j].top().y] == rc) {
-								if (field[_stacks[j].top().x - 1][_stacks[j].top().y] == ai_seen) {
-									field[component->getCoord().x][component->getCoord().y] = ai_seen;
-									dynamic_cast<robotCommander*>(component)->moveRobotInDirection(left);
-									field[component->getCoord().x][component->getCoord().y] = rc;
-								}
-								else if (field[_stacks[j].top().x][_stacks[j].top().y + 1] == ai_seen) {
-									field[component->getCoord().x][component->getCoord().y] = ai_seen;
-									dynamic_cast<robotCommander*>(component)->moveRobotInDirection(down);
-									field[component->getCoord().x][component->getCoord().y] = rc;
-								}
-								else if (field[_stacks[j].top().x + 1][_stacks[j].top().y] == ai_seen) {
-									field[component->getCoord().x][component->getCoord().y] = ai_seen;
-									dynamic_cast<robotCommander*>(component)->moveRobotInDirection(right);
-									field[component->getCoord().x][component->getCoord().y] = rc;
-								}
-							}
-							field[component->getComp(j)->getCoord().x][component->getComp(j)->getCoord().y] = ai_seen;
-							component->moveRobot(j, down);
-							field[component->getComp(j)->getCoord().x][component->getComp(j)->getCoord().y] = rs;
-						}
-						else if ((_stacks[j].top().y < y) && (field[x][y - 1] != notexist)) {
-							if (field[_stacks[j].top().x][_stacks[j].top().y] == rc) {
-								if (field[_stacks[j].top().x - 1][_stacks[j].top().y] == ai_seen) {
-									field[component->getCoord().x][component->getCoord().y] = ai_seen;
-									dynamic_cast<robotCommander*>(component)->moveRobotInDirection(left);
-									field[component->getCoord().x][component->getCoord().y] = rc;
-								}
-								else if (field[_stacks[j].top().x + 1][_stacks[j].top().y] == ai_seen) {
-									field[component->getCoord().x][component->getCoord().y] = ai_seen;
-									dynamic_cast<robotCommander*>(component)->moveRobotInDirection(right);
-									field[component->getCoord().x][component->getCoord().y] = rc;
-								}
-								else if (field[_stacks[j].top().x + 1][_stacks[j].top().y] == ai_seen) {
-									field[component->getCoord().x][component->getCoord().y] = ai_seen;
-									dynamic_cast<robotCommander*>(component)->moveRobotInDirection(right);
-									field[component->getCoord().x][component->getCoord().y] = rc;
-								}
-							}
-							field[component->getComp(j)->getCoord().x][component->getComp(j)->getCoord().y] = ai_seen;
-							component->moveRobot(j, up);
-							field[component->getComp(j)->getCoord().x][component->getComp(j)->getCoord().y] = rs;
-						}
-						//	std::cout << "\nHERE\n";
+					}
+
+					if (save >= 0) {
+						int x = (*component)->getComp(save)->getCoord().x;
+						int y = (*component)->getComp(save)->getCoord().y;
+
+						this->bfs(c_n, { x2, y2 }, { x,y }, field);
+						_states[c_n].push(following_mode);
+						scanning = true;
+						++component;
+						++c_n;
+						continue;
 					}
 				}
-				else if (dead_robots.size() != 0) {
-					scanning = true;
-					last_chance = true;
+
+				//FOLLOW
+				else if (_states[c_n].top() == following_mode) {
+					int x = (*component)->getComp(0)->getCoord().x;
+					int y = (*component)->getComp(0)->getCoord().y;
+					int x2 = (*component)->getCoord().x;
+					int y2 = (*component)->getCoord().y;
+
+					if (way_back[c_n].empty()) {
+						_states[c_n].pop();
+						scanning = true;
+						++component;
+						++c_n;
+						continue;
+					}
+
+					if ((sqrt((x - x2) * (x - x2) + (y - y2) * (y - y2)) > 1)) {
+						if ((way_back[c_n].top().x > x2) && checkMoveAbility(field, (*component)->getCoord().x, (*component)->getCoord().y, right, (*component)->getVel())) {
+							field[x2][y2] = ai_seen;
+							dynamic_cast<robotCommander*>((*component))->moveRobotInDirection(right, checkMoveAbility(field, (*component)->getCoord().x, (*component)->getCoord().y, right, (*component)->getVel()));
+							field[(*component)->getCoord().x][(*component)->getCoord().y] = rc;
+						}
+						else if ((way_back[c_n].top().x < x2) && checkMoveAbility(field, (*component)->getCoord().x, (*component)->getCoord().y, left, (*component)->getVel())) {
+							field[x2][y2] = ai_seen;
+							dynamic_cast<robotCommander*>((*component))->moveRobotInDirection(left, checkMoveAbility(field, (*component)->getCoord().x, (*component)->getCoord().y, left, (*component)->getVel()));
+							field[(*component)->getCoord().x][(*component)->getCoord().y] = rc;
+						}
+						else if ((way_back[c_n].top().y > y2) && checkMoveAbility(field, (*component)->getCoord().x, (*component)->getCoord().y, down, (*component)->getVel())) {
+							field[x2][y2] = ai_seen;
+							dynamic_cast<robotCommander*>((*component))->moveRobotInDirection(down, checkMoveAbility(field, (*component)->getCoord().x, (*component)->getCoord().y, down, (*component)->getVel()));
+							field[(*component)->getCoord().x][(*component)->getCoord().y] = rc;
+						}
+						else if ((way_back[c_n].top().y < y2) && checkMoveAbility(field, (*component)->getCoord().x, (*component)->getCoord().y, up, (*component)->getVel())) {
+							field[x2][y2] = ai_seen;
+							dynamic_cast<robotCommander*>((*component))->moveRobotInDirection(up, checkMoveAbility(field, (*component)->getCoord().x, (*component)->getCoord().y, up, (*component)->getVel()));
+							field[(*component)->getCoord().x][(*component)->getCoord().y] = rc;
+						}
+
+						way_back[c_n].pop();
+
+						scanning = true;
+						++component;
+						++c_n;
+						continue;
+					}
+					else {
+						while (!way_back[c_n].empty())
+							way_back[c_n].pop();
+
+						_states[c_n].pop();
+
+						scanning = true;
+						++component;
+						++c_n;
+						continue;
+					}
 				}
 
-				show(environment, x, y, component, field);
-				showfield(environment->getSize(), visited_vertex);
+				//STATE
+				else if (_states[c_n].top() == state_mode)
+					if (dead_robots.size() != 0) {
 
-				if (_stacks[j].size() == 0) {
-					_stacks[j].push({ -1, -1 });
+						size_t i = 0;
+						for (; i < dead_robots.size(); i++)
+						{
+
+							int x = dead_robots[i]->getCoord().x;
+							int y = dead_robots[i]->getCoord().y;
+
+							this->bfs(c_n, { x2, y2 }, { x,y }, field);
+							if (!way_back[c_n].empty())
+								break;
+						}
+
+						if (!way_back[c_n].empty()) {
+							vector<Modules_N::Module*>::iterator it = (*component)->getModules()->begin();
+							it = (*component)->getModules()->begin();
+							while (it != (*component)->getModules()->end())
+							{
+								if ((*it)->iAm() == management_Module) {
+									dynamic_cast<managementModule*>(*it)->sendResourse((*component), dead_robots[i]);
+									_stacks[c_n].push_back(_dead_stacks[i]);
+									field[dead_robots[i]->getCoord().x][dead_robots[i]->getCoord().y] = rs;
+									vector<Component*>::iterator temp = dead_robots.begin();
+									vector<stack<Point>>::iterator temp2 = _dead_stacks.begin();
+
+									_dead_stacks.erase(temp2 + i);
+									dead_robots.erase(temp + i);
+									break;
+								}
+								it++;
+							}
+
+
+							scanning = true;
+							_states[c_n].pop();
+							_states[c_n].push(following_mode);
+							++component;
+							++c_n;
+							continue;
+						}
+					}
+
+				//COMPONENTS
+				for (size_t j = 0; j < (*component)->getNComp()->size(); j++)
+				{
+					Point nopoint = { -1,-1 };
+					if ((_stacks[c_n][j].size()) && (_stacks[c_n][j].top() == nopoint)) {
+						field[(*component)->getComp(j)->getCoord().x][(*component)->getComp(j)->getCoord().y] = rsd;
+						continue;
+					}
+
+					Point vertex = { (*component)->getComp(j)->getCoord().x, (*component)->getComp(j)->getCoord().y };
+
+					int x = (*component)->getComp(j)->getCoord().x;
+					int y = (*component)->getComp(j)->getCoord().y;
+
+					//Coord_Set
+					if ((*component)->iAm() == robot_commander)
+						field[(*component)->getCoord().x][(*component)->getCoord().y] = rc;
+					else if ((*component)->iAm() == command_center)
+						field[(*component)->getCoord().x][(*component)->getCoord().y] = cc;
+
+					field[(*component)->getComp(j)->getCoord().x][(*component)->getComp(j)->getCoord().y] = rs;
+
+					//SCAN VERTEX
+					if (visited_vertex[vertex.x][vertex.y] == V_not) {
+						visited_vertex[vertex.x][vertex.y] = V_partly;
+
+						vector<Component*> diffComponents;
+						//GET ALL INFO FROM ROBOT
+						for (size_t i = 0; i < 4; i++)
+						{
+							diffComponents = (*component)->getInfo(j, environment, field).components;
+
+							vector<Component*>::iterator it0 = diffComponents.begin();
+							while (it0 != diffComponents.end())
+							{
+								if (((*it0)->iAm() == observe_center) && (visited_vertex[(*it0)->getCoord().x][(*it0)->getCoord().y] != V_visited)) {
+									UselessObserveCenters.push_back(*it0);
+									visited_vertex[(*it0)->getCoord().x][(*it0)->getCoord().y] = V_visited;
+									field[(*it0)->getCoord().x][(*it0)->getCoord().y] = oc;
+								}
+								else if (((*it0)->iAm() == robot_scout) && (*it0)->getActive() == false) {
+									dead_robots.push_back((*it0));
+									(*it0)->setActive();
+									_dead_stacks.push_back(std::stack<Point>());
+									_dead_stacks[_dead_stacks.size() - 1].push((*it0)->getCoord());
+									field[(*it0)->getCoord().x][(*it0)->getCoord().y] = rsd;
+								}
+								++it0;
+							}
+
+							vector<Modules_N::Module*>::iterator it = (*component)->getComp(j)->getModules()->begin();
+							while (it != (*component)->getComp(j)->getModules()->end())
+							{
+								if ((*it)->iAm() == sensor_Module)
+									dynamic_cast<sensorModule*>(*it)->turn();
+								++it;
+							}
+						}
+
+						//CHECK CELLS AROUND THE ROBOT
+						vector<Vertex> newVertex;
+						Point test_point;
+						test_point = { x - 1,y };
+						if ((y > 0) && ((field[x - 1][y] == ai_seen) || (field[x - 1][y] == rc)) && visited_vertex[x - 1][y] == V_not)
+							newVertex.push_back({ x - 1, y });
+						test_point = { x,y - 1 };
+						if ((y > 0) && ((field[x][y - 1] == ai_seen) || (field[x][y - 1] == rc)) && visited_vertex[x][y - 1] == V_not)
+							newVertex.push_back({ x, y - 1 });
+						test_point = { x,y + 1 };
+						if ((y < environment->getSize().m - 1) && ((field[x][y + 1] == ai_seen) || (field[x][y + 1] == rc)) && visited_vertex[x][y + 1] == V_not)
+							newVertex.push_back({ x, y + 1 });
+						test_point = { x + 1,y };
+						if ((x < environment->getSize().n - 1) && ((field[x + 1][y] == ai_seen) || (field[x + 1][y] == rc)) && visited_vertex[x + 1][y] == V_not)
+							newVertex.push_back({ x + 1, y });
+
+						//IF NO NEW WAYS -> V == visited
+						if (newVertex.size() == 0) {
+							visited_vertex[vertex.x][vertex.y] = V_visited;
+						}
+
+						_graph.insert(pair<Point, vector<Vertex>>(vertex, newVertex));
+						_stacks[c_n][j].push(vertex);
+					}
+
+					//SCAN WAYS
+					if (visited_vertex[vertex.x][vertex.y] == V_partly) {
+						if (_stacks[c_n][j].top() != vertex)
+							_stacks[c_n][j].push(vertex);
+						vector<Vertex>::iterator iter;
+						iter = _graph[vertex].begin();
+						int ways_left = false;
+						for (iter; iter != _graph[vertex].end(); iter++)
+						{
+							if ((*iter).visited == V_not) {
+								ways_left = true;
+								(*iter).visited = V_visited;
+
+								if (((*iter).x < x) && (checkMoveAbility(field, (*component)->getComp(j)->getCoord().x, (*component)->getComp(j)->getCoord().y, left, (*component)->getComp(j)->getVel(), true))) {
+									if (field[(*iter).x][(*iter).y] == rc) {
+										if (checkMoveAbility(field, (*component)->getCoord().x, (*component)->getCoord().y, left, (*component)->getVel())) {
+											field[(*component)->getCoord().x][(*component)->getCoord().y] = ai_seen;
+											dynamic_cast<robotCommander*>((*component))->moveRobotInDirection(left, 1);
+											field[(*component)->getCoord().x][(*component)->getCoord().y] = rc;
+										}
+										else if (checkMoveAbility(field, (*component)->getCoord().x, (*component)->getCoord().y, down, (*component)->getVel())) {
+											field[(*component)->getCoord().x][(*component)->getCoord().y] = ai_seen;
+											dynamic_cast<robotCommander*>((*component))->moveRobotInDirection(down, 1);
+											field[(*component)->getCoord().x][(*component)->getCoord().y] = rc;
+										}
+										else if (checkMoveAbility(field, (*component)->getCoord().x, (*component)->getCoord().y, up, (*component)->getVel())) {
+											field[(*component)->getCoord().x][(*component)->getCoord().y] = ai_seen;
+											dynamic_cast<robotCommander*>((*component))->moveRobotInDirection(up, 1);
+											field[(*component)->getCoord().x][(*component)->getCoord().y] = rc;
+										}
+									}
+									field[(*component)->getComp(j)->getCoord().x][(*component)->getComp(j)->getCoord().y] = ai_seen;
+									(*component)->moveRobot(j, left, checkMoveAbility(field, (*component)->getComp(j)->getCoord().x, (*component)->getComp(j)->getCoord().y, left, (*component)->getComp(j)->getVel()));
+									field[(*component)->getComp(j)->getCoord().x][(*component)->getComp(j)->getCoord().y] = rs;
+								}
+								else if (((*iter).x > x) && (checkMoveAbility(field, (*component)->getComp(j)->getCoord().x, (*component)->getComp(j)->getCoord().y, right, (*component)->getComp(j)->getVel(), true))) {
+									if (field[(*iter).x][(*iter).y] == rc) {
+										if (checkMoveAbility(field, (*component)->getCoord().x, (*component)->getCoord().y, right, (*component)->getVel())) {
+											field[(*component)->getCoord().x][(*component)->getCoord().y] = ai_seen;
+											dynamic_cast<robotCommander*>((*component))->moveRobotInDirection(right, 1);
+											field[(*component)->getCoord().x][(*component)->getCoord().y] = rc;
+										}
+										else if (checkMoveAbility(field, (*component)->getCoord().x, (*component)->getCoord().y, down, (*component)->getVel())) {
+											field[(*component)->getCoord().x][(*component)->getCoord().y] = ai_seen;
+											dynamic_cast<robotCommander*>((*component))->moveRobotInDirection(down, 1);
+											field[(*component)->getCoord().x][(*component)->getCoord().y] = rc;
+										}
+										else if (checkMoveAbility(field, (*component)->getCoord().x, (*component)->getCoord().y, up, (*component)->getVel())) {
+											field[(*component)->getCoord().x][(*component)->getCoord().y] = ai_seen;
+											dynamic_cast<robotCommander*>((*component))->moveRobotInDirection(up, 1);
+											field[(*component)->getCoord().x][(*component)->getCoord().y] = rc;
+										}
+									}
+									field[(*component)->getComp(j)->getCoord().x][(*component)->getComp(j)->getCoord().y] = ai_seen;
+									(*component)->moveRobot(j, right, checkMoveAbility(field, (*component)->getComp(j)->getCoord().x, (*component)->getComp(j)->getCoord().y, right, (*component)->getComp(j)->getVel()));
+									field[(*component)->getComp(j)->getCoord().x][(*component)->getComp(j)->getCoord().y] = rs;
+								}
+								else if (((*iter).y < y) && (checkMoveAbility(field, (*component)->getComp(j)->getCoord().x, (*component)->getComp(j)->getCoord().y, up, (*component)->getComp(j)->getVel(), true))) {
+									if (field[(*iter).x][(*iter).y] == rc) {
+										if (checkMoveAbility(field, (*component)->getCoord().x, (*component)->getCoord().y, left, (*component)->getVel())) {
+											field[(*component)->getCoord().x][(*component)->getCoord().y] = ai_seen;
+											dynamic_cast<robotCommander*>((*component))->moveRobotInDirection(left, 1);
+											field[(*component)->getCoord().x][(*component)->getCoord().y] = rc;
+										}
+										else if (checkMoveAbility(field, (*component)->getCoord().x, (*component)->getCoord().y, right, (*component)->getVel())) {
+											field[(*component)->getCoord().x][(*component)->getCoord().y] = ai_seen;
+											dynamic_cast<robotCommander*>((*component))->moveRobotInDirection(right, 1);
+											field[(*component)->getCoord().x][(*component)->getCoord().y] = rc;
+										}
+										else if (checkMoveAbility(field, (*component)->getCoord().x, (*component)->getCoord().y, up, (*component)->getVel())) {
+											field[(*component)->getCoord().x][(*component)->getCoord().y] = ai_seen;
+											dynamic_cast<robotCommander*>((*component))->moveRobotInDirection(up, 1);
+											field[(*component)->getCoord().x][(*component)->getCoord().y] = rc;
+										}
+									}
+									field[(*component)->getComp(j)->getCoord().x][(*component)->getComp(j)->getCoord().y] = ai_seen;
+									(*component)->moveRobot(j, up, checkMoveAbility(field, (*component)->getComp(j)->getCoord().x, (*component)->getComp(j)->getCoord().y, up, (*component)->getComp(j)->getVel(), true));
+									field[(*component)->getComp(j)->getCoord().x][(*component)->getComp(j)->getCoord().y] = rs;
+								}
+								else if (((*iter).y > y) && (checkMoveAbility(field, (*component)->getComp(j)->getCoord().x, (*component)->getComp(j)->getCoord().y, down, (*component)->getComp(j)->getVel(), true))) {
+									if (field[(*iter).x][(*iter).y] == rc) {
+										if (checkMoveAbility(field, (*component)->getCoord().x, (*component)->getCoord().y, left, (*component)->getVel())) {
+											field[(*component)->getCoord().x][(*component)->getCoord().y] = ai_seen;
+											dynamic_cast<robotCommander*>((*component))->moveRobotInDirection(left, 1);
+											field[(*component)->getCoord().x][(*component)->getCoord().y] = rc;
+										}
+										else if (checkMoveAbility(field, (*component)->getCoord().x, (*component)->getCoord().y, right, (*component)->getVel())) {
+											field[(*component)->getCoord().x][(*component)->getCoord().y] = ai_seen;
+											dynamic_cast<robotCommander*>((*component))->moveRobotInDirection(right, 1);
+											field[(*component)->getCoord().x][(*component)->getCoord().y] = rc;
+										}
+										else if (checkMoveAbility(field, (*component)->getCoord().x, (*component)->getCoord().y, down, (*component)->getVel())) {
+											field[(*component)->getCoord().x][(*component)->getCoord().y] = ai_seen;
+											dynamic_cast<robotCommander*>((*component))->moveRobotInDirection(down, 1);
+											field[(*component)->getCoord().x][(*component)->getCoord().y] = rc;
+										}
+									}
+									field[(*component)->getComp(j)->getCoord().x][(*component)->getComp(j)->getCoord().y] = ai_seen;
+									(*component)->moveRobot(j, down, checkMoveAbility(field, (*component)->getComp(j)->getCoord().x, (*component)->getComp(j)->getCoord().y, down, (*component)->getComp(j)->getVel()));
+									field[(*component)->getComp(j)->getCoord().x][(*component)->getComp(j)->getCoord().y] = rs;
+								}
+								break;
+							}
+						}
+						if (!ways_left)
+							visited_vertex[vertex.x][vertex.y] = V_visited;
+					}
+					if (visited_vertex[vertex.x][vertex.y] == V_visited)
+						_stacks[c_n][j].pop();
+
+					if (_stacks[c_n][j].size() != 0) {
+						if (_stacks[c_n][j].top() == nopoint) {
+							break;
+						}
+
+						scanning = true;
+						if (visited_vertex[vertex.x][vertex.y] == V_visited) {
+							if ((_stacks[c_n][j].top().x > x) && (checkMoveAbility(field, (*component)->getComp(j)->getCoord().x, (*component)->getComp(j)->getCoord().y, right, (*component)->getComp(j)->getVel(), true))) {
+								if (field[_stacks[c_n][j].top().x][_stacks[c_n][j].top().y] == rc) {
+									if (checkMoveAbility(field, (*component)->getCoord().x, (*component)->getCoord().y, right, (*component)->getVel())) {
+										field[(*component)->getCoord().x][(*component)->getCoord().y] = ai_seen;
+										dynamic_cast<robotCommander*>((*component))->moveRobotInDirection(right, 1);
+										field[(*component)->getCoord().x][(*component)->getCoord().y] = rc;
+									}
+									else if (checkMoveAbility(field, (*component)->getCoord().x, (*component)->getCoord().y, down, (*component)->getVel())) {
+										field[(*component)->getCoord().x][(*component)->getCoord().y] = ai_seen;
+										dynamic_cast<robotCommander*>((*component))->moveRobotInDirection(down, 1);
+										field[(*component)->getCoord().x][(*component)->getCoord().y] = rc;
+									}
+									else if (checkMoveAbility(field, (*component)->getCoord().x, (*component)->getCoord().y, up, (*component)->getVel())) {
+										field[(*component)->getCoord().x][(*component)->getCoord().y] = ai_seen;
+										dynamic_cast<robotCommander*>((*component))->moveRobotInDirection(up, 1);
+										field[(*component)->getCoord().x][(*component)->getCoord().y] = rc;
+									}
+								}
+								field[(*component)->getComp(j)->getCoord().x][(*component)->getComp(j)->getCoord().y] = ai_seen;
+								(*component)->moveRobot(j, right, (checkMoveAbility(field, (*component)->getComp(j)->getCoord().x, (*component)->getComp(j)->getCoord().y, right, (*component)->getComp(j)->getVel())));
+								field[(*component)->getComp(j)->getCoord().x][(*component)->getComp(j)->getCoord().y] = rs;
+							}
+							else if ((_stacks[c_n][j].top().x < x) && (checkMoveAbility(field, (*component)->getComp(j)->getCoord().x, (*component)->getComp(j)->getCoord().y, left, (*component)->getComp(j)->getVel(), true))) {
+								if (field[_stacks[c_n][j].top().x][_stacks[c_n][j].top().y] == rc) {
+									if (checkMoveAbility(field, (*component)->getCoord().x, (*component)->getCoord().y, left, (*component)->getVel())) {
+										field[(*component)->getCoord().x][(*component)->getCoord().y] = ai_seen;
+										dynamic_cast<robotCommander*>((*component))->moveRobotInDirection(left, 1);
+										field[(*component)->getCoord().x][(*component)->getCoord().y] = rc;
+									}
+									else if (checkMoveAbility(field, (*component)->getCoord().x, (*component)->getCoord().y, down, (*component)->getVel())) {
+										field[(*component)->getCoord().x][(*component)->getCoord().y] = ai_seen;
+										dynamic_cast<robotCommander*>((*component))->moveRobotInDirection(down, 1);
+										field[(*component)->getCoord().x][(*component)->getCoord().y] = rc;
+									}
+									else if (checkMoveAbility(field, (*component)->getCoord().x, (*component)->getCoord().y, up, (*component)->getVel())) {
+										field[(*component)->getCoord().x][(*component)->getCoord().y] = ai_seen;
+										dynamic_cast<robotCommander*>((*component))->moveRobotInDirection(up, 1);
+										field[(*component)->getCoord().x][(*component)->getCoord().y] = rc;
+									}
+								}
+								field[(*component)->getComp(j)->getCoord().x][(*component)->getComp(j)->getCoord().y] = ai_seen;
+								(*component)->moveRobot(j, left, (checkMoveAbility(field, (*component)->getComp(j)->getCoord().x, (*component)->getComp(j)->getCoord().y, left, (*component)->getComp(j)->getVel())));
+								field[(*component)->getComp(j)->getCoord().x][(*component)->getComp(j)->getCoord().y] = rs;
+							}
+							else if ((_stacks[c_n][j].top().y > y) && (checkMoveAbility(field, (*component)->getComp(j)->getCoord().x, (*component)->getComp(j)->getCoord().y, down, (*component)->getComp(j)->getVel(), true))) {
+								if (field[_stacks[c_n][j].top().x][_stacks[c_n][j].top().y] == rc) {
+									if (checkMoveAbility(field, (*component)->getCoord().x, (*component)->getCoord().y, left, (*component)->getVel())) {
+										field[(*component)->getCoord().x][(*component)->getCoord().y] = ai_seen;
+										dynamic_cast<robotCommander*>((*component))->moveRobotInDirection(left, 1);
+										field[(*component)->getCoord().x][(*component)->getCoord().y] = rc;
+									}
+									else if (checkMoveAbility(field, (*component)->getCoord().x, (*component)->getCoord().y, right, (*component)->getVel())) {
+										field[(*component)->getCoord().x][(*component)->getCoord().y] = ai_seen;
+										dynamic_cast<robotCommander*>((*component))->moveRobotInDirection(right, 1);
+										field[(*component)->getCoord().x][(*component)->getCoord().y] = rc;
+									}
+									else if (checkMoveAbility(field, (*component)->getCoord().x, (*component)->getCoord().y, down, (*component)->getVel())) {
+										field[(*component)->getCoord().x][(*component)->getCoord().y] = ai_seen;
+										dynamic_cast<robotCommander*>((*component))->moveRobotInDirection(down, 1);
+										field[(*component)->getCoord().x][(*component)->getCoord().y] = rc;
+									}
+								}
+								field[(*component)->getComp(j)->getCoord().x][(*component)->getComp(j)->getCoord().y] = ai_seen;
+								(*component)->moveRobot(j, down, (checkMoveAbility(field, (*component)->getComp(j)->getCoord().x, (*component)->getComp(j)->getCoord().y, down, (*component)->getComp(j)->getVel())));
+								field[(*component)->getComp(j)->getCoord().x][(*component)->getComp(j)->getCoord().y] = rs;
+							}
+							else if ((_stacks[c_n][j].top().y < y) && (checkMoveAbility(field, (*component)->getComp(j)->getCoord().x, (*component)->getComp(j)->getCoord().y, up, (*component)->getComp(j)->getVel(), true))) {
+								if (field[_stacks[c_n][j].top().x][_stacks[c_n][j].top().y] == rc) {
+									if (checkMoveAbility(field, (*component)->getCoord().x, (*component)->getCoord().y, left, (*component)->getVel())) {
+										field[(*component)->getCoord().x][(*component)->getCoord().y] = ai_seen;
+										dynamic_cast<robotCommander*>((*component))->moveRobotInDirection(left, 1);
+										field[(*component)->getCoord().x][(*component)->getCoord().y] = rc;
+									}
+									else if (checkMoveAbility(field, (*component)->getCoord().x, (*component)->getCoord().y, right, (*component)->getVel())) {
+										field[(*component)->getCoord().x][(*component)->getCoord().y] = ai_seen;
+										dynamic_cast<robotCommander*>((*component))->moveRobotInDirection(right, 1);
+										field[(*component)->getCoord().x][(*component)->getCoord().y] = rc;
+									}
+									else if (checkMoveAbility(field, (*component)->getCoord().x, (*component)->getCoord().y, up, (*component)->getVel())) {
+										field[(*component)->getCoord().x][(*component)->getCoord().y] = ai_seen;
+										dynamic_cast<robotCommander*>((*component))->moveRobotInDirection(up, 1);
+										field[(*component)->getCoord().x][(*component)->getCoord().y] = rc;
+									}
+								}
+								field[(*component)->getComp(j)->getCoord().x][(*component)->getComp(j)->getCoord().y] = ai_seen;
+								(*component)->moveRobot(j, up, (checkMoveAbility(field, (*component)->getComp(j)->getCoord().x, (*component)->getComp(j)->getCoord().y, up, (*component)->getComp(j)->getVel())));
+								field[(*component)->getComp(j)->getCoord().x][(*component)->getComp(j)->getCoord().y] = rs;
+							}
+							//	std::cout << "\nHERE\n";
+						}
+					}
+					else if (dead_robots.size() != 0) {
+						scanning = true;
+						_states[c_n].push(state_mode);
+					}
+
+					if (_stacks[c_n][j].size() == 0) {
+
+						field[(*component)->getComp(j)->getCoord().x][(*component)->getComp(j)->getCoord().y] = rsd;
+						_stacks[c_n][j].push({ -1, -1 });
+					}
+				}
+
+				if (!scanning) {
+					(*component)->setDead();
+				}
+				else {
+					++component;
+					++c_n;
 				}
 			}
+			frameTime = SDL_GetTicks() - frameStart;
 
-		} while (scanning);
+			if (frameDelay > frameTime) {
+				SDL_Delay(frameDelay - frameTime);
+			}
+
+			_render->render_map(field);
+
+		}
+
 		return;
 
 	}
 
 	//! Method that returns all points of intererst
 	vector<Point> AI::findInterestPoints(ED_N::environmentDescriptor* environment) {
+
+
 
 		///////////////////////////////////////////////////////////////
 		///INIT FIELD
@@ -814,14 +1030,19 @@ namespace AI_N {
 
 		vector<Components_N::managementComponent*>::iterator fmc_it;
 
-
 		fmc_it = components.begin();
+		int c_num = 0;
 		while (fmc_it != components.end())
 		{
-			field[(*fmc_it)->getCoord().x][(*fmc_it)->getCoord().y] = rc;
+			if ((*fmc_it)->iAm() == robot_commander)
+				field[(*fmc_it)->getCoord().x][(*fmc_it)->getCoord().y] = rc;
+			else
+				field[(*fmc_it)->getCoord().x][(*fmc_it)->getCoord().y] = cc;
+
+			_stacks.push_back(vector<stack<Point>>());
 			for (size_t i = 0; i < (*fmc_it)->getNComp()->size(); i++)
 			{
-				_stacks.push_back(stack<Point>());
+				_stacks[c_num].push_back(stack<Point>());
 				switch ((*fmc_it)->getComp(i)->iAm()) {
 				case observe_center:
 					field[(*fmc_it)->getComp(i)->getCoord().x][(*fmc_it)->getComp(i)->getCoord().y] = oc;
@@ -832,30 +1053,21 @@ namespace AI_N {
 				}
 			}
 			++fmc_it;
+			++c_num;
 		}
 
 		std::cout << "\n Map created by robotic complex before scan:\n\n";
 		showfield(field_Size, field, pointsOfInterest);
 
-		vector<Components_N::managementComponent*>::iterator mc_it;
-
-
-		mc_it = components.begin();
-		while (mc_it != components.end())
-		{
-
-			this->dfs(environment, field, (*mc_it));
-
-			++mc_it;
-		}
-
+		this->dfs(environment, field, components);
 
 		///////////////////////////////////////////////////////////////
 		///////////////////////////////////////////////////////////////
 
 		std::cout << "\n Map created by robotic complex after scan:\n\n";
 		showfield(field_Size, field, pointsOfInterest);
-
+		
+			std::cout << "\n\n Step: "<<num<<"\n\n";
 		return pointsOfInterest;
 	}
 };

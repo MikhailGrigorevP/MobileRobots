@@ -14,11 +14,9 @@ Component.h // .cpp
 */
 
 //! Vector namespace
-/*! My realization of <vector> from stl 
+/*! My realization of <vector> from stl
 */
 namespace my_std {
-
-
 	/*!Iterators */
 
 	template<class T>
@@ -44,9 +42,9 @@ namespace my_std {
 		//! Not Equal overloading for boolean operation
 		bool operator != (const const_Iterator& other) const { return !(p == other.p); }
 		//! Equal overloading for boolean operation
-		bool operator == (const const_Iterator& other) const { return p == other.p; }	
+		bool operator == (const const_Iterator& other) const { return p == other.p; }
 
-		//! Pointer overloading 
+		//! Pointer overloading
 		const typename const_Iterator::reference operator*  () const { if (p) return *p; throw std::exception("pointer is unitializated"); }
 
 		//! ++ Overloading
@@ -84,7 +82,7 @@ namespace my_std {
 		//! Equal overloading for boolean operation
 		bool operator == (const Iterator& other) const { return this->p == other.p; }
 
-		//! Pointer overloading 
+		//! Pointer overloading
 		typename Iterator::reference operator*  () { if (this->p) return *this->p; throw std::exception("pointer is unitializated"); }
 
 		//! ++ Overloading
@@ -115,7 +113,7 @@ namespace my_std {
 
 		//!Return capacity of size
 		size_t capacity_of_size(size_t size) { return (size / _additional_size + 1) * _additional_size; }
-	
+
 		//!Method for destroying array
 		void destroy_array(T*& _array, size_t& _constructed_count) {
 			for (size_t i = 0; i < _constructed_count; ++i) {
@@ -127,7 +125,7 @@ namespace my_std {
 		//!Method for destroying current array
 		void destroy_current_array() { destroy_array(_array, _size); }
 
-		//!Method for deallocate memory 
+		//!Method for deallocate memory
 		void deallocate_array(T*& _array, const size_t& _capacity) {
 			if (_array) {
 				allocator_t::deallocate(_allocator, _array, _capacity);
@@ -140,7 +138,7 @@ namespace my_std {
 			deallocate_array(_array, _capacity);
 			_capacity = _additional_size;
 		}
-		
+
 		/*!Method for deleting array
 		* Consist of destroying and dealloc
 		*/
@@ -148,7 +146,7 @@ namespace my_std {
 			destroy_current_array();
 			deallocate_current_array();
 		}
-	
+
 	public:
 
 		//! Empty constructor
@@ -160,7 +158,7 @@ namespace my_std {
 				throw std::bad_alloc(ex);
 			}
 		}
-		
+
 		//!Constructor with initializer list
 		vector(const std::initializer_list<T>& list) {
 			size_t list_size = list.size();
@@ -269,7 +267,7 @@ namespace my_std {
 			return *(_array + index);
 		}
 
-		//! Access to element 
+		//! Access to element
 		T& operator[](size_t index) {
 			return *(_array + index);
 		}
@@ -303,7 +301,7 @@ namespace my_std {
 		size_t size()  const noexcept { return _size; }
 
 		//! Clear array
-		void clear() noexcept { 
+		void clear() noexcept {
 			destroy_current_array();
 			_size = 0;
 		}
@@ -349,8 +347,8 @@ namespace my_std {
 			try {
 				if (_size + 1 > _capacity) {
 					size_t new_capacity;
-					
-					if(_size < 1000)
+
+					if (_size < 1000)
 						new_capacity = _capacity + _additional_size;
 					else
 						new_capacity = _capacity * 2;
@@ -432,8 +430,6 @@ namespace my_std {
 
 		return true;
 	}
-
 }
 
 #endif
-

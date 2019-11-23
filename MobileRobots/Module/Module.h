@@ -4,7 +4,7 @@
 #ifndef _MODULE_H_
 #define _MODULE_H_
 
-static vector<vector<unsigned>> nofield { { 0 },
+static vector<vector<unsigned>> nofield{ { 0 },
 										 {  } };
 
 namespace ED_N {
@@ -24,7 +24,6 @@ namespace Components_N {
  *
  */
 namespace Modules_N {
-
 	//! Parent class
 	class Module
 	{
@@ -41,17 +40,17 @@ namespace Modules_N {
 		* en to set energy,
 		* c to set cost
 		*/
-		
+
 		//! turn module on
 		virtual void on();
 
 		//! turn module off
 		virtual void off();
 
-		Module(int st = 0, int pr = 0, int en = 0, int c = 0) : 
-			state(st), 
-			priority(pr), 
-			energy(en), 
+		Module(int st = 0, int pr = 0, int en = 0, int c = 0) :
+			state(st),
+			priority(pr),
+			energy(en),
 			cost(c) {};
 		//! virtual destructor
 		virtual  ~Module() {};
@@ -88,8 +87,8 @@ namespace Modules_N {
 	public:
 		virtual int iAm() const { return generator_Module; }
 		//!	Simple constructor
-		generatorModule(int st = 0, int pr = 0, int en = 0, int c = 0, int enpr = 0) : 
-			Module(st, pr, en, c), 
+		generatorModule(int st = 0, int pr = 0, int en = 0, int c = 0, int enpr = 0) :
+			Module(st, pr, en, c),
 			energyProvision(enpr) {};
 
 		virtual int getEnergyProvision() {
@@ -112,7 +111,6 @@ namespace Modules_N {
 		int num = 0;  //!< num of managed components
 	protected:
 
-
 	public:
 		//!< send management resourse
 		void sendResourse(Components_N::managementComponent*, Components_N::Component*);
@@ -128,8 +126,8 @@ namespace Modules_N {
 		virtual int iAm() const { return management_Module; }
 		//!	Simple constructor
 		managementModule(int st = 0, int pr = 0, int en = 0, int c = 0, int r = 0, int n = 0) :
-			Module(st, pr, en, c), 
-			radius(r), 
+			Module(st, pr, en, c),
+			radius(r),
 			num(n) {};
 		//! Destructor
 		~managementModule() {};
@@ -150,7 +148,7 @@ namespace Modules_N {
 	protected:
 	public:
 
-		EnvironmentInfo getInfo(Point curr_location, ED_N::environmentDescriptor* env, vector<vector<unsigned>> &field = nofield);
+		EnvironmentInfo getInfo(Point curr_location, ED_N::environmentDescriptor* env, vector<vector<unsigned>>& field = nofield);
 
 		virtual int getR() {
 			return radius;
@@ -174,15 +172,12 @@ namespace Modules_N {
 		virtual int iAm() const { return sensor_Module; }
 		//!	Simple constructor
 		sensorModule(int st = 0, int pr = 0, int en = 0, int c = 0, int r = 0, int ang = 0, int direct = 0) :
-			Module(st, pr, en, c), 
-			radius(r), 
-			angle(ang), 
+			Module(st, pr, en, c),
+			radius(r),
+			angle(ang),
 			direction(direct) {};
 		//! Destructor
 		~sensorModule() {};
-
 	};
-
-
 }
 #endif
