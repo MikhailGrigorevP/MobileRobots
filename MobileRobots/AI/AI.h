@@ -29,12 +29,16 @@ namespace AI_N {
 	class AI
 	{
 	private:
+		unsigned budget = 0;
+		vector<Modules_N::Module*> shop;
 		std::map<Point, vector<Vertex>> _graph;
 		vector<vector<int>> visited_vertex;
 		vector<Point> interestPonts; //!< Array with all points of interest
 	public:
 		//! Constructor
 		AI() {};
+		AI(unsigned _budget, vector<Modules_N::Module*> _shop) :budget(_budget), shop(_shop) {
+		};
 		//! Destructor
 		~AI() { interestPonts.~vector(); };
 

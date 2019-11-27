@@ -35,6 +35,10 @@
 #include <iostream>
 #include <cstdlib>
 #include <functional>
+#include <string>
+using std::string;
+
+const unsigned budget = 2000;
 
 #include "SDL.h"
 using namespace Components_N;
@@ -84,9 +88,9 @@ void getClear()
 
 #include <fstream>
 using std::ifstream;
-void readFromFile(ED_N::environmentDescriptor& environment)
+void readFromFile(ED_N::environmentDescriptor& environment, string f_name)
 {
-	ifstream file("map.txt");
+	ifstream file(f_name);
 	string str;
 	int i = 0;
 	int j = 0;
@@ -99,9 +103,8 @@ void readFromFile(ED_N::environmentDescriptor& environment)
 			n = str.size();
 	}
 	file.seekg(0);
-	environment.setSize({ m - 1, n });
-	//vbstd::cout << n << " " << m << std::endl;
-	ifstream file2("map.txt");
+	environment.setSize({ m, n });
+	ifstream file2(f_name);
 	while (getline(file2, str)) {
 		i = 0;
 		for (char& c : str) {
@@ -214,7 +217,8 @@ void menu_InitEnvironment(ED_N::environmentDescriptor& environment) {
 	//////////////////////////////////////
 };
 void menu_InitEnvironment_2(ED_N::environmentDescriptor& environment) {
-	readFromFile(environment);
+	
+	readFromFile(environment, "map.txt");
 
 	environment.AddRobotScout({ 5, 3 }, 80, 5, 1, 600);
 	environment.getComponent(0)->setModule_g(1, 100, 125, 4500);
@@ -286,6 +290,81 @@ void menu_InitEnvironment_2(ED_N::environmentDescriptor& environment) {
 
 	dynamic_cast<managementComponent*>(environment.getComponent(9))->getMModule(1)->sendResourse(environment.getRCComponent(9), environment.getComponent(8));
 };
+void menu_InitEnvironment_3(ED_N::environmentDescriptor& environment) {
+
+	readFromFile(environment, "map2.txt");
+
+	environment.AddRobotScout({ 5, 3 }, 80, 5, 1, 600);
+	environment.getComponent(0)->setModule_g(1, 100, 125, 4500);
+	environment.getRSComponent(0)->setModule_s(1, 150, 500, 1, 60, 0);
+	environment.getComponent(0)->moduleOn(1);
+
+	environment.AddRobotCommander({ 5, 5 }, 150, 4, 2, 1, 600);
+	environment.getComponent(1)->setModule_g(1, 100, 125, 4500);
+	environment.getComponent(1)->setModule_m(2, 150, 250, 3, 4);
+
+	environment.AddRobotScout({ 3, 5 }, 80, 5, 1, 600);
+	environment.getComponent(2)->setModule_g(1, 100, 125, 4500);
+	environment.getRSComponent(2)->setModule_s(1, 150, 500, 1, 60, 2);
+	environment.getComponent(2)->moduleOn(1);
+
+	environment.AddObserveCenter({ 14, 14 }, 80, 5, 600);
+	environment.getComponent(3)->setModule_g(1, 100, 125, 4500);
+	environment.getComponent(3)->setModule_s(1, 150, 500, 4, 60, 0);
+	environment.getComponent(3)->setModule_s(1, 150, 500, 4, 60, 1);
+	environment.getComponent(3)->setModule_s(1, 150, 500, 4, 60, 2);
+	environment.getComponent(3)->setModule_s(1, 150, 500, 4, 60, 3);
+	environment.getComponent(3)->moduleOn(1);
+	environment.getComponent(3)->moduleOn(2);
+	environment.getComponent(3)->moduleOn(3);
+	environment.getComponent(3)->moduleOn(4);
+
+	environment.AddRobotScout({ 13, 3 }, 80, 5, 1, 600);
+	environment.getComponent(4)->setModule_g(1, 100, 125, 4500);
+	environment.getRSComponent(4)->setModule_s(1, 150, 500, 1, 60, 0);
+	environment.getComponent(4)->moduleOn(1);
+
+	environment.AddRobotCommander({ 13, 1 }, 150, 4, 2, 1, 600);
+	environment.getComponent(5)->setModule_g(1, 100, 125, 4500);
+	environment.getComponent(5)->setModule_m(2, 150, 250, 3, 4);
+
+	environment.AddRobotScout({ 19, 23 }, 80, 5, 1, 600);
+	environment.getComponent(6)->setModule_g(1, 100, 125, 4500);
+	environment.getRSComponent(6)->setModule_s(1, 150, 500, 2, 60, 0);
+	environment.getComponent(6)->moduleOn(1);
+
+	environment.AddRobotCommander({ 18, 21 }, 150, 4, 2, 1, 600);
+	environment.getComponent(7)->setModule_g(1, 100, 125, 4500);
+	environment.getComponent(7)->setModule_m(2, 150, 250, 3, 4);
+
+	environment.AddRobotScout({ 22, 12 }, 80, 5, 1, 600);
+	environment.getComponent(8)->setModule_g(1, 100, 125, 4500);
+	environment.getRSComponent(8)->setModule_s(1, 150, 500, 2, 60, 0);
+	environment.getComponent(8)->moduleOn(1);
+
+	environment.AddRobotCommander({ 23, 12 }, 150, 4, 2, 1, 600);
+	environment.getComponent(9)->setModule_g(1, 100, 125, 4500);
+	environment.getComponent(9)->setModule_m(2, 150, 250, 3, 4);
+
+	environment.AddRobotScout({ 3, 9 }, 80, 5, 1, 600);
+	environment.getComponent(10)->setModule_g(1, 100, 125, 4500);
+	environment.getRSComponent(10)->setModule_s(1, 150, 500, 2, 60, 0);
+	environment.getComponent(10)->moduleOn(1);
+
+	environment.AddCommandCenter({ 3, 10 }, 150, 4, 2, 600);
+	environment.getComponent(11)->setModule_g(1, 100, 125, 4500);
+	environment.getComponent(11)->setModule_m(2, 150, 250, 8, 4);
+
+	dynamic_cast<managementComponent*>(environment.getComponent(1))->getMModule(1)->sendResourse(environment.getRCComponent(1), environment.getComponent(0));
+	dynamic_cast<managementComponent*>(environment.getComponent(1))->getMModule(1)->sendResourse(environment.getRCComponent(1), environment.getComponent(2));
+
+	dynamic_cast<managementComponent*>(environment.getComponent(5))->getMModule(1)->sendResourse(environment.getRCComponent(5), environment.getComponent(4));
+
+	dynamic_cast<managementComponent*>(environment.getComponent(7))->getMModule(1)->sendResourse(environment.getRCComponent(7), environment.getComponent(6));
+
+	dynamic_cast<managementComponent*>(environment.getComponent(9))->getMModule(1)->sendResourse(environment.getRCComponent(9), environment.getComponent(8));
+};
+
 
 //Menu 0
 void WorkWithEnvironment(ED_N::environmentDescriptor& environment) {
@@ -301,11 +380,17 @@ void WorkWithEnvironment(ED_N::environmentDescriptor& environment) {
 
 		std::cout << ">> "; std::cin >> menu;
 
-		if (std::cin.eof()) {
+		if (menu < 0 || menu > menu_1_SZ) {
+			std::cout << " >>> wrong num";
+			work = false;
+		}
+		else if (std::cin.eof()) {
 			std::cout << " >>> End Of File";
 			work = false;
 		}
 		else if (!menu) {
+			if (system("CLS"))
+				system("clear");
 			return;
 		}
 		else
@@ -340,11 +425,17 @@ void WorkWithComponents(ED_N::environmentDescriptor& environment) {
 
 		std::cout << ">> "; std::cin >> menu;
 
-		if (std::cin.eof()) {
+		if (menu < 0 || menu > menu_2_SZ) {
+			std::cout << " >>> wrong num";
+			work = false;
+		}
+		else if (std::cin.eof()) {
 			std::cout << " >>> End Of File";
 			work = false;
 		}
 		else if (!menu) {
+			if (system("CLS"))
+				system("clear");
 			return;
 		}
 		else
@@ -376,7 +467,16 @@ void ShowAllInformation(ED_N::environmentDescriptor& environment) {
 	return;
 };
 void FindInterestPoints(ED_N::environmentDescriptor& environment) {
-	AI _AI;
+	vector<Modules_N::Module*> shop;
+
+	sensorModule* mod_1 = new sensorModule (0, 1, 150, 500, 5, 60, 3);
+	shop.push_back(mod_1);
+
+	sensorModule* mod_2 = new sensorModule(0, 1, 150, 1500, 5, 60, 3);
+	shop.push_back(mod_2);
+
+
+	AI _AI(2200, shop);
 
 	vector<Point> pointsOfInterest;
 	pointsOfInterest = _AI.findInterestPoints(&environment);
@@ -395,6 +495,7 @@ void FindInterestPoints(ED_N::environmentDescriptor& environment) {
 	}
 	else
 		std::cout << "points weren't found";
+
 	std::cout << std::endl;
 	std::cout << std::endl;
 	return;
@@ -716,11 +817,17 @@ void WorkWithMC(ED_N::environmentDescriptor& environment) {
 
 		std::cout << ">> "; std::cin >> menu;
 
-		if (std::cin.eof()) {
+		if (menu < 0 || menu > menu_3_SZ) {
+			std::cout << " >>> wrong num";
+			work = false;
+		}
+		else if (std::cin.eof()) {
 			std::cout << " >>> End Of File";
 			work = false;
 		}
 		else if (!menu) {
+			if (system("CLS"))
+				system("clear");
 			return;
 		}
 		else
@@ -1220,7 +1327,7 @@ void GetInfo(ED_N::environmentDescriptor& environment) {
 }
 
 //! Main
-/*! Main
+/*! Main 
 *
 *
 *
@@ -1232,8 +1339,7 @@ int main(int argc, char* args[]) {
 
 	environmentDescriptor environment;
 
-	//menu_InitEnvironment(environment);
-	menu_InitEnvironment_2(environment);
+	menu_InitEnvironment_3(environment);
 
 	do {
 		if (menu)
@@ -1242,7 +1348,12 @@ int main(int argc, char* args[]) {
 
 		std::cout << ">> "; std::cin >> menu;
 
-		if (std::cin.eof()) {
+
+		if (menu < 0 || menu > menu_0_SZ) {
+			std::cout << " >>> wrong num";
+			work = false;
+		}
+		else if (std::cin.eof()) {
 			std::cout << " >>> End Of File";
 			work = false;
 		}

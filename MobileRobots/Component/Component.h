@@ -108,8 +108,11 @@ namespace Components_N {
 		//! setters
 
 		void setModule_g(int pr, int en, int c, int enpr);
+		void setModule_g(generatorModule* g);
 		void setModule_s(int pr, int en, int c, int r, int ang, int direct);
+		void setModule_s(sensorModule* sm);
 		void setModule_m(int pr, int en, int c, int r, int n);
+		void setModule_m(managementModule* m);
 
 		void setActive() {
 			active = true;

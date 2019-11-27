@@ -85,6 +85,30 @@ namespace Components_N {
 		modules.push_back(mod);
 	};
 
+	void  Component::setModule_s(sensorModule* sm) {
+
+		if (modules.size() == slotsNum)
+			throw std::exception(" >>> not enough space for modules");
+
+		modules.push_back(sm);
+	}
+
+	void  Component::setModule_g(generatorModule* sm) {
+
+		if (modules.size() == slotsNum)
+			throw std::exception(" >>> not enough space for modules");
+
+		modules.push_back(sm);
+	}
+
+	void  Component::setModule_m(managementModule* sm) {
+
+		if (modules.size() == slotsNum)
+			throw std::exception(" >>> not enough space for modules");
+
+		modules.push_back(sm);
+	}
+
 	/*!
 	Set management module on the component*/
 	void Component::setModule_m(int pr, int en, int c, int r, int n) {
@@ -241,6 +265,16 @@ namespace Components_N {
 					}
 					++iterc;
 				}
+
+				iter = EInf_old.allpoints.begin();
+				while (iter != EInf_old.allpoints.end())
+				{
+					if (std::find(EInf.allpoints.begin(), EInf.allpoints.end(), *iter) == EInf.allpoints.end()) {
+						EInf.allpoints.push_back(*iter);
+					}
+					++iter;
+				}
+
 			}
 			++it;
 		}

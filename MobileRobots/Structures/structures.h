@@ -56,7 +56,6 @@ struct Vertex {
 	{
 		return ((a.x == b.x) && (a.y == b.y));
 	}
-
 	friend bool operator != (const Vertex& b, const Vertex& a)
 	{
 		return ((a.x != b.x) || (a.y != b.y));
@@ -113,4 +112,5 @@ struct EnvironmentInfo {
 	vector<Components_N::Component*> components;  //!< used components
 	vector<Point> pointsOfInterest;  //!< points of interest
 	vector<Point> barriers;  //!< barriers
+	vector<Point> allpoints;  //!< barriers
 };

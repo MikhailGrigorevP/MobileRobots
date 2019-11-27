@@ -10,8 +10,11 @@ using std::map;
 using std::stack;
 using std::pair;
 //using namespace my_std;
-
+#include <algorithm>
+#include <stdio.h>
+#include <stdlib.h>
 static bool IS_ACTIVE = true;
+static bool TryClear = false;
 
 static vector<Point> no_vector = {};
 int num = 0;
@@ -54,7 +57,7 @@ namespace AI_N {
 					++steps;
 					continue;
 				}
-				if (i >= field.size())
+				if (i >= field[0].size())
 					return steps;
 				if (field[x][i] != ai_seen)
 					return steps;
@@ -86,6 +89,7 @@ namespace AI_N {
 				case none_cell:
 					std::cout << "x";
 					break;
+				case border:
 				case barrier:
 					std::cout << "#";
 					break;
@@ -177,6 +181,7 @@ namespace AI_N {
 
 	vector<std::stack<Point>> way_back;
 
+
 	void AI::bfs(int c_num, Point v, Point e, vector<vector<unsigned>>& field) {
 		queue<Point> q;
 		Point s = v;
@@ -184,10 +189,16 @@ namespace AI_N {
 		vector<vector<int>> mark;
 		std::map<Point, vector<Vertex>> _n_graph;
 
-		for (int j = 0; j < field.size(); ++j) {
+		int i = s.x;
+		int j = s.y;
+
+
+
+
+		for (int i = 0; i < field.size(); ++i) {
 			mark.push_back(vector<int>());
-			for (int i = 0; i < field[j].size(); ++i) {
-				mark[j].push_back(0);
+			for (int j = 0; j < field[i].size(); ++j) {
+				mark[i].push_back(0);
 				Point potential_end;
 				if (field[i][j] != notexist) {
 					vector<Vertex> nVertex;
@@ -200,11 +211,11 @@ namespace AI_N {
 						nVertex.push_back({ i, j - 1 });
 
 					potential_end = { i, j + 1 };
-					if ((j < field.size() - 1 && (field[i][j + 1] == ai_seen)) || (potential_end == e))
+					if ((j < field[0].size() - 1 && (field[i][j + 1] == ai_seen)) || (potential_end == e))
 						nVertex.push_back({ i, j + 1 });
 
 					potential_end = { i + 1, j };
-					if ((i < field[j].size() - 1 && (field[i + 1][j] == ai_seen)) || (potential_end == e))
+					if ((i < field.size() - 1 && (field[i + 1][j] == ai_seen)) || (potential_end == e))
 						nVertex.push_back({ i + 1, j });
 
 					_n_graph.insert(pair<Point, vector<Vertex>>({ i, j }, nVertex));
@@ -212,7 +223,7 @@ namespace AI_N {
 			}
 		}
 
-		for (size_t j = 0; j < field.size() * field.size(); j++)
+		for (size_t j = 0; j < field.size() * field[0].size(); j++)
 		{
 			p.push_back({ 0,0 });
 		}
@@ -229,8 +240,6 @@ namespace AI_N {
 			vector<Vertex>::iterator iter;
 			iter = _n_graph[v].begin();
 			for (iter; iter != _n_graph[v].end(); iter++) {
-				if (s.x == 3 && s.y == 6) {
-				}
 				if (mark[(*iter).x][(*iter).y]) {
 					continue;
 				}
@@ -241,8 +250,9 @@ namespace AI_N {
 			}
 		}
 
-		if (!mark[e.x][e.y])
+		if (!mark[e.x][e.y]) {
 			return;
+		}
 		else {
 			int num = e.y * field.size() + e.x;
 			int end = s.y * field.size() + s.x;
@@ -254,21 +264,33 @@ namespace AI_N {
 		};
 		return;
 	}
-	
+
 	vector<vector<stack<Point>>> _stacks;
 	void AI::dfs(ED_N::environmentDescriptor* environment, vector<vector<unsigned>>& field, vector<Components_N::managementComponent*> components) {
 
-		const int FPS = 20;
+		const int FPS = 24;
 		const int frameDelay = 1000 / FPS;
 		Uint32 frameStart;
 		int frameTime;
 
-		render* _render = new render("NameOfGame", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1024, 850, false);
-
+		render* _render = new render("NameOfGame", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1024, 946, false);
+		//_render->test();
 		vector<Component*> dead_robots;
 		vector<stack<Point>> _dead_stacks;
 		vector<Point> active_points;
 		vector<Component*> UselessObserveCenters;
+
+		vector<char const*> _budget;
+
+
+
+		char* _string12 = new char[12];
+		strcpy_s(_string12, 12, "Start");
+		_budget.push_back(_string12);
+
+		std::string s = std::to_string(budget);
+		char const* _string = s.c_str();
+		_budget.push_back(_string);
 
 		vector <stack<unsigned>> _states;
 
@@ -285,6 +307,10 @@ namespace AI_N {
 		while (_ai_) {
 			_ai_ = false;
 			int c_n = 0;
+
+
+			++num;
+
 			component = components.begin();
 
 			for (size_t i = 0; i < components.size(); i++)
@@ -293,12 +319,43 @@ namespace AI_N {
 					_ai_ = true;
 			}
 
+			if (TryClear) {
+				//vector<vector<unsigned>> _field = field;
+				bool stop = true;
+				for (size_t i = 0; i < field.size(); i++)
+				{
+					for (size_t j = 0; j < field[0].size(); j++)
+					{
+						if (field[i][j] == ai_seen) {
+							//check left
+							if ((i != 0) && (i > 0 && (field[i - 1][j] == notexist)))
+								stop = false;
+							//check up
+							if ((j != 0) && (j > 0 && (field[i][j - 1] == notexist)))
+								stop = false;
+							//check right
+							if ((i != field.size() - 1) && (i < field.size() - 1 && (field[i + 1][j] == notexist)))
+								stop = false;
+							//check down
+							if ((j != field[0].size() - 1) & (j < field[0].size() - 1 && (field[i][j + 1] == notexist)))
+								stop = false;
+						}
+					}
+				}
+				if (stop) {
+					_ai_ = false;
+					continue;
+
+				}
+			}
+
+			map<Point, Point> prev;
 
 			frameStart = SDL_GetTicks();
 			while (component != components.end())
 			{
-				++num;
 
+				
 				//show(environment, field);
 				//	showfield(environment->getSize(), visited_vertex);
 
@@ -444,7 +501,51 @@ namespace AI_N {
 							{
 								if ((*it)->iAm() == management_Module) {
 									dynamic_cast<managementModule*>(*it)->sendResourse((*component), UselessObserveCenters[i]);
-									vector<Component*> diffComponents = (*component)->getInfo((*component)->getNComp()->size() - 1, environment, field).components;
+
+									EnvironmentInfo env = (*component)->getInfo((*component)->getNComp()->size() - 1, environment, field);
+									vector<Component*> diffComponents = env.components;
+
+									//ADDITION TO SCAN 
+									vector<Point>::iterator allpoints = env.allpoints.begin();
+									for (allpoints; allpoints != env.allpoints.end(); allpoints++)
+									{
+										//check left
+										if (((*allpoints).x == 0) || ((*allpoints).x > 0 && (field[(*allpoints).x - 1][(*allpoints).y] != notexist)))
+											//check up
+											if (((*allpoints).y == 0) || ((*allpoints).y > 0 && (field[(*allpoints).x][(*allpoints).y - 1] != notexist)))
+												//check right
+												if (((*allpoints).x == field.size() - 1) || ((*allpoints).x < field.size() - 1 && (field[(*allpoints).x + 1][(*allpoints).y] != notexist)))
+													//check down
+													if (((*allpoints).y == field[0].size() - 1) || ((*allpoints).y < field[0].size() - 1 && (field[(*allpoints).x][(*allpoints).y + 1] != notexist))) {
+
+
+
+														//CHECK CELLS AROUND THIS POINT
+
+														int x = (*allpoints).x;
+														int y = (*allpoints).y;
+
+														Point vertex = { x, y };
+
+														vector<Vertex> newVertex;
+														Point test_point;
+														test_point = { x - 1,y };
+														if ((x > 0) && ((field[x - 1][y] == ai_seen) || (field[x - 1][y] == rc)) && visited_vertex[x - 1][y] == V_not)
+															newVertex.push_back({ x - 1, y });
+														test_point = { x,y - 1 };
+														if ((y > 0) && ((field[x][y - 1] == ai_seen) || (field[x][y - 1] == rc)) && visited_vertex[x][y - 1] == V_not)
+															newVertex.push_back({ x, y - 1 });
+														test_point = { x,y + 1 };
+														if ((y < environment->getSize().m - 1) && ((field[x][y + 1] == ai_seen) || (field[x][y + 1] == rc)) && visited_vertex[x][y + 1] == V_not)
+															newVertex.push_back({ x, y + 1 });
+														test_point = { x + 1,y };
+														if ((x < environment->getSize().n - 1) && ((field[x + 1][y] == ai_seen) || (field[x + 1][y] == rc)) && visited_vertex[x + 1][y] == V_not)
+															newVertex.push_back({ x + 1, y });
+
+														_graph.insert(pair<Point, vector<Vertex>>(vertex, newVertex));
+													}
+									}
+
 									vector<Component*>::iterator it0 = diffComponents.begin();
 									while (it0 != diffComponents.end())
 									{
@@ -598,6 +699,8 @@ namespace AI_N {
 							field[(*component)->getCoord().x][(*component)->getCoord().y] = rc;
 						}
 
+						prev.insert(pair<Point, Point>({ x2,y2 }, (*component)->getCoord()));
+
 						way_back[c_n].pop();
 
 						scanning = true;
@@ -666,10 +769,57 @@ namespace AI_N {
 				//COMPONENTS
 				for (size_t j = 0; j < (*component)->getNComp()->size(); j++)
 				{
+
+
 					Point nopoint = { -1,-1 };
 					if ((_stacks[c_n][j].size()) && (_stacks[c_n][j].top() == nopoint)) {
 						field[(*component)->getComp(j)->getCoord().x][(*component)->getComp(j)->getCoord().y] = rsd;
 						continue;
+					}
+
+
+				//CHECK SHOP
+
+					if (shop.size() != 0) {
+
+						for (size_t i = 0; i < shop.size(); i++)
+						{
+							if (shop[i]->getCost() < budget) {
+								if ((*component)->getComp(j)->getModules()->size() < (*component)->getComp(j)->getSlotsNum()) {
+									(*component)->getComp(j)->setModule_s(static_cast<sensorModule*>(shop[i]));
+									(*component)->getComp(j)->moduleOn((*component)->getComp(j)->getModules()->size() - 1);
+									vector<Module*>::iterator iter = shop.begin();
+
+									_budget.push_back("");
+
+									char* _string1 = new char [12];
+									strcpy_s(_string1, 12, "-");
+									char* _string2 = new char[10];
+									sprintf_s(_string2, 10, "%d", shop[i]->getCost());
+									strcat_s(_string1, 12, _string2);
+									_budget.push_back(_string1);
+
+									char* _string12 = new char[12];
+									strcpy_s(_string12, 12, "for SM");
+									_budget.push_back(_string12);
+									
+									budget -= shop[i]->getCost();
+
+									char* _string21 = new char[12];
+									 strcpy_s(_string21, 12, "=");
+									 char* _string22 = new char[10];
+									sprintf_s(_string22, 10, "%d", budget);
+									strcat_s(_string21, 12, _string22);
+									_budget.push_back(_string21);
+
+
+
+									shop.erase(iter + i);
+									i--;
+									break;
+								}
+							}
+						}
 					}
 
 					Point vertex = { (*component)->getComp(j)->getCoord().x, (*component)->getComp(j)->getCoord().y };
@@ -688,12 +838,25 @@ namespace AI_N {
 					//SCAN VERTEX
 					if (visited_vertex[vertex.x][vertex.y] == V_not) {
 						visited_vertex[vertex.x][vertex.y] = V_partly;
-
+						EnvironmentInfo env;
 						vector<Component*> diffComponents;
+						vector<Point> allpoints_g;
 						//GET ALL INFO FROM ROBOT
 						for (size_t i = 0; i < 4; i++)
 						{
-							diffComponents = (*component)->getInfo(j, environment, field).components;
+							env = (*component)->getInfo(j, environment, field);
+							diffComponents = env.components;
+
+
+							vector<Point>::iterator iter;
+							iter = env.allpoints.begin();
+							while (iter != env.allpoints.end())
+							{
+								if (std::find(allpoints_g.begin(), allpoints_g.end(), *iter) == allpoints_g.end()) {
+									allpoints_g.push_back(*iter);
+								}
+								++iter;
+							}
 
 							vector<Component*>::iterator it0 = diffComponents.begin();
 							while (it0 != diffComponents.end())
@@ -722,11 +885,82 @@ namespace AI_N {
 							}
 						}
 
+
+						//ADDITION TO SCAN 
+						vector<Point>::iterator allpoints = allpoints_g.begin();
+						for (allpoints; allpoints != allpoints_g.end(); allpoints++)
+						{
+							//check left
+							if (((*allpoints).x == 0) || ((*allpoints).x > 0 && (field[(*allpoints).x - 1][(*allpoints).y] != notexist)))
+								//check up
+								if (((*allpoints).y == 0) || ((*allpoints).y > 0 && (field[(*allpoints).x][(*allpoints).y - 1] != notexist)))
+									//check right
+									if (((*allpoints).x == field.size() - 1) || ((*allpoints).x < field.size() - 1 && (field[(*allpoints).x + 1][(*allpoints).y] != notexist)))
+										//check down
+										if (((*allpoints).y == field[0].size() - 1) || ((*allpoints).y < field[0].size() - 1 && (field[(*allpoints).x][(*allpoints).y + 1] != notexist))) {
+
+											//CHECK CELLS AROUND THIS POINT
+
+											int x = (*allpoints).x;
+											int y = (*allpoints).y;
+
+											Point vertex = { x, y };
+
+											vector<Vertex> newVertex;
+											Point test_point;
+
+											int n = 0;
+
+
+											if ((x == 0) || ((x > 0) && ((field[x - 1][y] == interest_point) || (field[x - 1][y] == border) || (field[x - 1][y] == barrier)))) {
+												++n;
+											}
+											
+											if ((y == 0) || ((y > 0) && ((field[x][y - 1] == interest_point) || (field[x][y - 1] == border) || (field[x][y - 1] == barrier)))) {
+												++n;
+											}
+											
+											if ((y == environment->getSize().m - 1) || ((y < environment->getSize().m - 1) && (field[x][y + 1] == interest_point || field[x][y + 1] == border || (field[x][y + 1] == barrier)))) {
+												++n;
+											}
+											
+											if ((x == environment->getSize().n - 1) || ((x < environment->getSize().n - 1) && (field[x + 1][y] == interest_point || field[x + 1][y] == border || (field[x + 1][y] == barrier)))) {
+												++n;
+											}
+											
+											if (n > 2)
+												visited_vertex[x][y] = V_visited;
+
+											//test_point = { x - 1, y };
+											//if ((x > 0) && ((field[x - 1][y] == ai_seen) || (field[x - 1][y] == rc)) && visited_vertex[x - 1][y] == V_not) {
+											//	newVertex.push_back({ x - 1, y });
+											//}
+											//
+											//test_point = { x, y - 1 };
+											//if ((y > 0) && ((field[x][y - 1] == ai_seen) || (field[x][y - 1] == rc)) && visited_vertex[x][y - 1] == V_not) {
+											//	newVertex.push_back({ x, y - 1 });
+											//}
+											//
+											//test_point = { x, y + 1 };
+											//if ((y < environment->getSize().m - 1) && ((field[x][y + 1] == ai_seen) || (field[x][y + 1] == rc)) && visited_vertex[x][y + 1] == V_not) {
+											//	newVertex.push_back({ x, y + 1 });
+											//}
+											//
+											//test_point = { x + 1, y };
+											//if ((x < environment->getSize().n - 1) && ((field[x + 1][y] == ai_seen) || (field[x + 1][y] == rc)) && visited_vertex[x + 1][y] == V_not) {
+											//	newVertex.push_back({ x + 1, y });
+											//}
+											//
+											//_graph.insert(pair<Point, vector<Vertex>>(vertex, newVertex));
+										}
+						}
+
+
 						//CHECK CELLS AROUND THE ROBOT
 						vector<Vertex> newVertex;
 						Point test_point;
 						test_point = { x - 1,y };
-						if ((y > 0) && ((field[x - 1][y] == ai_seen) || (field[x - 1][y] == rc)) && visited_vertex[x - 1][y] == V_not)
+						if ((x > 0) && ((field[x - 1][y] == ai_seen) || (field[x - 1][y] == rc)) && visited_vertex[x - 1][y] == V_not)
 							newVertex.push_back({ x - 1, y });
 						test_point = { x,y - 1 };
 						if ((y > 0) && ((field[x][y - 1] == ai_seen) || (field[x][y - 1] == rc)) && visited_vertex[x][y - 1] == V_not)
@@ -777,10 +1011,13 @@ namespace AI_N {
 											dynamic_cast<robotCommander*>((*component))->moveRobotInDirection(up, 1);
 											field[(*component)->getCoord().x][(*component)->getCoord().y] = rc;
 										}
+										prev.insert(pair<Point, Point>({ (*iter).x,(*iter).y }, (*component)->getCoord()));
 									}
 									field[(*component)->getComp(j)->getCoord().x][(*component)->getComp(j)->getCoord().y] = ai_seen;
 									(*component)->moveRobot(j, left, checkMoveAbility(field, (*component)->getComp(j)->getCoord().x, (*component)->getComp(j)->getCoord().y, left, (*component)->getComp(j)->getVel()));
 									field[(*component)->getComp(j)->getCoord().x][(*component)->getComp(j)->getCoord().y] = rs;
+
+									prev.insert(pair<Point, Point>({ x,y }, (*component)->getComp(j)->getCoord()));
 								}
 								else if (((*iter).x > x) && (checkMoveAbility(field, (*component)->getComp(j)->getCoord().x, (*component)->getComp(j)->getCoord().y, right, (*component)->getComp(j)->getVel(), true))) {
 									if (field[(*iter).x][(*iter).y] == rc) {
@@ -799,10 +1036,13 @@ namespace AI_N {
 											dynamic_cast<robotCommander*>((*component))->moveRobotInDirection(up, 1);
 											field[(*component)->getCoord().x][(*component)->getCoord().y] = rc;
 										}
+
+										prev.insert(pair<Point, Point>({ (*iter).x,(*iter).y }, (*component)->getCoord()));
 									}
 									field[(*component)->getComp(j)->getCoord().x][(*component)->getComp(j)->getCoord().y] = ai_seen;
 									(*component)->moveRobot(j, right, checkMoveAbility(field, (*component)->getComp(j)->getCoord().x, (*component)->getComp(j)->getCoord().y, right, (*component)->getComp(j)->getVel()));
 									field[(*component)->getComp(j)->getCoord().x][(*component)->getComp(j)->getCoord().y] = rs;
+									prev.insert(pair<Point, Point>({ x,y }, (*component)->getComp(j)->getCoord()));
 								}
 								else if (((*iter).y < y) && (checkMoveAbility(field, (*component)->getComp(j)->getCoord().x, (*component)->getComp(j)->getCoord().y, up, (*component)->getComp(j)->getVel(), true))) {
 									if (field[(*iter).x][(*iter).y] == rc) {
@@ -821,10 +1061,13 @@ namespace AI_N {
 											dynamic_cast<robotCommander*>((*component))->moveRobotInDirection(up, 1);
 											field[(*component)->getCoord().x][(*component)->getCoord().y] = rc;
 										}
+
+										prev.insert(pair<Point, Point>({ (*iter).x,(*iter).y }, (*component)->getCoord()));
 									}
 									field[(*component)->getComp(j)->getCoord().x][(*component)->getComp(j)->getCoord().y] = ai_seen;
 									(*component)->moveRobot(j, up, checkMoveAbility(field, (*component)->getComp(j)->getCoord().x, (*component)->getComp(j)->getCoord().y, up, (*component)->getComp(j)->getVel(), true));
 									field[(*component)->getComp(j)->getCoord().x][(*component)->getComp(j)->getCoord().y] = rs;
+									prev.insert(pair<Point, Point>({ x,y }, (*component)->getComp(j)->getCoord()));
 								}
 								else if (((*iter).y > y) && (checkMoveAbility(field, (*component)->getComp(j)->getCoord().x, (*component)->getComp(j)->getCoord().y, down, (*component)->getComp(j)->getVel(), true))) {
 									if (field[(*iter).x][(*iter).y] == rc) {
@@ -843,10 +1086,13 @@ namespace AI_N {
 											dynamic_cast<robotCommander*>((*component))->moveRobotInDirection(down, 1);
 											field[(*component)->getCoord().x][(*component)->getCoord().y] = rc;
 										}
+
+										prev.insert(pair<Point, Point>({ (*iter).x,(*iter).y }, (*component)->getCoord()));
 									}
 									field[(*component)->getComp(j)->getCoord().x][(*component)->getComp(j)->getCoord().y] = ai_seen;
 									(*component)->moveRobot(j, down, checkMoveAbility(field, (*component)->getComp(j)->getCoord().x, (*component)->getComp(j)->getCoord().y, down, (*component)->getComp(j)->getVel()));
 									field[(*component)->getComp(j)->getCoord().x][(*component)->getComp(j)->getCoord().y] = rs;
+									prev.insert(pair<Point, Point>({ x,y }, (*component)->getComp(j)->getCoord()));
 								}
 								break;
 							}
@@ -854,8 +1100,10 @@ namespace AI_N {
 						if (!ways_left)
 							visited_vertex[vertex.x][vertex.y] = V_visited;
 					}
-					if (visited_vertex[vertex.x][vertex.y] == V_visited)
+					if (visited_vertex[vertex.x][vertex.y] == V_visited) {
 						_stacks[c_n][j].pop();
+						TryClear = true;
+					}
 
 					if (_stacks[c_n][j].size() != 0) {
 						if (_stacks[c_n][j].top() == nopoint) {
@@ -881,10 +1129,12 @@ namespace AI_N {
 										dynamic_cast<robotCommander*>((*component))->moveRobotInDirection(up, 1);
 										field[(*component)->getCoord().x][(*component)->getCoord().y] = rc;
 									}
+									prev.insert(pair<Point, Point>({ _stacks[c_n][j].top().x, _stacks[c_n][j].top().y }, (*component)->getCoord()));
 								}
 								field[(*component)->getComp(j)->getCoord().x][(*component)->getComp(j)->getCoord().y] = ai_seen;
 								(*component)->moveRobot(j, right, (checkMoveAbility(field, (*component)->getComp(j)->getCoord().x, (*component)->getComp(j)->getCoord().y, right, (*component)->getComp(j)->getVel())));
 								field[(*component)->getComp(j)->getCoord().x][(*component)->getComp(j)->getCoord().y] = rs;
+								prev.insert(pair<Point, Point>({ x,y }, (*component)->getComp(j)->getCoord()));
 							}
 							else if ((_stacks[c_n][j].top().x < x) && (checkMoveAbility(field, (*component)->getComp(j)->getCoord().x, (*component)->getComp(j)->getCoord().y, left, (*component)->getComp(j)->getVel(), true))) {
 								if (field[_stacks[c_n][j].top().x][_stacks[c_n][j].top().y] == rc) {
@@ -903,10 +1153,12 @@ namespace AI_N {
 										dynamic_cast<robotCommander*>((*component))->moveRobotInDirection(up, 1);
 										field[(*component)->getCoord().x][(*component)->getCoord().y] = rc;
 									}
+									prev.insert(pair<Point, Point>({ _stacks[c_n][j].top().x, _stacks[c_n][j].top().y }, (*component)->getCoord()));
 								}
 								field[(*component)->getComp(j)->getCoord().x][(*component)->getComp(j)->getCoord().y] = ai_seen;
 								(*component)->moveRobot(j, left, (checkMoveAbility(field, (*component)->getComp(j)->getCoord().x, (*component)->getComp(j)->getCoord().y, left, (*component)->getComp(j)->getVel())));
 								field[(*component)->getComp(j)->getCoord().x][(*component)->getComp(j)->getCoord().y] = rs;
+								prev.insert(pair<Point, Point>({ x,y }, (*component)->getComp(j)->getCoord()));
 							}
 							else if ((_stacks[c_n][j].top().y > y) && (checkMoveAbility(field, (*component)->getComp(j)->getCoord().x, (*component)->getComp(j)->getCoord().y, down, (*component)->getComp(j)->getVel(), true))) {
 								if (field[_stacks[c_n][j].top().x][_stacks[c_n][j].top().y] == rc) {
@@ -925,10 +1177,12 @@ namespace AI_N {
 										dynamic_cast<robotCommander*>((*component))->moveRobotInDirection(down, 1);
 										field[(*component)->getCoord().x][(*component)->getCoord().y] = rc;
 									}
+									prev.insert(pair<Point, Point>({ _stacks[c_n][j].top().x, _stacks[c_n][j].top().y }, (*component)->getCoord()));
 								}
 								field[(*component)->getComp(j)->getCoord().x][(*component)->getComp(j)->getCoord().y] = ai_seen;
 								(*component)->moveRobot(j, down, (checkMoveAbility(field, (*component)->getComp(j)->getCoord().x, (*component)->getComp(j)->getCoord().y, down, (*component)->getComp(j)->getVel())));
 								field[(*component)->getComp(j)->getCoord().x][(*component)->getComp(j)->getCoord().y] = rs;
+								prev.insert(pair<Point, Point>({ x,y }, (*component)->getComp(j)->getCoord()));
 							}
 							else if ((_stacks[c_n][j].top().y < y) && (checkMoveAbility(field, (*component)->getComp(j)->getCoord().x, (*component)->getComp(j)->getCoord().y, up, (*component)->getComp(j)->getVel(), true))) {
 								if (field[_stacks[c_n][j].top().x][_stacks[c_n][j].top().y] == rc) {
@@ -947,10 +1201,12 @@ namespace AI_N {
 										dynamic_cast<robotCommander*>((*component))->moveRobotInDirection(up, 1);
 										field[(*component)->getCoord().x][(*component)->getCoord().y] = rc;
 									}
+									prev.insert(pair<Point, Point>({ _stacks[c_n][j].top().x, _stacks[c_n][j].top().y }, (*component)->getCoord()));
 								}
 								field[(*component)->getComp(j)->getCoord().x][(*component)->getComp(j)->getCoord().y] = ai_seen;
 								(*component)->moveRobot(j, up, (checkMoveAbility(field, (*component)->getComp(j)->getCoord().x, (*component)->getComp(j)->getCoord().y, up, (*component)->getComp(j)->getVel())));
 								field[(*component)->getComp(j)->getCoord().x][(*component)->getComp(j)->getCoord().y] = rs;
+								prev.insert(pair<Point, Point>({ x,y }, (*component)->getComp(j)->getCoord()));
 							}
 							//	std::cout << "\nHERE\n";
 						}
@@ -981,10 +1237,13 @@ namespace AI_N {
 				SDL_Delay(frameDelay - frameTime);
 			}
 
-			_render->render_map(field);
+
+			_render->init_text(_budget);
+			_render->render_map(field, prev);
+
 
 		}
-
+		_render->stop();
 		return;
 
 	}
@@ -1066,8 +1325,8 @@ namespace AI_N {
 
 		std::cout << "\n Map created by robotic complex after scan:\n\n";
 		showfield(field_Size, field, pointsOfInterest);
-		
-			std::cout << "\n\n Step: "<<num<<"\n\n";
+
+		std::cout << "\n\n Step: " << num << "\n\n";
 		return pointsOfInterest;
 	}
 };

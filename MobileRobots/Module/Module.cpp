@@ -29,7 +29,7 @@ namespace Modules_N {
 		switch (direction) {
 		case left:
 			x_start_point = radius * cos(angle / 2 * PI / 180) < 0 ? round(radius * cos(angle / 2 * PI / 180)) : 0;
-			x_end = -x_start_point + curr_location.x >= env->getSize().m ? env->getSize().m - 1 : -x_start_point + curr_location.x;
+			x_end = -x_start_point + curr_location.x >= env->getSize().n ? env->getSize().n - 1 : -x_start_point + curr_location.x;
 			x_start = -radius + curr_location.x < 0 ? 0 : -radius + curr_location.x;
 
 			for (int i = x_start; i <= x_end; i++)
@@ -37,7 +37,7 @@ namespace Modules_N {
 				curr_rad = abs(i - curr_location.x);
 				dst = round(curr_rad * tan(angle / 2 * PI / 180));
 				y_start = (curr_location.y - dst) < 0 ? 0 : (curr_location.y - dst);
-				y_end = (dst + curr_location.y) > (env->getSize().n - 1) ? (env->getSize().n - 1) : (dst + curr_location.y);
+				y_end = (dst + curr_location.y) > (env->getSize().m - 1) ? (env->getSize().m - 1) : (dst + curr_location.y);
 				for (int j = y_start; j <= y_end; j++)
 				{
 					if ((env->getCell({ i,j }) != notexist) && (i != curr_location.x || j != curr_location.y)) {
@@ -51,8 +51,10 @@ namespace Modules_N {
 							if (field.size() != 2)
 								field[i][j] = interest_point;
 						}
-						else if ((field.size() != 2) && (field[i][j] == notexist))
+						else if ((field.size() != 2) && (field[i][j] == notexist)) {
+							currInfo.allpoints.push_back({ i, j });
 							field[i][j] = ai_seen;
+						}
 
 						vector<Components_N::Component*>* comp = env->getComponents();
 						vector<Components_N::Component*>::iterator it;
@@ -84,20 +86,25 @@ namespace Modules_N {
 							++it;
 						}
 					}
+					else if ((env->getCell({ i,j }) == notexist) && (i != curr_location.x || j != curr_location.y)) {
+						if ((field.size() != 2) && (field[i][j] == notexist)) {
+							field[i][j] = border;
+						}
+					}
 				}
 			}
 			break;
 		case right:
 			x_start_point = radius * cos(angle / 2 * PI / 180) < 0 ? round(radius * cos(angle / 2 * PI / 180)) : 0;
 			x_start = x_start_point + curr_location.x < 0 ? 0 : x_start_point + curr_location.x;
-			x_end = radius + curr_location.x >= env->getSize().m ? env->getSize().m - 1 : radius + curr_location.x;
+			x_end = radius + curr_location.x >= env->getSize().n ? env->getSize().n - 1 : radius + curr_location.x;
 
 			for (int i = x_start; i <= x_end; i++)
 			{
 				curr_rad = abs(i - curr_location.x);
 				dst = round(curr_rad * tan(angle / 2 * PI / 180));
 				y_start = (curr_location.y - dst) < 0 ? 0 : (curr_location.y - dst);
-				y_end = (dst + curr_location.y) > (env->getSize().n - 1) ? (env->getSize().n - 1) : (dst + curr_location.y);
+				y_end = (dst + curr_location.y) > (env->getSize().m - 1) ? (env->getSize().m - 1) : (dst + curr_location.y);
 				for (int j = y_start; j <= y_end; j++)
 				{
 					if ((env->getCell({ i,j }) != notexist) && (i != curr_location.x || j != curr_location.y)) {
@@ -107,134 +114,14 @@ namespace Modules_N {
 								field[i][j] = barrier;
 						}
 						else if (env->getCell({ i,j }) == interest_point) {
-							currInfo.pointsOfInterest.push_back({ i, j });
+							currInfo.allpoints.push_back({ i, j });
 							if (field.size() != 2)
 								field[i][j] = interest_point;
 						}
-						else if ((field.size() != 2) && (field[i][j] == notexist))
+						else if ((field.size() != 2) && (field[i][j] == notexist)) {
+							currInfo.allpoints.push_back({ i, j });
 							field[i][j] = ai_seen;
-
-						vector<Components_N::Component*>* comp = env->getComponents();
-						vector<Components_N::Component*>::iterator it;
-
-						it = comp->begin();
-
-						while (it != comp->end())
-						{
-							if ((i == (*it)->getCoord().x) && (j == (*it)->getCoord().y)) {
-								if (field.size() != 2) {
-									switch ((*it)->iAm()) {
-									case robot_commander:
-										field[i][j] = rc;
-										break;
-									case observe_center:
-										field[i][j] = oc;
-										break;
-									case robot_scout:
-										if (field[i][j] != rsd)
-											field[i][j] = rs;
-										break;
-									case command_center:
-										field[i][j] = cc;
-										break;
-									}
-								}
-								currInfo.components.push_back(*it);
-							}
-							++it;
 						}
-					}
-				}
-			}
-			break;
-		case up:
-			y_start_point = radius * cos(angle / 2 * PI / 180) < 0 ? round(radius * cos(angle / 2 * PI / 180)) : 0;
-			y_end = -y_start_point + curr_location.y >= env->getSize().n ? env->getSize().n - 1 : -y_start_point + curr_location.y;
-			y_start = -radius + curr_location.y < 0 ? 0 : -radius + curr_location.y;
-
-			for (int j = y_start; j <= y_end; j++)
-			{
-				curr_rad = abs(j - curr_location.y);
-				dst = round(curr_rad * tan(angle / 2 * PI / 180));
-				x_start = (-dst + curr_location.x) < 0 ? 0 : ceil(-dst + curr_location.x);
-				x_end = (dst + curr_location.x) > (env->getSize().m - 1) ? (env->getSize().m - 1) : (dst + curr_location.x);
-				for (int i = x_start; i <= x_end; i++)
-				{
-					if ((env->getCell({ i,j }) != notexist) && (i != curr_location.x || j != curr_location.y)) {
-						if (env->getCell({ i,j }) == barrier) {
-							currInfo.barriers.push_back({ i, j });
-							if (field.size() != 2)
-								field[i][j] = barrier;
-						}
-						else if (env->getCell({ i,j }) == interest_point) {
-							currInfo.pointsOfInterest.push_back({ i, j });
-							if (field.size() != 2)
-								field[i][j] = interest_point;
-						}
-						else if ((field.size() != 2) && (field[i][j] == notexist))
-							field[i][j] = ai_seen;
-
-						vector<Components_N::Component*>* comp = env->getComponents();
-						vector<Components_N::Component*>::iterator it;
-
-						it = comp->begin();
-
-						while (it != comp->end())
-						{
-							if ((i == (*it)->getCoord().x) && (j == (*it)->getCoord().y)) {
-								if (field.size() != 2) {
-									switch ((*it)->iAm()) {
-									case robot_commander:
-										field[i][j] = rc;
-										break;
-									case observe_center:
-										field[i][j] = oc;
-										break;
-									case robot_scout:
-										if (field[i][j] != rsd)
-											field[i][j] = rs;
-										break;
-									case command_center:
-										field[i][j] = cc;
-										break;
-									}
-								}
-								currInfo.components.push_back(*it);
-							}
-							++it;
-						}
-					}
-				}
-			}
-			break;
-		case down:
-
-			y_start_point = radius * cos(angle / 2 * PI / 180) < 0 ? round(radius * cos(angle / 2 * PI / 180)) : 0;
-			y_start = y_start_point + curr_location.y < 0 ? 0 : y_start_point + curr_location.y;
-			y_end = radius + curr_location.y >= env->getSize().n ? env->getSize().n - 1 : radius + curr_location.y;
-
-			for (int j = y_start; j <= y_end; j++)
-			{
-				curr_rad = abs(j - curr_location.y);
-				dst = round(curr_rad * tan(angle / 2 * PI / 180));
-				x_start = (-dst + curr_location.x) < 0 ? 0 : (-dst + curr_location.x);
-				x_end = (dst + curr_location.x) > (env->getSize().m - 1) ? (env->getSize().m - 1) : (dst + curr_location.x);
-
-				for (int i = x_start; i <= x_end; i++)
-				{
-					if ((env->getCell({ i,j }) != notexist) && (i != curr_location.x || j != curr_location.y)) {
-						if (env->getCell({ i,j }) == barrier) {
-							currInfo.barriers.push_back({ i, j });
-							if (field.size() != 2)
-								field[i][j] = barrier;
-						}
-						else if (env->getCell({ i,j }) == interest_point) {
-							currInfo.pointsOfInterest.push_back({ i, j });
-							if (field.size() != 2)
-								field[i][j] = interest_point;
-						}
-						else if ((field.size() != 2) && (field[i][j] == notexist))
-							field[i][j] = ai_seen;
 
 						vector<Components_N::Component*>* comp = env->getComponents();
 						vector<Components_N::Component*>::iterator it;
@@ -267,8 +154,145 @@ namespace Modules_N {
 						}
 					}
 					else if ((env->getCell({ i,j }) == notexist) && (i != curr_location.x || j != curr_location.y)) {
-						if ((field.size() != 2) && (field[i][j] == notexist))
+						if ((field.size() != 2) && (field[i][j] == notexist)) {
 							field[i][j] = border;
+						}
+					}
+				}
+			}
+			break;
+		case up:
+			y_start_point = radius * cos(angle / 2 * PI / 180) < 0 ? round(radius * cos(angle / 2 * PI / 180)) : 0;
+			y_end = -y_start_point + curr_location.y >= env->getSize().m ? env->getSize().m - 1 : -y_start_point + curr_location.y;
+			y_start = -radius + curr_location.y < 0 ? 0 : -radius + curr_location.y;
+
+			for (int j = y_start; j <= y_end; j++)
+			{
+				curr_rad = abs(j - curr_location.y);
+				dst = round(curr_rad * tan(angle / 2 * PI / 180));
+				x_start = (-dst + curr_location.x) < 0 ? 0 : ceil(-dst + curr_location.x);
+				x_end = (dst + curr_location.x) > (env->getSize().n - 1) ? (env->getSize().n- 1) : (dst + curr_location.x);
+				for (int i = x_start; i <= x_end; i++)
+				{
+					if ((env->getCell({ i,j }) != notexist) && (i != curr_location.x || j != curr_location.y)) {
+						if (env->getCell({ i,j }) == barrier) {
+							currInfo.barriers.push_back({ i, j });
+							if (field.size() != 2)
+								field[i][j] = barrier;
+						}
+						else if (env->getCell({ i,j }) == interest_point) {
+							currInfo.pointsOfInterest.push_back({ i, j });
+							if (field.size() != 2)
+								field[i][j] = interest_point;
+						}
+						else if ((field.size() != 2) && (field[i][j] == notexist)){
+							currInfo.allpoints.push_back({ i, j });
+							field[i][j] = ai_seen;
+						}
+
+						vector<Components_N::Component*>* comp = env->getComponents();
+						vector<Components_N::Component*>::iterator it;
+
+						it = comp->begin();
+
+						while (it != comp->end())
+						{
+							if ((i == (*it)->getCoord().x) && (j == (*it)->getCoord().y)) {
+								if (field.size() != 2) {
+									switch ((*it)->iAm()) {
+									case robot_commander:
+										field[i][j] = rc;
+										break;
+									case observe_center:
+										field[i][j] = oc;
+										break;
+									case robot_scout:
+										if (field[i][j] != rsd)
+											field[i][j] = rs;
+										break;
+									case command_center:
+										field[i][j] = cc;
+										break;
+									}
+								}
+								currInfo.components.push_back(*it);
+							}
+							++it;
+						}
+					}
+					else if ((env->getCell({ i,j }) == notexist) && (i != curr_location.x || j != curr_location.y)) {
+						if ((field.size() != 2) && (field[i][j] == notexist)) {
+							field[i][j] = border;
+						}
+					}
+				}
+			}
+			break;
+		case down:
+
+			y_start_point = radius * cos(angle / 2 * PI / 180) < 0 ? round(radius * cos(angle / 2 * PI / 180)) : 0;
+			y_start = y_start_point + curr_location.y < 0 ? 0 : y_start_point + curr_location.y;
+			y_end = radius + curr_location.y >= env->getSize().m ? env->getSize().m- 1 : radius + curr_location.y;
+
+			for (int j = y_start; j <= y_end; j++)
+			{
+				curr_rad = abs(j - curr_location.y);
+				dst = round(curr_rad * tan(angle / 2 * PI / 180));
+				x_start = (-dst + curr_location.x) < 0 ? 0 : (-dst + curr_location.x);
+				x_end = (dst + curr_location.x) > (env->getSize().n - 1) ? (env->getSize().n- 1) : (dst + curr_location.x);
+
+				for (int i = x_start; i <= x_end; i++)
+				{
+					if ((env->getCell({ i,j }) != notexist) && (i != curr_location.x || j != curr_location.y)) {
+						if (env->getCell({ i,j }) == barrier) {
+							currInfo.barriers.push_back({ i, j });
+							if (field.size() != 2)
+								field[i][j] = barrier;
+						}
+						else if (env->getCell({ i,j }) == interest_point) {
+							currInfo.pointsOfInterest.push_back({ i, j });
+							if (field.size() != 2)
+								field[i][j] = interest_point;
+						}
+						else if ((field.size() != 2) && (field[i][j] == notexist)) {
+							currInfo.allpoints.push_back({ i, j });
+							field[i][j] = ai_seen;
+						}
+
+						vector<Components_N::Component*>* comp = env->getComponents();
+						vector<Components_N::Component*>::iterator it;
+
+						it = comp->begin();
+
+						while (it != comp->end())
+						{
+							if ((i == (*it)->getCoord().x) && (j == (*it)->getCoord().y)) {
+								if (field.size() != 2) {
+									switch ((*it)->iAm()) {
+									case robot_commander:
+										field[i][j] = rc;
+										break;
+									case observe_center:
+										field[i][j] = oc;
+										break;
+									case robot_scout:
+										if (field[i][j] != rsd)
+											field[i][j] = rs;
+										break;
+									case command_center:
+										field[i][j] = cc;
+										break;
+									}
+								}
+								currInfo.components.push_back(*it);
+							}
+							++it;
+						}
+					}
+					else if ((env->getCell({ i,j }) == notexist) && (i != curr_location.x || j != curr_location.y)) {
+						if ((field.size() != 2) && (field[i][j] == notexist)) {
+							field[i][j] = border;
+						}
 					}
 				}
 			}

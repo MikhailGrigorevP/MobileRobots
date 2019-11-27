@@ -5,6 +5,8 @@
 #include <iostream>
 #include "../Structures/structures.h"
 #include <vector>
+#include <map>
+using std::map;
 
 class render
 {
@@ -34,10 +36,13 @@ public:
 
 	SDL_Window* window = nullptr;
 	render(const char* title, int xpos, int ypos, int width, int height, bool fullscreen);
-	void render_map(vector<vector<unsigned>>& field);
+	void render_map(vector<vector<unsigned>>& field, map<Point, Point> prev);
 	~render() {};
 
 	void add_texture_to_render(SDL_Texture* texture, SDL_Rect* _dst);
 	void init_texture();
+	void init_text(vector<char const*> budget);
+	void test();
+	void stop();
 };
 #endif
