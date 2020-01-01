@@ -93,6 +93,7 @@
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
+      <AdditionalDependencies>SDL2.lib;SDL2main.lib;SDL2test.lib;SDL2_ttf.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -130,6 +131,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AI\AI.cpp" />
+    <ClCompile Include="AI_THREAD\AI_T.cpp" />
     <ClCompile Include="Component\Component.cpp" />
     <ClCompile Include="environmentDescriptor\environmentDescriptor.cpp" />
     <ClCompile Include="mobileRobots.cpp" />
@@ -138,6 +140,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AI\AI.h" />
+    <ClInclude Include="AI_THREAD\AI_T.h" />
     <ClInclude Include="Component\Component.h" />
     <ClInclude Include="environmentDescriptor\environmentDescriptor.h" />
     <ClInclude Include="Module\Module.h" />

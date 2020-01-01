@@ -30,6 +30,7 @@
 			* Coming soon
 			*/
 
+#include "AI_THREAD/AI_T.h"
 #include "AI/AI.h"
 #include "environmentDescriptor/environmentDescriptor.h"
 #include <iostream>
@@ -43,16 +44,16 @@ const unsigned budget = 2000;
 #include "SDL.h"
 using namespace Components_N;
 using namespace Modules_N;
-using namespace AI_N;
 using namespace ED_N;
 
-const char* MENU_0[]{ "1. Work with Environment", "2. Work with components", "3. Show all information", "4. Find points of interest", "0. Exit" };
+const char* MENU_0[]{ "1. Work with Environment", "2. Work with components", "3. Show all information", "4. [WHILE] Find points of interest", "5. [THREADS] Find points of interest",  "0. Exit" };
 const unsigned menu_0_SZ = sizeof(MENU_0) / sizeof(MENU_0[0]);
 void WorkWithEnvironment(ED_N::environmentDescriptor& environment);
 void WorkWithComponents(ED_N::environmentDescriptor& environment);
 void ShowAllInformation(ED_N::environmentDescriptor& environment);
 void FindInterestPoints(ED_N::environmentDescriptor& environment);
-vector<std::function<void(ED_N::environmentDescriptor&)> > menu_1 = { WorkWithEnvironment, WorkWithComponents, ShowAllInformation, FindInterestPoints };
+void T_FindInterestPoints(ED_N::environmentDescriptor& environment);
+vector<std::function<void(ED_N::environmentDescriptor&)> > menu_1 = { WorkWithEnvironment, WorkWithComponents, ShowAllInformation, FindInterestPoints, T_FindInterestPoints };
 
 const char* MENU_1[]{ "1. Set field", "2. Get field size", "3. Set cell info", "4. Get cell info", "5. Add component to field", "0. <- Back to Main menu" };
 const unsigned menu_1_SZ = sizeof(MENU_1) / sizeof(MENU_1[0]);
@@ -476,7 +477,43 @@ void FindInterestPoints(ED_N::environmentDescriptor& environment) {
 	shop.push_back(mod_2);
 
 
-	AI _AI(2200, shop);
+	AI_N::AI _AI(2200, shop);
+
+	vector<Point> pointsOfInterest;
+	pointsOfInterest = _AI.findInterestPoints(&environment);
+
+	vector<Point>::iterator p_it;
+
+	std::cout << "Points of interest: ";
+
+	if (pointsOfInterest.size() != 0) {
+		p_it = pointsOfInterest.begin();
+		while (p_it != pointsOfInterest.end())
+		{
+			std::cout << "(" << (*p_it).x << ";" << (*p_it).y << ") ";
+			++p_it;
+		}
+	}
+	else
+		std::cout << "points weren't found";
+
+	std::cout << std::endl;
+	std::cout << std::endl;
+	return;
+};
+
+
+void T_FindInterestPoints(ED_N::environmentDescriptor& environment) {
+	vector<Modules_N::Module*> shop;
+
+	sensorModule* mod_1 = new sensorModule(0, 1, 150, 500, 5, 60, 3);
+	shop.push_back(mod_1);
+
+	sensorModule* mod_2 = new sensorModule(0, 1, 150, 1500, 5, 60, 3);
+	shop.push_back(mod_2);
+
+
+	AI_T_N::AI _AI(2200, shop);
 
 	vector<Point> pointsOfInterest;
 	pointsOfInterest = _AI.findInterestPoints(&environment);

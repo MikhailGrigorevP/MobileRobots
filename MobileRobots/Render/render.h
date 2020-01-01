@@ -40,9 +40,16 @@ public:
 	~render() {};
 
 	void add_texture_to_render(SDL_Texture* texture, SDL_Rect* _dst);
+
+	void play();
 	void init_texture();
 	void init_text(vector<char const*> budget);
-	void test();
 	void stop();
+
+	void start();
+	void updateFireIntensityPerPixel(int);
+	void renderFire();
+	void calculateFirePropagation();
+
 };
 #endif

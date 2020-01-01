@@ -10,100 +10,7 @@ void render::add_texture_to_render(SDL_Texture* texture, SDL_Rect* _dst) {
 	SDL_RenderCopy(renderer, texture, NULL, _dst);
 }
 
-typedef struct {
-	SDL_Rect draw_rect;    // dimensions of button
-	struct {
-		Uint8 r, g, b, a;
-	} colour;
 
-	bool pressed;
-} button_t;
-
-static void button_process_event(button_t* btn, const SDL_Event* ev) {
-	// react on mouse click within button rectangle by setting 'pressed'
-	if (ev->type == SDL_MOUSEBUTTONDOWN) {
-		if (ev->button.button == SDL_BUTTON_LEFT &&
-			ev->button.x >= btn->draw_rect.x &&
-			ev->button.x <= (btn->draw_rect.x + btn->draw_rect.w) &&
-			ev->button.y >= btn->draw_rect.y &&
-			ev->button.y <= (btn->draw_rect.y + btn->draw_rect.h)) {
-			btn->pressed = true;
-		}
-	}
-}
-
-static bool button(SDL_Renderer* r, button_t* btn) {
-	// draw button
-	SDL_SetRenderDrawColor(r, btn->colour.r, btn->colour.g, btn->colour.b, btn->colour.a);
-	SDL_RenderFillRect(r, &btn->draw_rect);
-
-	// if button press detected - reset it so it wouldn't trigger twice
-	if (btn->pressed) {
-		btn->pressed = false;
-		return true;
-	}
-	return false;
-}
-
-void render::test() {
-	int quit = 0;
-
-	SDL_Texture* txt = NULL;
-
-	SDL_Rect rct;
-	rct.x = 0;
-	rct.y = 0;
-	rct.h = 500;
-	rct.w = 800;
-
-	// button state - colour and rectangle
-	button_t start_button;
-	start_button.colour.r = 255;
-	start_button.colour.g = 255;
-	start_button.colour.b = 255;
-	start_button.colour.a = 255;
-
-	start_button.draw_rect = { 28, 128,128,  128 };
-
-	enum states {
-		STATE_IN_MENU,
-		STATE_IN_GAME,
-	} ;
-	bool state = STATE_IN_MENU;
-	while (!quit) {
-		SDL_Event evt;    // no need for new/delete, stack is fine
-
-		// event loop and draw loop are separate things, don't mix them
-		while (SDL_PollEvent(&evt)) {
-			// quit on close, window close, or 'escape' key hit
-			if (evt.type == SDL_QUIT ||
-				(evt.type == SDL_WINDOWEVENT && evt.window.event == SDL_WINDOWEVENT_CLOSE) ||
-				(evt.type == SDL_KEYDOWN && evt.key.keysym.sym == SDLK_ESCAPE)) {
-				quit = 1;
-			}
-
-			// pass event to button
-			button_process_event(&start_button, &evt);
-		}
-
-		SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
-		SDL_RenderClear(renderer);
-
-		//      SDL_RenderCopy(renderer, txt, NULL, &rct);
-
-		if (state == STATE_IN_MENU) {
-			if (button(renderer, &start_button)) {
-				printf("start button pressed\n");
-				state = STATE_IN_GAME;   // state change - button will not be drawn anymore
-			}
-		}
-		else if (state == STATE_IN_GAME) {
-			/* your game logic */
-		}
-
-		SDL_RenderPresent(renderer);
-	}
-}
 
 void render::init_texture() {
 
@@ -181,6 +88,23 @@ render::render(const char* title, int xpos, int ypos, int width, int height, boo
 }
 
 #include <string>
+#include <math.h>
+
+
+#include <time.h>
+
+int WINDOW_WIDTH = 1024;
+int WINDOW_HEIGHT = 946;
+
+SDL_Window* window;
+SDL_Renderer* renderer;
+
+int fireSize = 16;
+int firePixelsArray[50000000] = { 0 };
+int numberOfPixels = 0;
+
+int fireColorsPalette[37][3] = { {7, 7, 7}, {31, 7, 7}, {47, 15, 7}, {71, 15, 7}, {87, 23, 7}, {103, 31, 7}, {119, 31, 7}, {143, 39, 7}, {159, 47, 7}, {175, 63, 7}, {191, 71, 7}, {199, 71, 7}, {223, 79, 7}, {223, 87, 7}, {223, 87, 7}, {215, 95, 7}, {215, 95, 7}, {215, 103, 15}, {207, 111, 15}, {207, 119, 15}, {207, 127, 15}, {207, 135, 23}, {199, 135, 23}, {199, 143, 23}, {199, 151, 31}, {191, 159, 31}, {191, 159, 31}, {191, 167, 39}, {191, 167, 39}, {191, 175, 47}, {183, 175, 47}, {183, 183, 47}, {183, 183, 55}, {207, 207, 111}, {223, 223, 159}, {239, 239, 199}, {255, 255, 255} };
+
 using std::string;
 
 void render::init_text(vector<char const*> budget) {
@@ -200,7 +124,12 @@ void render::init_text(vector<char const*> budget) {
 
 	budget.push_back(budget[budget.size()-3]);
 
-	for (size_t i = 0; i < budget.size(); i++)
+	int start_p = 0;
+	if (budget.size() >= 40) {
+		start_p = budget.size() - 40;
+	}
+
+	for (size_t i = 0 + start_p; i < budget.size(); i++)
 	{
 
 
@@ -215,7 +144,7 @@ void render::init_text(vector<char const*> budget) {
 		r.x = 25;
 		r.w = 40;
 		r.h = 20;
-		r.y = 20 + r.h*i;
+		r.y = 20 + r.h*(i- start_p);
 
 	   
 		SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer, surface);
@@ -413,45 +342,160 @@ void render::render_map(vector<vector<unsigned>>& field, map<Point, Point> prev)
 
 }
 
-void render::stop() {
 
+void render::start() {
+	numberOfPixels = (WINDOW_WIDTH / fireSize) * (WINDOW_HEIGHT / fireSize);
+	for (int i = 0; i < numberOfPixels; i++) {
+		firePixelsArray[i] = 36;
+	}
+}
+
+void render::updateFireIntensityPerPixel(int currentPixelIndex) {
+	int belowPixelIndex = currentPixelIndex + (WINDOW_WIDTH / fireSize);
+	if (belowPixelIndex < numberOfPixels) {
+		int decay = floor(rand() % 3);
+		int belowPixelFireIntensity = firePixelsArray[belowPixelIndex];
+		int newFireIntensity =
+			belowPixelFireIntensity - decay >= 0 ? belowPixelFireIntensity - decay : 0;
+		int pos = (currentPixelIndex - decay >= 0) ? currentPixelIndex - decay : 0;
+		firePixelsArray[pos] = newFireIntensity;
+	}
+}
+
+void render::renderFire() {
+	SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
 	SDL_RenderClear(renderer);
+	for (int x = 0; x < WINDOW_WIDTH; x += fireSize) {
+		for (int y = 0; y < WINDOW_HEIGHT; y += fireSize) {
+			int p = x + ((WINDOW_WIDTH / fireSize) * y);
+			int pixelIndex = p / fireSize;
+			int fireIntensity = firePixelsArray[pixelIndex];
+			int colorR = fireColorsPalette[fireIntensity][0];
+			int colorG = fireColorsPalette[fireIntensity][1];
+			int colorB = fireColorsPalette[fireIntensity][2];
+			SDL_SetRenderDrawColor(renderer, colorR, colorG, colorB, 255);
+			SDL_Rect rectToDraw = { x, y, x + fireSize, y + fireSize };
+			SDL_RenderFillRect(renderer, &rectToDraw);
+		}
+	}
+	SDL_RenderPresent(renderer);
+}
+
+void render::calculateFirePropagation() {
+	renderFire();
+	for (int i = 0; i < numberOfPixels; i++) {
+		updateFireIntensityPerPixel(i);
+	}
+}
+
+
+void render::play() {
 	SDL_SetRenderTarget(renderer, NULL);
 	TTF_Init();
+	TTF_Font* font = TTF_OpenFont("ps.ttf", 300);
+
+	SDL_Color color = { 204, 255, 204 };
+	SDL_Surface* surface = TTF_RenderText_Solid(font,
+		"Start", color);
+
+	SDL_Rect r;
+
+	r.w = 180;
+	r.h = 100;
+
+	int x = (_map_source->w - r.w) / 2;
+	int y = (_map_source->h- r.h) / 2;
+
+	r.x = x;
+	r.y = y;
+
+	SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer, surface);
+	SDL_RenderCopy(renderer, texture, NULL, &r);
+
+	SDL_RenderPresent(renderer);
+	bool working = true;
+	while (working) {
+		int x;
+		int y;
+
+			SDL_Event e;
+			while (SDL_PollEvent(&e)) {
+				switch (e.type)
+				case SDL_MOUSEBUTTONDOWN:
+					if (e.button.button == SDL_BUTTON_LEFT) {
+						working = false;
+						//SDL_GetMouseState(&x, &y);
+					}
+					break;
+			}
+	}
+
+SDL_DestroyTexture(texture);
+SDL_FreeSurface(surface);
+TTF_CloseFont(font);
+}
+
+void render::stop() {
+
+	srand(time(NULL));
+
+	SDL_SetRenderTarget(renderer, NULL);
+	start();
+
+	TTF_Init();
+	TTF_Font* font = TTF_OpenFont("ps.ttf", 300);
+
+	SDL_Color color = { 255, 2, 2 };
+	SDL_Surface* surface = TTF_RenderText_Solid(font,
+		"Game over", color);
+
+	SDL_Rect r;
+
+	r.w = 200;
+	r.h = 50;
+
+	int x = (_map_source->w - r.w) / 2;
+	int y = 200;
+
+	r.x = x;
+	r.y = y;
 
 
-		TTF_Font* font = TTF_OpenFont("ps.ttf", 300);
+	SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer, surface);
 
-		SDL_Color color = { 255, 2, 2 };
-		SDL_Surface* surface = TTF_RenderText_Solid(font,
-			"Game over", color);
+	bool is_running = true;
+	SDL_Event event;
+	while (is_running) {
+		while (SDL_PollEvent(&event)) {
+			if (event.type == SDL_QUIT) {
+				is_running = false;
+			}
+			else if(event.type == SDL_MOUSEBUTTONDOWN)
+				if (event.button.button == SDL_BUTTON_LEFT) {
+					is_running = false;
+					//SDL_GetMouseState(&x, &y);
+				}
+		}
 
-		SDL_Rect r;
+		calculateFirePropagation();
 
-		r.w = 200;
-		r.h = 50;
-
-		int x = (_map_source->w - r.w) / 2;
-		int y = (_map_source->h - r.h) / 2;
-
-		r.x = x;
-		r.y = y;
-
-
-		SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer, surface);
 		SDL_RenderCopy(renderer, texture, NULL, &r);
 
 		SDL_RenderPresent(renderer);
+		SDL_Delay(50);
 
-		SDL_DestroyTexture(texture);
-		SDL_FreeSurface(surface);
-		TTF_CloseFont(font);
-	
+	}
+
+
+	SDL_DestroyTexture(texture);
+	SDL_FreeSurface(surface);
+	TTF_CloseFont(font);
+
 
 	TTF_Quit();
-	SDL_Delay(10000);
 
 	SDL_DestroyRenderer(renderer);
 	SDL_DestroyWindow(window);
 	SDL_Quit();
 }
+

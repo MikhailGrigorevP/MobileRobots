@@ -268,13 +268,13 @@ namespace AI_N {
 	vector<vector<stack<Point>>> _stacks;
 	void AI::dfs(ED_N::environmentDescriptor* environment, vector<vector<unsigned>>& field, vector<Components_N::managementComponent*> components) {
 
-		const int FPS = 24;
+		const int FPS = 60;
 		const int frameDelay = 1000 / FPS;
 		Uint32 frameStart;
 		int frameTime;
 
 		render* _render = new render("NameOfGame", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1024, 946, false);
-		//_render->test();
+		_render->play();
 		vector<Component*> dead_robots;
 		vector<stack<Point>> _dead_stacks;
 		vector<Point> active_points;
@@ -355,7 +355,7 @@ namespace AI_N {
 			while (component != components.end())
 			{
 
-				
+
 				//show(environment, field);
 				//	showfield(environment->getSize(), visited_vertex);
 
@@ -517,9 +517,6 @@ namespace AI_N {
 												if (((*allpoints).x == field.size() - 1) || ((*allpoints).x < field.size() - 1 && (field[(*allpoints).x + 1][(*allpoints).y] != notexist)))
 													//check down
 													if (((*allpoints).y == field[0].size() - 1) || ((*allpoints).y < field[0].size() - 1 && (field[(*allpoints).x][(*allpoints).y + 1] != notexist))) {
-
-
-
 														//CHECK CELLS AROUND THIS POINT
 
 														int x = (*allpoints).x;
@@ -774,49 +771,461 @@ namespace AI_N {
 					Point nopoint = { -1,-1 };
 					if ((_stacks[c_n][j].size()) && (_stacks[c_n][j].top() == nopoint)) {
 						field[(*component)->getComp(j)->getCoord().x][(*component)->getComp(j)->getCoord().y] = rsd;
+
+
+						for (int i = (*component)->getComp(j)->getModules()->size(); i > 0; i--)
+						{
+
+							budget += (*component)->getComp(j)->getModule(0)->getCost();
+							shop.push_back((*component)->getComp(j)->getModule(0));
+
+							_budget.push_back("");
+
+							char* _string1 = new char[12];
+							strcpy_s(_string1, 12, "+");
+							char* _string2 = new char[10];
+							sprintf_s(_string2, 10, "%d", (*component)->getComp(j)->getModule(0)->getCost());
+							strcat_s(_string1, 12, _string2);
+							_budget.push_back(_string1);
+
+							char* _string12 = new char[12];
+							strcpy_s(_string12, 12, "Sensor sold");
+							_budget.push_back(_string12);
+
+							(*component)->getComp(j)->deleteModule(0);
+
+
+						}
 						continue;
 					}
 
-
-				//CHECK SHOP
-
+					//CHECK SHOP
 					if (shop.size() != 0) {
+						//
+						//	CHECKING GENERATOR
+						//
 
-						for (size_t i = 0; i < shop.size(); i++)
+						int check_man = -1;
+						int check_generator = -1;
+						int check_sensor = -1;
+						int shop_generator = 0;
+						int shop_man = -1;
+
+						int num = 0;
+
+						vector<Module*>::iterator m_iter = (*component)->getComp(j)->getModules()->begin();
+						for (m_iter; m_iter != (*component)->getComp(j)->getModules()->end(); ++m_iter, ++num)
 						{
-							if (shop[i]->getCost() < budget) {
+							if ((*m_iter)->iAm() == generator_Module) {
+								if (check_generator < 0) {
+									check_generator = num;
+								}
+								else {
+
+									int s = dynamic_cast<generatorModule*>((*component)->getComp(j)->getModule(check_generator))->getEnergyProvision();
+									int new_s = dynamic_cast<generatorModule*>((*component)->getComp(j)->getModule(num))->getEnergyProvision();
+
+									// IF NEW SENSOR CAS SEE FAR
+									if (new_s > s) {
+
+										//SELL S2
+										budget += (*component)->getComp(j)->getModule(check_generator)->getCost();
+										shop.push_back((*component)->getComp(j)->getModule(check_generator));
+
+										_budget.push_back("");
+
+										char* _string1 = new char[12];
+										strcpy_s(_string1, 12, "+");
+										char* _string2 = new char[10];
+										sprintf_s(_string2, 10, "%d", (*component)->getComp(j)->getModule(check_generator)->getCost());
+										strcat_s(_string1, 12, _string2);
+										_budget.push_back(_string1);
+
+										char* _string12 = new char[12];
+										strcpy_s(_string12, 12, "Sensor sold");
+										_budget.push_back(_string12);
+
+										(*component)->getComp(j)->deleteModule(check_generator);
+
+										if (check_man > check_generator)
+											--check_man;
+										if (check_sensor > check_generator)
+											--check_sensor;
+
+										check_generator = num - 1;
+										--num;
+										--m_iter;
+										continue;
+
+									}
+									else {
+
+										//SELL S2
+										budget += (*component)->getComp(j)->getModule(num)->getCost();
+										shop.push_back((*component)->getComp(j)->getModule(num));
+										_budget.push_back("");
+
+										char* _string1 = new char[12];
+										strcpy_s(_string1, 12, "+");
+										char* _string2 = new char[10];
+										sprintf_s(_string2, 10, "%d", (*component)->getComp(j)->getModule(num)->getCost());
+										strcat_s(_string1, 12, _string2);
+										_budget.push_back(_string1);
+
+										char* _string12 = new char[12];
+										strcpy_s(_string12, 12, "Sensor sold");
+										_budget.push_back(_string12);
+
+										(*component)->getComp(j)->deleteModule(num);
+										--num;
+										--m_iter;
+										continue;
+									}
+								}
+							}
+
+							if ((*m_iter)->iAm() == sensor_Module) {
+
+								if (check_sensor < 0) {
+									check_sensor = num;
+								}
+								else {
+
+									int s = (dynamic_cast<sensorModule*>((*component)->getComp(j)->getModule(check_sensor))->getAng())* (dynamic_cast<sensorModule*>((*component)->getComp(j)->getModule(check_sensor))->getR());
+									int new_s = (dynamic_cast<sensorModule*>((*component)->getComp(j)->getModule(num))->getAng())* (dynamic_cast<sensorModule*>((*component)->getComp(j)->getModule(num))->getR());
+
+									// IF NEW SENSOR CAS SEE FAR
+									if (new_s > s) {
+
+										//SELL S2
+										budget += (*component)->getComp(j)->getModule(check_sensor)->getCost();
+										shop.push_back((*component)->getComp(j)->getModule(check_sensor));
+
+										_budget.push_back("");
+
+										char* _string1 = new char[12];
+										strcpy_s(_string1, 12, "+");
+										char* _string2 = new char[10];
+										sprintf_s(_string2, 10, "%d", (*component)->getComp(j)->getModule(check_sensor)->getCost());
+										strcat_s(_string1, 12, _string2);
+										_budget.push_back(_string1);
+
+										char* _string12 = new char[12];
+										strcpy_s(_string12, 12, "Sens sold");
+										_budget.push_back(_string12);
+
+										(*component)->getComp(j)->deleteModule(check_sensor);
+
+										if (check_generator > check_sensor)
+											--check_generator;
+										if (check_man > check_sensor)
+											--check_man;
+
+										check_sensor = num - 1;
+										--num;
+										--m_iter;
+										continue;
+
+									}
+									else {
+
+										//SELL S2
+										budget += (*component)->getComp(j)->getModule(num)->getCost();
+										shop.push_back((*component)->getComp(j)->getModule(num));
+										_budget.push_back("");
+
+										char* _string1 = new char[12];
+										strcpy_s(_string1, 12, "+");
+										char* _string2 = new char[10];
+										sprintf_s(_string2, 10, "%d", (*component)->getComp(j)->getModule(num)->getCost());
+										strcat_s(_string1, 12, _string2);
+										_budget.push_back(_string1);
+
+										char* _string12 = new char[12];
+										strcpy_s(_string12, 12, "Sens sold");
+										_budget.push_back(_string12);
+
+										(*component)->getComp(j)->deleteModule(num);
+										--num;
+										--m_iter;
+										continue;
+									}
+								}
+							}
+
+							/*if ((*m_iter)->iAm() == management_Module) {
+
+								if (check_man < 0) {
+									check_man = num;
+								}
+								else {
+
+									int s = (dynamic_cast<managementModule*>((*component)->getComp(j)->getModule(check_man))->getN())* (dynamic_cast<managementModule*>((*component)->getComp(j)->getModule(check_man))->getR());
+									int new_s = (dynamic_cast<managementModule*>((*component)->getComp(j)->getModule(num))->getN())* (dynamic_cast<managementModule*>((*component)->getComp(j)->getModule(num))->getR());
+
+									// IF NEW SENSOR CAS SEE FAR
+									if (new_s > s) {
+
+										//SELL S2
+										budget += (*component)->getComp(j)->getModule(check_man)->getCost();
+										shop.push_back((*component)->getComp(j)->getModule(check_man));
+
+										_budget.push_back("");
+
+										char* _string1 = new char[12];
+										strcpy_s(_string1, 12, "+");
+										char* _string2 = new char[10];
+										sprintf_s(_string2, 10, "%d", (*component)->getComp(j)->getModule(check_man)->getCost());
+										strcat_s(_string1, 12, _string2);
+										_budget.push_back(_string1);
+
+										char* _string12 = new char[12];
+										strcpy_s(_string12, 12, "Sensor sold");
+										_budget.push_back(_string12);
+
+										(*component)->getComp(j)->deleteModule(check_man);
+
+										if (check_generator > check_man)
+											--check_generator;
+										if (check_sensor > check_man)
+											--check_sensor;
+
+										check_man = num - 1;
+										--num;
+										--m_iter;
+										continue;
+
+									}
+									else {
+
+										//SELL S2
+										budget += (*component)->getComp(j)->getModule(num)->getCost();
+										shop.push_back((*component)->getComp(j)->getModule(num));
+										_budget.push_back("");
+
+										char* _string1 = new char[12];
+										strcpy_s(_string1, 12, "+");
+										char* _string2 = new char[10];
+										sprintf_s(_string2, 10, "%d", (*component)->getComp(j)->getModule(num)->getCost());
+										strcat_s(_string1, 12, _string2);
+										_budget.push_back(_string1);
+
+										char* _string12 = new char[12]; 
+										strcpy_s(_string12, 12, "Sensor sold");
+										_budget.push_back(_string12);
+
+										(*component)->getComp(j)->deleteModule(num);
+										--num;
+										--m_iter;
+										continue;
+									}
+								}
+							}*/
+
+						}
+
+						if (check_generator == -1) {
+
+							vector<Module*>::iterator m_shop_iter = shop.begin();
+							for (m_shop_iter; m_shop_iter != shop.end(); ++m_shop_iter)
+							{
+								if ((*m_shop_iter)->iAm() == generator_Module)
+									break;
+								++shop_generator;
+							}
+
+							if ((shop_generator != -1) && budget > shop[shop_generator]->getCost()) {
 								if ((*component)->getComp(j)->getModules()->size() < (*component)->getComp(j)->getSlotsNum()) {
-									(*component)->getComp(j)->setModule_s(static_cast<sensorModule*>(shop[i]));
-									(*component)->getComp(j)->moduleOn((*component)->getComp(j)->getModules()->size() - 1);
-									vector<Module*>::iterator iter = shop.begin();
+
+									(*component)->getComp(j)->setModule_g(dynamic_cast<generatorModule*>(shop[shop_generator]));
+
+									//Budget setting
+									budget -= shop[shop_generator]->getCost();
 
 									_budget.push_back("");
 
-									char* _string1 = new char [12];
+									char* _string1 = new char[12];
 									strcpy_s(_string1, 12, "-");
 									char* _string2 = new char[10];
-									sprintf_s(_string2, 10, "%d", shop[i]->getCost());
+									sprintf_s(_string2, 10, "%d", shop[shop_generator]->getCost());
 									strcat_s(_string1, 12, _string2);
 									_budget.push_back(_string1);
 
 									char* _string12 = new char[12];
-									strcpy_s(_string12, 12, "for SM");
+									strcpy_s(_string12, 12, "Gen bought");
 									_budget.push_back(_string12);
-									
+
+									shop.erase(shop.begin() + shop_generator);
+									check_generator = (*component)->getComp(j)->getModules()->size() - 1;
+								}
+							}
+						}
+
+						if (check_sensor == -1) {
+
+							int i = 0;
+
+							vector<Module*>::iterator m_shop_iter = shop.begin();
+							for (m_shop_iter; m_shop_iter != shop.end(); ++m_shop_iter)
+							{
+								if ((*m_shop_iter)->iAm() == robot_scout)
+									break;
+								++i;
+							}
+
+							(*component)->getComp(j)->setModule_s(dynamic_cast<sensorModule*>(shop[i]));
+
+							(*component)->getComp(j)->moduleOn((*component)->getComp(j)->getModules()->size() - 1);
+
+							//
+							// BUY SENSOR
+							//
+
+							vector<Module*>::iterator iter = shop.begin();
+
+							_budget.push_back("");
+
+							char* e_string1 = new char[12];
+							strcpy_s(e_string1, 12, "-");
+							char* e_string2 = new char[10];
+							sprintf_s(e_string2, 10, "%d", shop[i]->getCost());
+							strcat_s(e_string1, 12, e_string2);
+							_budget.push_back(e_string1);
+
+							char* e_string12 = new char[12];
+							strcpy_s(e_string12, 12, "for sens");
+							_budget.push_back(e_string12);
+
+							budget -= shop[i]->getCost();
+
+							char* e_string21 = new char[12];
+							strcpy_s(e_string21, 12, "=");
+							char* e_string22 = new char[10];
+							sprintf_s(e_string22, 10, "%d", budget);
+							strcat_s(e_string21, 12, e_string22);
+							_budget.push_back(e_string21);
+
+							shop.erase(iter + i);
+
+							(*component)->getComp(j)->moduleOn((*component)->getComp(j)->getModules()->size() - 1);
+							check_sensor = (*component)->getComp(j)->getModules()->size() - 1;
+						}
+
+						/*if (check_man == -1) {
+
+							vector<Module*>::iterator m_shop_iter = shop.begin();
+							for (m_shop_iter; m_shop_iter != shop.end(); ++m_shop_iter)
+							{
+								if ((*m_shop_iter)->iAm() == management_Module)
+									break;
+								++shop_man;
+							}
+
+							if ((check_man != -1) && budget > shop[shop_man]->getCost()) {
+								if ((*component)->getComp(j)->getModules()->size() < (*component)->getComp(j)->getSlotsNum()) {
+									(*component)->getComp(j)->setModule_s(dynamic_cast<sensorModule*>(shop[shop_man]));
+									(*component)->getComp(j)->moduleOn((*component)->getComp(j)->getModules()->size() - 1);
+
+									//Budget setting
+									budget -= shop[shop_man]->getCost();
+
+									_budget.push_back("");
+
+									char* _string1 = new char[12];
+									strcpy_s(_string1, 12, "-");
+									char* _string2 = new char[10];
+									sprintf_s(_string2, 10, "%d", shop[shop_man]->getCost());
+									strcat_s(_string1, 12, _string2);
+									_budget.push_back(_string1);
+
+									char* _string12 = new char[12];
+									strcpy_s(_string12, 12, "Man bought");
+									_budget.push_back(_string12);
+
+									shop.erase(shop.begin() + shop_man);
+									check_man = (*component)->getComp(j)->getModules()->size() - 1;
+								}
+							}
+						}*/
+
+
+						for (size_t i = 0; i < shop.size(); i++)
+						{
+
+							if ((shop[i]->getCost() < budget) && shop[i]->iAm() == sensor_Module) {
+
+
+								int s = (dynamic_cast<sensorModule*>((*component)->getComp(j)->getModule(check_sensor))->getAng())* (dynamic_cast<sensorModule*>((*component)->getComp(j)->getModule(check_sensor))->getR());
+								int new_s = (dynamic_cast<sensorModule*>(shop[i])->getAng()) * (dynamic_cast<sensorModule*>(shop[i])->getR());
+
+								if (new_s > s) {
+
+									//
+									// SELL SENSOR
+									//
+
+									budget += (*component)->getComp(j)->getModule(check_sensor)->getCost();
+									shop.push_back((*component)->getComp(j)->getModule(check_sensor));
+
+
+									_budget.push_back("");
+
+									char* _string1 = new char[12];
+									strcpy_s(_string1, 12, "+");
+									char* _string2 = new char[10];
+									sprintf_s(_string2, 10, "%d", (*component)->getComp(j)->getModule(check_sensor)->getCost());
+									strcat_s(_string1, 12, _string2);
+									_budget.push_back(_string1);
+
+									char* _string12 = new char[12];
+									strcpy_s(_string12, 12, "SM sold");
+									_budget.push_back(_string12);
+
+									(*component)->getComp(j)->deleteModule(check_sensor);
+
+									//
+									// SET NEW
+									//
+
+
+									(*component)->getComp(j)->setModule_s(dynamic_cast<sensorModule*>(shop[i]));
+
+									(*component)->getComp(j)->moduleOn((*component)->getComp(j)->getModules()->size() - 1);
+
+
+									//
+									// BUY SENSOR
+									//
+
+									vector<Module*>::iterator iter = shop.begin();
+
+									_budget.push_back("");
+
+									char* e_string1 = new char[12];
+									strcpy_s(e_string1, 12, "-");
+									char* e_string2 = new char[10];
+									sprintf_s(e_string2, 10, "%d", shop[i]->getCost());
+									strcat_s(e_string1, 12, e_string2);
+									_budget.push_back(e_string1);
+
+									char* e_string12 = new char[12];
+									strcpy_s(e_string12, 12, "for sens");
+									_budget.push_back(e_string12);
+
 									budget -= shop[i]->getCost();
 
-									char* _string21 = new char[12];
-									 strcpy_s(_string21, 12, "=");
-									 char* _string22 = new char[10];
-									sprintf_s(_string22, 10, "%d", budget);
-									strcat_s(_string21, 12, _string22);
-									_budget.push_back(_string21);
-
-
+									char* e_string21 = new char[12];
+									strcpy_s(e_string21, 12, "=");
+									char* e_string22 = new char[10];
+									sprintf_s(e_string22, 10, "%d", budget);
+									strcat_s(e_string21, 12, e_string22);
+									_budget.push_back(e_string21);
 
 									shop.erase(iter + i);
+
+									(*component)->getComp(j)->moduleOn((*component)->getComp(j)->getModules()->size() - 1);
+									check_sensor = (*component)->getComp(j)->getModules()->size() - 1;
 									i--;
-									break;
 								}
 							}
 						}
@@ -904,54 +1313,26 @@ namespace AI_N {
 											int x = (*allpoints).x;
 											int y = (*allpoints).y;
 
-											Point vertex = { x, y };
-
-											vector<Vertex> newVertex;
-											Point test_point;
-
 											int n = 0;
-
 
 											if ((x == 0) || ((x > 0) && ((field[x - 1][y] == interest_point) || (field[x - 1][y] == border) || (field[x - 1][y] == barrier)))) {
 												++n;
 											}
-											
+
 											if ((y == 0) || ((y > 0) && ((field[x][y - 1] == interest_point) || (field[x][y - 1] == border) || (field[x][y - 1] == barrier)))) {
 												++n;
 											}
-											
+
 											if ((y == environment->getSize().m - 1) || ((y < environment->getSize().m - 1) && (field[x][y + 1] == interest_point || field[x][y + 1] == border || (field[x][y + 1] == barrier)))) {
 												++n;
 											}
-											
+
 											if ((x == environment->getSize().n - 1) || ((x < environment->getSize().n - 1) && (field[x + 1][y] == interest_point || field[x + 1][y] == border || (field[x + 1][y] == barrier)))) {
 												++n;
 											}
-											
+
 											if (n > 2)
 												visited_vertex[x][y] = V_visited;
-
-											//test_point = { x - 1, y };
-											//if ((x > 0) && ((field[x - 1][y] == ai_seen) || (field[x - 1][y] == rc)) && visited_vertex[x - 1][y] == V_not) {
-											//	newVertex.push_back({ x - 1, y });
-											//}
-											//
-											//test_point = { x, y - 1 };
-											//if ((y > 0) && ((field[x][y - 1] == ai_seen) || (field[x][y - 1] == rc)) && visited_vertex[x][y - 1] == V_not) {
-											//	newVertex.push_back({ x, y - 1 });
-											//}
-											//
-											//test_point = { x, y + 1 };
-											//if ((y < environment->getSize().m - 1) && ((field[x][y + 1] == ai_seen) || (field[x][y + 1] == rc)) && visited_vertex[x][y + 1] == V_not) {
-											//	newVertex.push_back({ x, y + 1 });
-											//}
-											//
-											//test_point = { x + 1, y };
-											//if ((x < environment->getSize().n - 1) && ((field[x + 1][y] == ai_seen) || (field[x + 1][y] == rc)) && visited_vertex[x + 1][y] == V_not) {
-											//	newVertex.push_back({ x + 1, y });
-											//}
-											//
-											//_graph.insert(pair<Point, vector<Vertex>>(vertex, newVertex));
 										}
 						}
 
@@ -1243,6 +1624,7 @@ namespace AI_N {
 
 
 		}
+		SDL_Delay(5000);
 		_render->stop();
 		return;
 
@@ -1318,8 +1700,15 @@ namespace AI_N {
 		std::cout << "\n Map created by robotic complex before scan:\n\n";
 		showfield(field_Size, field, pointsOfInterest);
 
+		auto begin = std::chrono::steady_clock::now();
+
 		this->dfs(environment, field, components);
 
+		auto end = std::chrono::steady_clock::now();
+
+
+		auto elapsed_ms = std::chrono::duration_cast<std::chrono::milliseconds>(end - begin);
+		std::cout << "\n TIME: " << elapsed_ms.count() << "ms";
 		///////////////////////////////////////////////////////////////
 		///////////////////////////////////////////////////////////////
 
